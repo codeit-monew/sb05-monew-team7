@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: monew
+
+  profiles:
+    active: dev # ?? ?? ?? (local/dev/prod ??? ?? ??)
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/monew
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # (?? ?) create / update / validate / none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/monew
+
+  batch:
+    job:
+      enabled: false # ?? ?? ? ?? ?? ?? ??
+    jdbc:
+      initialize-schema: always
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+aws:
+  s3:
+    bucket: your-bucket-name
+    region: ap-northeast-2
+    access-key: ${AWS_ACCESS_KEY_ID:dummy-access}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:dummy-secret}
