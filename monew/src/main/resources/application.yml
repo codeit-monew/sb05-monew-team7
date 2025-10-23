@@ -1,10 +1,6 @@
 spring:
   application:
     name: monew
-
-  profiles:
-    active: dev # ?? ?? ?? (local/dev/prod ??? ?? ??)
-
   datasource:
     url: jdbc:postgresql://localhost:5432/monew
     username: postgres
@@ -24,11 +20,15 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/monew
 
+    redis:
+      host: localhost    # 또는 redis service name (docker-compose)
+      port: 6379
+
   batch:
     job:
-      enabled: false # ?? ?? ? ?? ?? ?? ??
+      enabled: false
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
 
   servlet:
     multipart:
