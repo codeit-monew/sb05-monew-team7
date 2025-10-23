@@ -1,0 +1,24 @@
+# .github/CODEOWNERS
+
+# 1. 기본 담당자 (Fallback)
+* @Namsoo315
+
+# 2. 구체적인 도메인 담당자
+# user 도메인 담당자
+/monew/src/main/java/com/spring/monew/user/   @kimyumin03
+/monew/src/main/java/com/spring/monew/auth/   @kimyumin03
+# comment 도메인 담당자
+/monew/src/main/java/com/spring/monew/comment/    @kimyumin03
+/monew/src/main/java/com/spring/monew/commentlike/ @kimyumin03
+
+# article 도메인 담당자
+/monew/src/main/java/com/spring/monew/article/    @haram-jo
+/monew/src/main/java/com/spring/monew/articleview/ @haram-jo
+
+# activity 도메인 담당자
+/monew/src/main/java/com/spring/monew/activity/ @yuhandemian
+# notification 도메인 담당자
+/monew/src/main/java/com/spring/monew/notification/ @yuhandemian
+# interest 도메인 담당자
+/monew/src/main/java/com/spring/monew/interest/ @yuhandemian
+/monew/src/main/java/com/spring/monew/subscribe/ @yuhandemian
