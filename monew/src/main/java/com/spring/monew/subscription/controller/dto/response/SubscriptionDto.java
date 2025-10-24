@@ -1,4 +1,4 @@
-package com.spring.monew.subscribe.controller.dto.response;
+package com.spring.monew.subscription.controller.dto.response;
 
 import java.time.Instant;
 import java.util.List;

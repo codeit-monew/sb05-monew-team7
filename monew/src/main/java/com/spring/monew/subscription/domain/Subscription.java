@@ -1,4 +1,4 @@
-package com.spring.monew.subscribe.domain;
+package com.spring.monew.subscription.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
