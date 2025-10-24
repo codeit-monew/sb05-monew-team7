@@ -1,5 +1,6 @@
 package com.spring.monew.user.domain;
 
-public class Test {
-
+public enum UserRole {
+  USER,
+  ADMIN
 }
