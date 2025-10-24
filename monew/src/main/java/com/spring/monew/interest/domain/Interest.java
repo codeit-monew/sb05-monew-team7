@@ -18,6 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class Interest {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)   //PK 자동 삽입
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -29,6 +30,5 @@ public class Interest {
 
     @Column(name = "subscriptions_count", nullable = false)
     @ColumnDefault("0")
-    @Default
-    private long subscriptionsCount = 0L;
+    private long subscriptionsCount;
 }
