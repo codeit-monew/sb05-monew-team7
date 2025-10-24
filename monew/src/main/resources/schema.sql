@@ -1,6 +1,7 @@
 -- ==============================
 -- USERS
 -- ==============================
+CREATE TYPE user_role AS ENUM ('ADMIN','USER');
 CREATE TABLE users
 (
     id         UUID PRIMARY KEY,
@@ -8,6 +9,7 @@ CREATE TABLE users
     nickname   VARCHAR(20)  NOT NULL,
     password   VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL,
+    role       user_role    NOT NULL,
     is_deleted BOOLEAN      NOT NULL DEFAULT FALSE,
     deleted_at TIMESTAMPTZ  NULL
 );
@@ -18,9 +20,9 @@ CREATE TABLE users
 CREATE TABLE interests
 (
     id                  UUID PRIMARY KEY,
-    name                UUID   NOT NULL UNIQUE,
-    keywords            TEXT   NOT NULL,
-    subscriptions_count BIGINT NOT NULL DEFAULT 0
+    name                VARCHAR(255) NOT NULL UNIQUE,
+    keywords            TEXT         NOT NULL,
+    subscriptions_count BIGINT       NOT NULL DEFAULT 0
 );
 
 -- ==============================
@@ -44,7 +46,7 @@ CREATE TABLE subscriptions
 -- ARTICLES
 -- ==============================
 -- Enum 타입에 맞춰서 변경하면 됨
-CREATE TYPE article_resource AS ENUM ('NAVER', 'HANKYUNG', 'CHOSUN', 'YONHAP');
+CREATE TYPE article_resource AS ENUM ('NAVER', 'HANKYUNG', 'CHOSUN', 'YEONHAP');
 
 CREATE TABLE articles
 (
