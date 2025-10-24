@@ -254,7 +254,7 @@ application-*.yml
 # (참고) 단, 기본 설정 파일은 포함되어야 하므로 제외 처리
 !application.properties
 !application.yml
-
+!application-test.yml
 
 # --- AWS Credentials & Keys ---
 # 1. EC2 Private Keys (e.g., my-key-pair.pem)
