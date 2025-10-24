@@ -8,6 +8,7 @@ import com.spring.monew.user.domain.UserRole;
 import com.spring.monew.user.repository.UserRepository;
 import com.sun.nio.sctp.IllegalReceiveException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class UserService {
 
   private final UserRepository userRepository;
-
+  private final PasswordEncoder passwordEncoder;
   /**
    * 회원 등록 처리
    */
@@ -29,7 +30,7 @@ public class UserService {
     User user = User.builder()
         .email(request.email())
         .nickname(request.nickname())
-        .password(request.password()) // 나중에 BCrypt 적용
+        .password(passwordEncoder.encode(request.password()))
         .createdAt(LocalDateTime.now())
         .role(UserRole.USER)
         .isDeleted(false)
