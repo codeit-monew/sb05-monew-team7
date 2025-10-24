@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "comment_like", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"content_id", "user_id"})
+    @UniqueConstraint(columnNames = {"comment_id", "user_id"})
 })
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Builder
@@ -27,7 +27,7 @@ public class CommentLike {
   private UUID id;
 
   @Column(name = "comment_id", nullable = false)
-  private UUID comment_id;
+  private UUID commentId;
 
   @Column(name = "user_id", nullable = false)
   private UUID userId;
