@@ -8,8 +8,10 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "comments")
@@ -33,12 +35,16 @@ public class Comment {
     private Instant createdAt;
 
     @Column(name = "is_deleted", nullable = false)
+    @ColumnDefault("false")
+    @Default
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
     @Column(name = "like_count", nullable = false)
+    @ColumnDefault("0")
+    @Default
     private long likeCount = 0L;
 
     // 연관 관계 (지금은 UUID로만, 이후 필요시 ManyToOne)
