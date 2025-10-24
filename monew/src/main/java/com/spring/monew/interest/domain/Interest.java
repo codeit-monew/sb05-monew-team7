@@ -1,20 +1,24 @@
 package com.spring.monew.interest.domain;
 
 import com.spring.monew.common.converter.KeywordsConverter;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "interests")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Interest {
 
     @Id

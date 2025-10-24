@@ -8,15 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "subscriptions")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Subscription {
 
     @Id
