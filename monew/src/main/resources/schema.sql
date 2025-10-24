@@ -95,7 +95,6 @@ CREATE TABLE comments
     user_id    UUID         NOT NULL,
     content    VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL,
-    updated_at TIMESTAMPTZ  NULL,
     is_deleted BOOLEAN      NOT NULL DEFAULT FALSE,
     deleted_at TIMESTAMPTZ  NULL,
     like_count BIGINT       NOT NULL DEFAULT 0,
@@ -110,13 +109,13 @@ CREATE TABLE comments
 -- ==============================
 -- COMMENT_LIKE
 -- ==============================
-CREATE TABLE comment_like
+CREATE TABLE comment_likes
 (
     id         UUID PRIMARY KEY,
-    content_id UUID        NOT NULL,
+    comment_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    CONSTRAINT fk_like_comment FOREIGN KEY (content_id)
+    CONSTRAINT fk_like_comment FOREIGN KEY (comment_id)
         REFERENCES comments (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_like_user FOREIGN KEY (user_id)
