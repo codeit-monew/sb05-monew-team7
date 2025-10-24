@@ -1,11 +1,11 @@
 package com.spring.monew.article.controller.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public record ArticleRestoreResultDto(
-        LocalDateTime restoreAt,
+        Instant restoreDate,
         List<UUID> restoredArticleIds,
         long restoredArticleCount
 ) {
