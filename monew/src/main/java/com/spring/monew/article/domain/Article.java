@@ -2,14 +2,11 @@ package com.spring.monew.article.domain;
 
 //import com.spring.monew.interest.domain.Interest;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import java.time.Instant;
 import java.util.UUID;
