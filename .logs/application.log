@@ -1,0 +1,439 @@
+25-10-24 13:21:55.941 [background-preinit]  INFO o.h.validator.internal.util.Version  [ |  | ] - HV000001: Hibernate Validator 8.0.3.Final
+25-10-24 13:21:56.556 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - Starting MonewApplication using Java 17.0.15 with PID 11768 (C:\dev_source\sb05-monew-team7\monew\build\classes\java\main started by SW in C:\dev_source\sb05-monew-team7)
+25-10-24 13:21:56.558 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - No active profile set, falling back to 1 default profile: "default"
+25-10-24 13:21:56.913 [restartedMain]  INFO o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [ |  | ] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+25-10-24 13:21:57.244 [restartedMain]  INFO o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [ |  | ] - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+25-10-24 13:22:02.307 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-24 13:22:02.312 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-10-24 13:22:02.685 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 349 ms. Found 1 JPA repository interface.
+25-10-24 13:22:02.699 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-24 13:22:02.700 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+25-10-24 13:22:02.739 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.user.repository.UserRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-24 13:22:02.739 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 37 ms. Found 0 MongoDB repository interfaces.
+25-10-24 13:22:02.756 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-24 13:22:02.758 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+25-10-24 13:22:02.810 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.user.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-24 13:22:02.811 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 36 ms. Found 0 Redis repository interfaces.
+25-10-24 13:22:04.000 [restartedMain]  INFO o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat initialized with port 8080 (http)
+25-10-24 13:22:04.025 [restartedMain]  INFO o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Initializing ProtocolHandler ["http-nio-8080"]
+25-10-24 13:22:04.030 [restartedMain]  INFO o.a.catalina.core.StandardService    [ |  | ] - Starting service [Tomcat]
+25-10-24 13:22:04.030 [restartedMain]  INFO o.a.catalina.core.StandardEngine     [ |  | ] - Starting Servlet engine: [Apache Tomcat/10.1.46]
+25-10-24 13:22:04.149 [restartedMain]  INFO o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring embedded WebApplicationContext
+25-10-24 13:22:04.150 [restartedMain]  INFO o.s.b.w.s.c.ServletWebServerApplicationContext [ |  | ] - Root WebApplicationContext: initialization completed in 6904 ms
+25-10-24 13:22:04.489 [restartedMain] DEBUG o.s.w.f.ServerHttpObservationFilter  [ |  | ] - Filter 'webMvcObservationFilter' configured for use
+25-10-24 13:22:04.574 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Starting...
+25-10-24 13:22:06.050 [restartedMain]  INFO o.h.jpa.internal.util.LogHelper      [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-10-24 13:22:06.189 [restartedMain]  INFO org.hibernate.Version                [ |  | ] - HHH000412: Hibernate ORM core version 6.6.29.Final
+25-10-24 13:22:06.264 [restartedMain]  INFO o.h.c.i.RegionFactoryInitiator       [ |  | ] - HHH000026: Second-level cache disabled
+25-10-24 13:22:07.220 [restartedMain]  INFO o.s.o.j.p.SpringPersistenceUnitInfo  [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-10-24 13:22:07.317 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Starting...
+25-10-24 13:22:08.519 [restartedMain]  WARN o.h.e.jdbc.spi.SqlExceptionHelper    [ |  | ] - SQL Error: 0, SQLState: 3D000
+25-10-24 13:22:08.520 [restartedMain] ERROR o.h.e.jdbc.spi.SqlExceptionHelper    [ |  | ] - ġ��������: "monew" �����ͺ��̽� ����
+25-10-24 13:22:08.522 [restartedMain]  WARN o.h.e.j.e.i.JdbcEnvironmentInitiator [ |  | ] - HHH000342: Could not obtain connection to query metadata
+org.hibernate.exception.GenericJDBCException: unable to obtain isolated JDBC connection [ġ��������: "monew" �����ͺ��̽� ����] [n/a]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:63)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:94)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:116)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:334)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:129)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:81)
+	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:130)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:263)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:238)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:215)
+	at org.hibernate.boot.model.relational.Database.<init>(Database.java:45)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:226)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:194)
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:171)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1442)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1513)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.spring.monew.MonewApplication.main(MonewApplication.java:10)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: org.postgresql.util.PSQLException: ġ��������: "monew" �����ͺ��̽� ����
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2734)
+	at org.postgresql.core.v3.QueryExecutorImpl.readStartupMessages(QueryExecutorImpl.java:2859)
+	at org.postgresql.core.v3.QueryExecutorImpl.<init>(QueryExecutorImpl.java:178)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:344)
+	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
+	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:277)
+	at org.postgresql.Driver.makeConnection(Driver.java:448)
+	at org.postgresql.Driver.connect(Driver.java:298)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:370)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:207)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576)
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:97)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111)
+	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:126)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:485)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:61)
+	... 40 common frames omitted
+25-10-24 13:22:08.578 [restartedMain]  WARN org.hibernate.orm.deprecation        [ |  | ] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+25-10-24 13:22:08.604 [restartedMain]  INFO o.hibernate.orm.connections.pooling  [ |  | ] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (null)']
+	Database driver: undefined/unknown
+	Database version: 12.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-10-24 13:22:08.624 [restartedMain] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry      [ |  | ] - addDescriptor(2003, org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@69d35a9) replaced previous registration(org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@234fceaf)
+25-10-24 13:22:08.625 [restartedMain] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry      [ |  | ] - addDescriptor(6, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@40b47278) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@7c1af8ad)
+25-10-24 13:22:10.642 [restartedMain]  INFO o.h.e.t.j.p.i.JtaPlatformInitiator   [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-10-24 13:22:10.684 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Starting...
+25-10-24 13:22:11.819 [restartedMain]  WARN o.h.e.jdbc.spi.SqlExceptionHelper    [ |  | ] - SQL Error: 0, SQLState: 3D000
+25-10-24 13:22:11.819 [restartedMain] ERROR o.h.e.jdbc.spi.SqlExceptionHelper    [ |  | ] - ġ��������: "monew" �����ͺ��̽� ����
+25-10-24 13:22:11.887 [restartedMain] ERROR o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [ġ��������: "monew" �����ͺ��̽� ����] [n/a]
+25-10-24 13:22:11.888 [restartedMain]  WARN o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [ġ��������: "monew" �����ͺ��̽� ����] [n/a]
+25-10-24 13:22:11.892 [restartedMain]  INFO o.a.catalina.core.StandardService    [ |  | ] - Stopping service [Tomcat]
+25-10-24 13:22:12.015 [restartedMain]  INFO o.s.b.a.l.ConditionEvaluationReportLogger [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-10-24 13:22:12.053 [restartedMain] ERROR o.s.boot.SpringApplication           [ |  | ] - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [ġ��������: "monew" �����ͺ��̽� ����] [n/a]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.spring.monew.MonewApplication.main(MonewApplication.java:10)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [ġ��������: "monew" �����ͺ��̽� ����] [n/a]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:431)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 20 common frames omitted
+Caused by: org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [ġ��������: "monew" �����ͺ��̽� ����] [n/a]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:63)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:94)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:74)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:39)
+	at org.hibernate.tool.schema.internal.exec.ImprovedExtractionContextImpl.getJdbcConnection(ImprovedExtractionContextImpl.java:63)
+	at org.hibernate.tool.schema.extract.spi.ExtractionContext.getQueryResults(ExtractionContext.java:43)
+	at org.hibernate.tool.schema.extract.internal.SequenceInformationExtractorLegacyImpl.extractMetadata(SequenceInformationExtractorLegacyImpl.java:39)
+	at org.hibernate.tool.schema.extract.internal.DatabaseInformationImpl.initializeSequences(DatabaseInformationImpl.java:66)
+	at org.hibernate.tool.schema.extract.internal.DatabaseInformationImpl.<init>(DatabaseInformationImpl.java:60)
+	at org.hibernate.tool.schema.internal.Helper.buildDatabaseInformation(Helper.java:185)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:93)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	... 24 common frames omitted
+Caused by: org.postgresql.util.PSQLException: ġ��������: "monew" �����ͺ��̽� ����
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2734)
+	at org.postgresql.core.v3.QueryExecutorImpl.readStartupMessages(QueryExecutorImpl.java:2859)
+	at org.postgresql.core.v3.QueryExecutorImpl.<init>(QueryExecutorImpl.java:178)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:344)
+	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
+	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:277)
+	at org.postgresql.Driver.makeConnection(Driver.java:448)
+	at org.postgresql.Driver.connect(Driver.java:298)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:370)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:207)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576)
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:97)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111)
+	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:126)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:485)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:46)
+	... 44 common frames omitted
+25-10-24 13:35:37.902 [background-preinit]  INFO o.h.validator.internal.util.Version  [ |  | ] - HV000001: Hibernate Validator 8.0.3.Final
+25-10-24 13:35:37.982 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - Starting MonewApplication using Java 17.0.15 with PID 26628 (C:\dev_source\sb05-monew-team7\monew\build\classes\java\main started by SW in C:\dev_source\sb05-monew-team7)
+25-10-24 13:35:37.983 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - No active profile set, falling back to 1 default profile: "default"
+25-10-24 13:35:38.064 [restartedMain]  INFO o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [ |  | ] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+25-10-24 13:35:38.065 [restartedMain]  INFO o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [ |  | ] - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+25-10-24 13:35:40.028 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-24 13:35:40.031 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-10-24 13:35:40.300 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 258 ms. Found 1 JPA repository interface.
+25-10-24 13:35:40.311 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-24 13:35:40.312 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+25-10-24 13:35:40.353 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.user.repository.UserRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-24 13:35:40.354 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 40 ms. Found 0 MongoDB repository interfaces.
+25-10-24 13:35:40.372 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-24 13:35:40.375 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+25-10-24 13:35:40.420 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.user.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-24 13:35:40.421 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 33 ms. Found 0 Redis repository interfaces.
+25-10-24 13:35:41.222 [restartedMain]  INFO o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat initialized with port 8080 (http)
+25-10-24 13:35:41.240 [restartedMain]  INFO o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Initializing ProtocolHandler ["http-nio-8080"]
+25-10-24 13:35:41.241 [restartedMain]  INFO o.a.catalina.core.StandardService    [ |  | ] - Starting service [Tomcat]
+25-10-24 13:35:41.242 [restartedMain]  INFO o.a.catalina.core.StandardEngine     [ |  | ] - Starting Servlet engine: [Apache Tomcat/10.1.46]
+25-10-24 13:35:41.321 [restartedMain]  INFO o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring embedded WebApplicationContext
+25-10-24 13:35:41.322 [restartedMain]  INFO o.s.b.w.s.c.ServletWebServerApplicationContext [ |  | ] - Root WebApplicationContext: initialization completed in 3256 ms
+25-10-24 13:35:41.578 [restartedMain] DEBUG o.s.w.f.ServerHttpObservationFilter  [ |  | ] - Filter 'webMvcObservationFilter' configured for use
+25-10-24 13:35:41.636 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Starting...
+25-10-24 13:35:41.888 [restartedMain]  INFO com.zaxxer.hikari.pool.HikariPool    [ |  | ] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@28ca3b7
+25-10-24 13:35:41.891 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Start completed.
+25-10-24 13:35:41.997 [restartedMain]  INFO o.h.jpa.internal.util.LogHelper      [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-10-24 13:35:42.080 [restartedMain]  INFO org.hibernate.Version                [ |  | ] - HHH000412: Hibernate ORM core version 6.6.29.Final
+25-10-24 13:35:42.135 [restartedMain]  INFO o.h.c.i.RegionFactoryInitiator       [ |  | ] - HHH000026: Second-level cache disabled
+25-10-24 13:35:42.748 [restartedMain]  INFO o.s.o.j.p.SpringPersistenceUnitInfo  [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-10-24 13:35:42.864 [restartedMain]  WARN org.hibernate.orm.deprecation        [ |  | ] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+25-10-24 13:35:42.893 [restartedMain]  INFO o.hibernate.orm.connections.pooling  [ |  | ] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-10-24 13:35:42.904 [restartedMain] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry      [ |  | ] - addDescriptor(2003, org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@6e96bb2b) replaced previous registration(org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@71696816)
+25-10-24 13:35:42.904 [restartedMain] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry      [ |  | ] - addDescriptor(6, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@57e7c3d2) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@4a8b2a25)
+25-10-24 13:35:44.107 [restartedMain]  INFO o.h.e.t.j.p.i.JtaPlatformInitiator   [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-10-24 13:35:44.209 [restartedMain] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    create table users (
+        id uuid not null,
+        created_at timestamp(6) not null,
+        deleted_at timestamp(6),
+        email varchar(255) not null,
+        is_deleted boolean not null,
+        nickname varchar(20) not null,
+        password varchar(255) not null,
+        role varchar(255) not null check (role in ('USER','ADMIN')),
+        primary key (id)
+    )
+25-10-24 13:35:44.252 [restartedMain] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    alter table if exists users 
+       drop constraint if exists UK6dotkott2kjsp8vw4d0m25fb7
+25-10-24 13:35:44.258 [restartedMain]  WARN o.h.e.jdbc.spi.SqlExceptionHelper    [ |  | ] - SQL Warning Code: 0, SQLState: 00000
+25-10-24 13:35:44.259 [restartedMain]  WARN o.h.e.jdbc.spi.SqlExceptionHelper    [ |  | ] - "uk6dotkott2kjsp8vw4d0m25fb7" 제약 조건(해당 테이블: "users")이 없음, 건너뜀
+25-10-24 13:35:44.259 [restartedMain] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    alter table if exists users 
+       add constraint UK6dotkott2kjsp8vw4d0m25fb7 unique (email)
+25-10-24 13:35:44.267 [restartedMain]  INFO o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-10-24 13:35:44.964 [restartedMain]  WARN o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [ |  | ] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+25-10-24 13:35:45.006 [restartedMain]  INFO o.s.b.a.w.s.WelcomePageHandlerMapping [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-10-24 13:35:45.092 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - 7 mappings in 'requestMappingHandlerMapping'
+25-10-24 13:35:45.309 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+25-10-24 13:35:45.386 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter [ |  | ] - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+25-10-24 13:35:45.462 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver [ |  | ] - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+25-10-24 13:35:46.314 [cluster-ClusterId{value='68fb02226b5eadf535118c68', description='null'}-localhost:27017]  INFO org.mongodb.driver.cluster           [ |  | ] - Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.lambda$open$0(SocketStream.java:85)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:85)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:233)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitor.lookupServerDescription(DefaultServerMonitor.java:219)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitor.run(DefaultServerMonitor.java:176)
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:547)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:602)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:633)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:76)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:104)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:79)
+	... 3 common frames omitted
+25-10-24 13:35:46.332 [restartedMain]  INFO org.mongodb.driver.client            [ |  | ] - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "5.5.1"}, "os": {"type": "Windows", "name": "Windows 11", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.15+9-LTS-241"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=null, transportSettings=null, commandListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsCommandListener@6c18ca9d], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@30c4c2ce, com.mongodb.Jep395RecordCodecProvider@36ab923d, com.mongodb.KotlinCodecProvider@4846f3af]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsConnectionPoolListener@7cd81713], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+25-10-24 13:35:47.267 [restartedMain]  WARN o.s.b.a.s.s.UserDetailsServiceAutoConfiguration [ |  | ] - 
+
+Using generated security password: 50acabe8-0c95-4258-a8bf-f6267c9fe909
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+25-10-24 13:35:47.277 [restartedMain]  INFO o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer [ |  | ] - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+25-10-24 13:35:47.642 [restartedMain]  INFO o.s.b.a.e.web.EndpointLinksResolver  [ |  | ] - Exposing 3 endpoints beneath base path '/actuator'
+25-10-24 13:35:47.799 [restartedMain]  INFO o.s.b.a.h.H2ConsoleAutoConfiguration [ |  | ] - H2 console available at '/h2-console'. Database available at 'jdbc:postgresql://localhost:5432/monew'
+25-10-24 13:35:47.897 [restartedMain]  INFO o.s.b.d.a.OptionalLiveReloadServer   [ |  | ] - LiveReload server is running on port 35729
+25-10-24 13:35:47.961 [restartedMain]  INFO o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Starting ProtocolHandler ["http-nio-8080"]
+25-10-24 13:35:47.985 [restartedMain]  INFO o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat started on port 8080 (http) with context path '/'
+25-10-24 13:35:48.004 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - Started MonewApplication in 10.91 seconds (process running for 12.287)
+25-10-24 13:35:54.254 [RMI TCP Connection(4)-192.168.32.1]  INFO o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-10-24 13:35:54.254 [RMI TCP Connection(4)-192.168.32.1]  INFO o.s.web.servlet.DispatcherServlet    [ |  | ] - Initializing Servlet 'dispatcherServlet'
+25-10-24 13:35:54.255 [RMI TCP Connection(4)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected StandardServletMultipartResolver
+25-10-24 13:35:54.255 [RMI TCP Connection(4)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected AcceptHeaderLocaleResolver
+25-10-24 13:35:54.258 [RMI TCP Connection(4)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected FixedThemeResolver
+25-10-24 13:35:54.260 [RMI TCP Connection(4)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@1981487e
+25-10-24 13:35:54.261 [RMI TCP Connection(4)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected org.springframework.web.servlet.support.SessionFlashMapManager@47ae1229
+25-10-24 13:35:54.262 [RMI TCP Connection(4)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+25-10-24 13:35:54.262 [RMI TCP Connection(4)-192.168.32.1]  INFO o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed initialization in 7 ms
+25-10-24 13:35:54.308 [RMI TCP Connection(3)-192.168.32.1]  INFO org.mongodb.driver.cluster           [ |  | ] - Waiting for server to become available for operation with ID 3. Remaining time: 29979 ms. Selector: ReadPreferenceServerSelector{readPreference=primary}, topology description: {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: no further information}}].
+25-10-24 13:36:24.309 [RMI TCP Connection(3)-192.168.32.1]  WARN o.s.b.a.d.mongo.MongoHealthIndicator [ |  | ] - MongoDB health check failed
+org.springframework.dao.DataAccessResourceFailureException: Timed out while waiting for a server that matches ReadPreferenceServerSelector{readPreference=primary}. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: no further information}}]
+	at org.springframework.data.mongodb.core.MongoExceptionTranslator.doTranslateException(MongoExceptionTranslator.java:97)
+	at org.springframework.data.mongodb.core.MongoExceptionTranslator.translateExceptionIfPossible(MongoExceptionTranslator.java:74)
+	at org.springframework.data.mongodb.core.MongoTemplate.potentiallyConvertRuntimeException(MongoTemplate.java:3043)
+	at org.springframework.data.mongodb.core.MongoTemplate.execute(MongoTemplate.java:597)
+	at org.springframework.data.mongodb.core.MongoTemplate.executeCommand(MongoTemplate.java:529)
+	at org.springframework.boot.actuate.data.mongo.MongoHealthIndicator.doHealthCheck(MongoHealthIndicator.java:46)
+	at org.springframework.boot.actuate.health.AbstractHealthIndicator.health(AbstractHealthIndicator.java:82)
+	at org.springframework.boot.actuate.health.HealthIndicator.getHealth(HealthIndicator.java:37)
+	at org.springframework.boot.actuate.health.HealthEndpoint.getHealth(HealthEndpoint.java:82)
+	at org.springframework.boot.actuate.health.HealthEndpoint.getHealth(HealthEndpoint.java:41)
+	at org.springframework.boot.actuate.health.HealthEndpointSupport.getLoggedHealth(HealthEndpointSupport.java:172)
+	at org.springframework.boot.actuate.health.HealthEndpointSupport.getContribution(HealthEndpointSupport.java:145)
+	at org.springframework.boot.actuate.health.HealthEndpointSupport.getAggregateContribution(HealthEndpointSupport.java:156)
+	at org.springframework.boot.actuate.health.HealthEndpointSupport.getContribution(HealthEndpointSupport.java:141)
+	at org.springframework.boot.actuate.health.HealthEndpointSupport.getHealth(HealthEndpointSupport.java:110)
+	at org.springframework.boot.actuate.health.HealthEndpointSupport.getHealth(HealthEndpointSupport.java:81)
+	at org.springframework.boot.actuate.health.HealthEndpoint.health(HealthEndpoint.java:76)
+	at org.springframework.boot.actuate.health.HealthEndpoint.health(HealthEndpoint.java:66)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:281)
+	at org.springframework.boot.actuate.endpoint.invoke.reflect.ReflectiveOperationInvoker.invoke(ReflectiveOperationInvoker.java:74)
+	at org.springframework.boot.actuate.endpoint.annotation.AbstractDiscoveredOperation.invoke(AbstractDiscoveredOperation.java:60)
+	at org.springframework.boot.actuate.endpoint.jmx.EndpointMBean.invoke(EndpointMBean.java:124)
+	at org.springframework.boot.actuate.endpoint.jmx.EndpointMBean.invoke(EndpointMBean.java:97)
+	at java.management/com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.invoke(DefaultMBeanServerInterceptor.java:814)
+	at java.management/com.sun.jmx.mbeanserver.JmxMBeanServer.invoke(JmxMBeanServer.java:802)
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.doOperation(RMIConnectionImpl.java:1472)
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl$PrivilegedOperation.run(RMIConnectionImpl.java:1310)
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.doPrivilegedOperation(RMIConnectionImpl.java:1405)
+	at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.invoke(RMIConnectionImpl.java:829)
+	at java.base/jdk.internal.reflect.GeneratedMethodAccessor39.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:587)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:828)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:705)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:704)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: com.mongodb.MongoTimeoutException: Timed out while waiting for a server that matches ReadPreferenceServerSelector{readPreference=primary}. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: no further information}}]
+	at com.mongodb.internal.connection.BaseCluster.logAndThrowTimeoutException(BaseCluster.java:427)
+	at com.mongodb.internal.connection.BaseCluster.lambda$selectServer$0(BaseCluster.java:154)
+	at com.mongodb.internal.time.Timeout.lambda$onExistsAndExpired$16(Timeout.java:236)
+	at com.mongodb.internal.time.Timeout.lambda$run$10(Timeout.java:201)
+	at com.mongodb.internal.time.TimePoint.checkedCall(TimePoint.java:99)
+	at com.mongodb.internal.time.Timeout.call(Timeout.java:174)
+	at com.mongodb.internal.time.Timeout.run(Timeout.java:194)
+	at com.mongodb.internal.time.Timeout.onExistsAndExpired(Timeout.java:233)
+	at com.mongodb.internal.time.Timeout.onExpired(Timeout.java:226)
+	at com.mongodb.internal.connection.BaseCluster.selectServer(BaseCluster.java:153)
+	at com.mongodb.internal.connection.SingleServerCluster.selectServer(SingleServerCluster.java:47)
+	at com.mongodb.internal.binding.ClusterBinding.getReadConnectionSource(ClusterBinding.java:82)
+	at com.mongodb.client.internal.ClientSessionBinding.getConnectionSource(ClientSessionBinding.java:108)
+	at com.mongodb.client.internal.ClientSessionBinding.getReadConnectionSource(ClientSessionBinding.java:88)
+	at com.mongodb.internal.operation.SyncOperationHelper.withSuppliedResource(SyncOperationHelper.java:148)
+	at com.mongodb.internal.operation.SyncOperationHelper.withSourceAndConnection(SyncOperationHelper.java:129)
+	at com.mongodb.internal.operation.SyncOperationHelper.lambda$executeRetryableRead$4(SyncOperationHelper.java:195)
+	at com.mongodb.internal.operation.SyncOperationHelper.lambda$decorateReadWithRetries$13(SyncOperationHelper.java:317)
+	at com.mongodb.internal.async.function.RetryingSyncSupplier.get(RetryingSyncSupplier.java:67)
+	at com.mongodb.internal.operation.SyncOperationHelper.executeRetryableRead(SyncOperationHelper.java:201)
+	at com.mongodb.internal.operation.SyncOperationHelper.executeRetryableRead(SyncOperationHelper.java:180)
+	at com.mongodb.internal.operation.CommandReadOperation.execute(CommandReadOperation.java:52)
+	at com.mongodb.client.internal.MongoClusterImpl$OperationExecutorImpl.execute(MongoClusterImpl.java:424)
+	at com.mongodb.client.internal.MongoDatabaseImpl.executeCommand(MongoDatabaseImpl.java:215)
+	at com.mongodb.client.internal.MongoDatabaseImpl.runCommand(MongoDatabaseImpl.java:184)
+	at com.mongodb.client.internal.MongoDatabaseImpl.runCommand(MongoDatabaseImpl.java:179)
+	at org.springframework.data.mongodb.core.MongoTemplate.lambda$executeCommand$3(MongoTemplate.java:529)
+	at org.springframework.data.mongodb.core.MongoTemplate.execute(MongoTemplate.java:595)
+	... 45 common frames omitted
+25-10-24 13:36:24.322 [RMI TCP Connection(3)-192.168.32.1]  WARN o.s.b.a.health.HealthEndpointSupport [ |  | ] - Health contributor org.springframework.boot.actuate.data.mongo.MongoHealthIndicator (mongo) took 30134ms to respond
+25-10-24 13:36:24.848 [boundedElastic-1]  WARN o.s.b.a.d.r.RedisReactiveHealthIndicator [ |  | ] - Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1866)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1797)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1594)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1574)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1535)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1571)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1282)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1157)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:121)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to localhost/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:63)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:41)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:354)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:220)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1795)
+	... 16 common frames omitted
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:6379
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:336)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:339)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:784)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-10-24 14:16:09.212 [cluster-ClusterId{value='68fb02226b5eadf535118c68', description='null'}-localhost:27017]  INFO org.mongodb.driver.cluster           [ |  | ] - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=27, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=160377500, minRoundTripTimeNanos=0}
+25-10-24 14:19:12.773 [SpringApplicationShutdownHook]  INFO o.s.b.w.e.tomcat.GracefulShutdown    [ |  | ] - Commencing graceful shutdown. Waiting for active requests to complete
+25-10-24 14:19:13.654 [tomcat-shutdown]  INFO o.s.b.w.e.tomcat.GracefulShutdown    [ |  | ] - Graceful shutdown complete
+25-10-24 14:19:14.361 [SpringApplicationShutdownHook]  INFO o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-10-24 14:19:14.476 [SpringApplicationShutdownHook]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Shutdown initiated...
+25-10-24 14:19:14.504 [SpringApplicationShutdownHook]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Shutdown completed.
