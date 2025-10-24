@@ -112,10 +112,10 @@ CREATE TABLE comments
 CREATE TABLE comment_like
 (
     id         UUID PRIMARY KEY,
-    content_id UUID        NOT NULL,
+    comment_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    CONSTRAINT fk_like_comment FOREIGN KEY (content_id)
+    CONSTRAINT fk_like_comment FOREIGN KEY (comment_id)
         REFERENCES comments (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_like_user FOREIGN KEY (user_id)

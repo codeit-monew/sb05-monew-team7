@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comment_like")
+@Table(name = "comment_like", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"content_id", "user_id"})
+})
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Builder
 public class CommentLike {
@@ -23,8 +26,8 @@ public class CommentLike {
   @GeneratedValue(strategy = GenerationType.UUID)   //PK 자동 삽입
   private UUID id;
 
-  @Column(name = "content_id", nullable = false)
-  private UUID contentId; // comment_id로도 가능하지만 스키마 기준 유지
+  @Column(name = "comment_id", nullable = false)
+  private UUID comment_id;
 
   @Column(name = "user_id", nullable = false)
   private UUID userId;
