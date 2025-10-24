@@ -76,7 +76,7 @@ CREATE TABLE article_views
     id         UUID PRIMARY KEY,
     article_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
-    create_at  TIMESTAMPTZ NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL,
     CONSTRAINT fk_view_article FOREIGN KEY (article_id)
         REFERENCES articles (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
