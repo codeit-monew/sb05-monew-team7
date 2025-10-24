@@ -95,7 +95,6 @@ CREATE TABLE comments
     user_id    UUID         NOT NULL,
     content    VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL,
-    updated_at TIMESTAMPTZ  NULL,
     is_deleted BOOLEAN      NOT NULL DEFAULT FALSE,
     deleted_at TIMESTAMPTZ  NULL,
     like_count BIGINT       NOT NULL DEFAULT 0,
