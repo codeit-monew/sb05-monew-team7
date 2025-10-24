@@ -1,5 +1,6 @@
 package com.spring.monew.interest.controller;
 
+import com.spring.monew.interest.controller.dto.request.InterestRegisterRequest;
 import com.spring.monew.interest.controller.dto.response.CursorPageResponseInterestDto;
 import com.spring.monew.interest.controller.dto.response.InterestDto;
 import com.spring.monew.interest.service.InterestService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,8 +23,8 @@ public class InterestController {
   private final InterestService interestService;
 
   @PostMapping
-  public InterestDto interestAdd() {
-    return null;
+  public InterestDto interestAdd(@RequestBody InterestRegisterRequest registerRequest) {
+    return interestService.addInterest(registerRequest);
   }
 
   @GetMapping
