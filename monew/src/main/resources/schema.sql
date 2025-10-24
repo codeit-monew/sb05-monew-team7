@@ -58,7 +58,7 @@ CREATE TABLE articles
     publish_date  TIMESTAMPTZ      NOT NULL,
     summary       TEXT             NOT NULL,
     comment_count BIGINT           NOT NULL DEFAULT 0,
-    article_count BIGINT           NOT NULL DEFAULT 0,
+    view_count    BIGINT           NOT NULL DEFAULT 0,
     created_at    TIMESTAMPTZ      NOT NULL,
     updated_at    TIMESTAMPTZ      NOT NULL,
     is_deleted    BOOLEAN          NOT NULL DEFAULT FALSE,
