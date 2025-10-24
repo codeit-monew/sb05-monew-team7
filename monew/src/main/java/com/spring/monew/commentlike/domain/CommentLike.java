@@ -9,17 +9,16 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comment_like", uniqueConstraints = {
+@Table(name = "comment_likes", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"comment_id", "user_id"})
 })
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class CommentLike {
 
   @Id

@@ -8,17 +8,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "comments")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@SQLDelete(sql = "UPDATE comments SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("is_deleted = false") // 조회 시 기본적으로 삭제되지 않은 것만 조회
 public class Comment {
 
     @Id
@@ -39,16 +41,14 @@ public class Comment {
 
     @Column(name = "is_deleted", nullable = false)
     @ColumnDefault("false")
-    @Default
-    private boolean isDeleted = false;
+    private boolean isDeleted;
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
     @Column(name = "like_count", nullable = false)
     @ColumnDefault("0")
-    @Default
-    private long likeCount = 0L;
+    private long likeCount;
 
     // 연관 관계 (지금은 UUID로만, 이후 필요시 ManyToOne)
     // @ManyToOne(fetch = FetchType.LAZY)
