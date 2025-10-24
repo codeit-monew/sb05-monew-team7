@@ -109,7 +109,7 @@ CREATE TABLE comments
 -- ==============================
 -- COMMENT_LIKE
 -- ==============================
-CREATE TABLE comment_like
+CREATE TABLE comment_likes
 (
     id         UUID PRIMARY KEY,
     comment_id UUID        NOT NULL,
