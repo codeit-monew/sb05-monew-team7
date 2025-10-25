@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "notifications",
@@ -15,6 +17,7 @@ import java.util.UUID;
 )
 public class Notification {
 
+  // 접근자
   @Id
   @Column(name = "id", nullable = false, updatable = false)
   private UUID id;
@@ -83,7 +86,6 @@ public class Notification {
   public void confirm() {
     if (!this.confirmed) {
       this.confirmed = true;
-      this.updatedAt = Instant.now();
     }
   }
 
@@ -92,16 +94,6 @@ public class Notification {
     this.content = Objects.requireNonNull(newContent, "content");
     this.updatedAt = Instant.now();
   }
-
-  // 접근자
-  public UUID getId() { return id; }
-  public UUID getUserId() { return userId; }
-  public String getContent() { return content; }
-  public boolean isConfirmed() { return confirmed; }
-  public NotificationResourceType getResourceType() { return resourceType; }
-  public UUID getResourceId() { return resourceId; }
-  public Instant getCreatedAt() { return createdAt; }
-  public Instant getUpdatedAt() { return updatedAt; }
 
   @Override public boolean equals(Object o) {
     if (this == o) return true;
