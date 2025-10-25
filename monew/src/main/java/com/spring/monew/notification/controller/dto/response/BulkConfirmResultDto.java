@@ -15,7 +15,7 @@ public record BulkConfirmResultDto(
     boolean allConfirmed,
 
     @Schema(description = "요청 사용자 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    String userId,  
+    String userId,
 
     @Schema(description = "처리 시각", example = "2025-10-23T04:22:14.900Z", format = "date-time")
     String processedAt
