@@ -47,13 +47,13 @@ CREATE TABLE articles
 (
     id            UUID PRIMARY KEY,
     interest_id   UUID             NOT NULL,
-    source        VARCHAR(50)      NOT NULL CHECK (source IN ('NAVER', 'HANKYUNG', 'CHOSUN', 'YONHAP')),
+    source        VARCHAR(50)      NOT NULL CHECK (source IN ('NAVER', 'HANKYUNG', 'CHOSUN', 'YEONHAP')),
     source_url    VARCHAR(255)     NOT NULL,
     title         VARCHAR(255)     NOT NULL,
     publish_date  TIMESTAMP WITH TIME ZONE NOT NULL,
     summary       TEXT             NOT NULL,
     comment_count BIGINT           NOT NULL DEFAULT 0,
-    article_count BIGINT           NOT NULL DEFAULT 0,
+    view_count    BIGINT           NOT NULL DEFAULT 0,
     created_at    TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at    TIMESTAMP WITH TIME ZONE NOT NULL,
     is_deleted    BOOLEAN          NOT NULL DEFAULT FALSE,
@@ -71,7 +71,7 @@ CREATE TABLE article_views
     id         UUID PRIMARY KEY,
     article_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
-    create_at  TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at  TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_view_article FOREIGN KEY (article_id)
         REFERENCES articles (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
