@@ -1,12 +1,21 @@
 package com.spring.monew.user.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "users")
@@ -15,7 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE id = ?") //논리삭제 SQL
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false") // 조회 시 기본적으로 삭제되지 않은 것만 조회
 public class User {
 
   @Id
@@ -32,7 +41,7 @@ public class User {
   private String password;
 
   @Column(name = "created_at", nullable = false)
-  private LocalDateTime createdAt;
+  private Instant createdAt;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -42,16 +51,25 @@ public class User {
   private boolean isDeleted = false;
 
   @Column(name = "deleted_at")
-  private LocalDateTime deletedAt;
+  private Instant deletedAt;
 
-  public static User create(String email, String nickname, String password) {
-    return User.builder()
-        .email(email)
-        .nickname(nickname)
-        .password(password) // 암호화는 이후에
-        .createdAt(LocalDateTime.now())
-        .role(UserRole.USER) // 기본은 일반 사용자
-        .isDeleted(false)
-        .build();
+  public User(String email, String nickname, String password) {
+    this.email = email;
+    this.nickname = nickname;
+    this.password = password;
+    this.createdAt = Instant.now();
+    this.role = UserRole.USER;
+    this.isDeleted = false;
   }
+
+  public User(String email, String nickname, String password, Instant createdAt, UserRole role) {
+    this.email = email;
+    this.nickname = nickname;
+    this.password = password;
+    this.createdAt = createdAt;
+    this.role = role;
+    this.isDeleted = false;
+  }
+
+
 }

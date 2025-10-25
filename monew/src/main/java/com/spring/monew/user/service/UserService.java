@@ -1,17 +1,14 @@
 package com.spring.monew.user.service;
 
 import com.spring.monew.user.controller.dto.data.UserDto;
-import com.spring.monew.user.controller.dto.data.UserDto;
 import com.spring.monew.user.controller.dto.request.UserRegisterRequest;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.domain.UserRole;
 import com.spring.monew.user.repository.UserRepository;
-import com.sun.nio.sctp.IllegalReceiveException;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,17 +21,16 @@ public class UserService {
    */
   public UserDto addUser(UserRegisterRequest request) {
     if (userRepository.existsByEmail(request.email())) {
-      throw new IllegalReceiveException("이미 사용 중인 이메일입니다.");
+      throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
     }
 
-    User user = User.builder()
-        .email(request.email())
-        .nickname(request.nickname())
-        .password(passwordEncoder.encode(request.password()))
-        .createdAt(LocalDateTime.now())
-        .role(UserRole.USER)
-        .isDeleted(false)
-        .build();
+    User user = new User(
+        request.email(),
+        request.nickname(),
+        passwordEncoder.encode(request.password()),
+        Instant.now(),
+        UserRole.USER
+    );
 
     User saved = userRepository.save(user);
 
@@ -43,6 +39,7 @@ public class UserService {
         saved.getEmail(),
         saved.getNickname(),
         saved.getCreatedAt()
+
     );
   }
 }
