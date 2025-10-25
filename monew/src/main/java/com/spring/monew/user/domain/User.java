@@ -22,7 +22,6 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //외부 new 막음
 @AllArgsConstructor
-@Builder
 @SQLDelete(sql = "UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE id = ?") //논리삭제 SQL
 @SQLRestriction("is_deleted = false") // 조회 시 기본적으로 삭제되지 않은 것만 조회
 public class User {
