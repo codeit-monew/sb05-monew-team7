@@ -1,5 +1,6 @@
 package com.spring.monew.interest.controller.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,5 +11,6 @@ public record InterestDto(
     long subscriberCount,
     boolean subscribedByMe
 ) {
-
+  @QueryProjection  //QueryDSL용
+  public InterestDto {}
 }
