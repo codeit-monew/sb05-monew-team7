@@ -95,20 +95,20 @@ public class NotificationController {
       @PathVariable UUID notificationId
   ) {
     var entity = repository.findByIdAndUserId(notificationId, userId)
-        .orElseThrow(() -> new IllegalArgumentException("알림을 찾을 수 없습니다."));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."));
 
     boolean already = entity.isConfirmed();
     if (!already) {
       entity.confirm();
       repository.flush();
     }
-    // JPA 전에 응답해야 해서 표시용
+
     return new NotificationConfirmResponseDto(
         entity.getId().toString(),
         true,
         already,
         userId.toString(),
-        Instant.now()
+        entity.getUpdatedAt() != null ? entity.getUpdatedAt() : entity.getCreatedAt()
     );
   }
 
@@ -120,12 +120,10 @@ public class NotificationController {
       @RequestHeader("Monew-Request-User-ID") UUID userId
   ) {
     long updated = repository.confirmAllByUserId(userId);
-    long remain  = repository.countUnread(userId);
-    boolean allConfirmed = (remain == 0L);
-    var processedAt = repository.getDatabaseNow();
+    Instant processedAt = repository.getDatabaseNow();
+
     return new BulkConfirmResultDto(
         updated,
-        allConfirmed,
         userId.toString(),
         processedAt
     );

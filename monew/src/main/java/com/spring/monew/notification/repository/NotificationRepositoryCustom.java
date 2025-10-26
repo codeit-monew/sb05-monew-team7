@@ -18,7 +18,5 @@ public interface NotificationRepositoryCustom {
 
   long confirmAllByUserId(UUID userId);
 
-  long countUnread(UUID userId);
-
   Instant getDatabaseNow();
 }
