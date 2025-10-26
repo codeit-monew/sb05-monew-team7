@@ -99,7 +99,8 @@ public class NotificationController {
 
     boolean already = entity.isConfirmed();
     if (!already) {
-      entity.confirm(); // @PreUpdate updatedAt 세팅
+      entity.confirm();
+      repository.flush();
     }
     // JPA 전에 응답해야 해서 표시용
     return new NotificationConfirmResponseDto(
