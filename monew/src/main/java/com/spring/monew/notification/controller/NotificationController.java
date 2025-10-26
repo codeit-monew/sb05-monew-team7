@@ -10,11 +10,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeParseException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -45,7 +48,12 @@ public class NotificationController {
   ) {
     var afterOrNow = (after == null) ? Instant.now() : after;
 
-    var decoded = decodeCursor(cursor); // createdAt & id
+    CursorDecoded decoded;
+    try {
+      decoded = decodeCursor(cursor);
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 커서 형식입니다.", e);
+    }
     var cursorAt = decoded == null ? null : decoded.createdAt;
     var cursorId = decoded == null ? null : decoded.id;
 
