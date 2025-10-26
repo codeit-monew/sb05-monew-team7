@@ -21,6 +21,7 @@ CREATE TABLE interests
 (
     id                  UUID PRIMARY KEY,
     name                VARCHAR(255) NOT NULL UNIQUE,
+    created_at          TIMESTAMPTZ  NOT NULL,
     keywords            TEXT         NOT NULL,
     subscriptions_count BIGINT       NOT NULL DEFAULT 0
 );
@@ -76,7 +77,7 @@ CREATE TABLE article_views
     id         UUID PRIMARY KEY,
     article_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT fk_view_article FOREIGN KEY (article_id)
         REFERENCES articles (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -143,3 +144,27 @@ CREATE TABLE notifications
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- COMMENT_LIKE
+DROP TABLE IF EXISTS comment_likes CASCADE;
+
+-- COMMENTS
+DROP TABLE IF EXISTS comments CASCADE;
+
+-- ARTICLE_VIEWS
+DROP TABLE IF EXISTS article_views CASCADE;
+
+-- ARTICLES
+DROP TABLE IF EXISTS articles CASCADE;
+
+-- SUBSCRIPTIONS
+DROP TABLE IF EXISTS subscriptions CASCADE;
+
+-- INTERESTS
+DROP TABLE IF EXISTS interests CASCADE;
+
+-- NOTIFICATIONS
+DROP TABLE IF EXISTS notifications CASCADE;
+
+-- USERS
+DROP TABLE IF EXISTS users CASCADE;
