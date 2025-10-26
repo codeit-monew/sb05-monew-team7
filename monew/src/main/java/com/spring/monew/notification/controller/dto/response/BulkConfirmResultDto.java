@@ -13,9 +13,6 @@ public record BulkConfirmResultDto(
     @Schema(description = "이번 호출로 확인 처리된 건수", example = "23")
     long updatedCount,
 
-    @Schema(description = "처리 후 미확인 알림이 남아있지 않으면 true", example = "true")
-    boolean allConfirmed,
-
     @Schema(description = "요청 사용자 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", format = "uuid")
     String userId,
 
