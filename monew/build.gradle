@@ -55,7 +55,7 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3:2.31.7'
 
 	// queryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.1.0'
+	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
 
 	// QueryDSL Annotation Processor
 	annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
