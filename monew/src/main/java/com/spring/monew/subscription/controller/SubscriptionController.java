@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,13 +18,14 @@ public class SubscriptionController {
   private final SubscriptionService subscriptionService;
 
   @PostMapping("/{interestId}/subscriptions")
-  public SubscriptionDto subscriptionAdd(@PathVariable UUID interestId) {
-
-    return null;
+  public SubscriptionDto subscriptionAdd(@PathVariable UUID interestId,
+      @RequestHeader UUID userId) {
+    return subscriptionService.addSubscription(interestId, userId);
   }
 
   @DeleteMapping("/{interestId}/subscriptions")
-  public void subscriptionRemove(@PathVariable UUID interestId) {
-
+  public void subscriptionRemove(@PathVariable UUID interestId,
+      @RequestHeader UUID userId) {
+    subscriptionService.removeSubscription(interestId, userId);
   }
 }
