@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Schema(name = "BulkConfirmResult", description = "전체 알림 확인 처리 결과")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"updatedCount", "allConfirmed", "userId", "processedAt"})
+@JsonPropertyOrder({"updatedCount", "userId", "processedAt"})
 public record BulkConfirmResultDto(
     @Schema(description = "이번 호출로 확인 처리된 건수", example = "23")
     long updatedCount,
