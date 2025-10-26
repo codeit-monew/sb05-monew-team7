@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -35,4 +36,11 @@ public class Interest {
     @Column(name = "subscriptions_count", nullable = false)
     @ColumnDefault("0")
     private long subscriptionsCount;
+
+    @Builder
+    public Interest(String name, List<String> keywords) {
+        this.name = name;
+        this.keywords = keywords;
+        this.subscriptionsCount = 0L; // 기본값 설정
+    }
 }
