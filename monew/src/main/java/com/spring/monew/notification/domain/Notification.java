@@ -63,7 +63,6 @@ public class Notification {
     this.updatedAt = updatedAt;
   }
 
-  /** 팩토리 */
   public static Notification of(UUID userId,
       String content,
       NotificationResourceType resourceType,
