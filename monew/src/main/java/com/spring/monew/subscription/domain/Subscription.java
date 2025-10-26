@@ -16,6 +16,7 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "subscriptions")
@@ -31,12 +32,17 @@ public class Subscription {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interest_id", nullable = false)
     private Interest interest;
 
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private Instant createdAt;
 
+    public Subscription(User user, Interest interest) {
+        this.user = user;
+        this.interest = interest;
+
+    }
 }
