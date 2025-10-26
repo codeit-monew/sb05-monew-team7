@@ -68,17 +68,6 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
   }
 
   @Override
-  public long countUnread(UUID userId) {
-    var q = em.createQuery("""
-            SELECT COUNT(n) FROM Notification n
-             WHERE n.userId = :userId
-               AND n.confirmed = FALSE
-        """, Long.class);
-    q.setParameter("userId", userId);
-    return q.getSingleResult();
-  }
-
-  @Override
   public Instant getDatabaseNow() {
     // CURRENT_TIMESTAMP는 DB 서버 시각
     Timestamp ts = (Timestamp) em.createNativeQuery("select current_timestamp").getSingleResult();
