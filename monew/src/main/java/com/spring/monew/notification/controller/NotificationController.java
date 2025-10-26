@@ -120,15 +120,17 @@ public class NotificationController {
       @RequestHeader("Monew-Request-User-ID") UUID userId
   ) {
     long updated = repository.confirmAllByUserId(userId);
-    long remain = repository.countUnread(userId);
+    long remain  = repository.countUnread(userId);
     boolean allConfirmed = (remain == 0L);
+    var processedAt = repository.getDatabaseNow();
     return new BulkConfirmResultDto(
         updated,
         allConfirmed,
         userId.toString(),
-        Instant.now()
+        processedAt
     );
   }
+
 
   // ====== 내부 ======
   private record CursorDecoded(Instant createdAt, UUID id) {}

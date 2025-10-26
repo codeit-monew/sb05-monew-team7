@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -75,5 +76,12 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
         """, Long.class);
     q.setParameter("userId", userId);
     return q.getSingleResult();
+  }
+
+  @Override
+  public Instant getDatabaseNow() {
+    // CURRENT_TIMESTAMP는 DB 서버 시각
+    Timestamp ts = (Timestamp) em.createNativeQuery("select current_timestamp").getSingleResult();
+    return ts.toInstant();
   }
 }
