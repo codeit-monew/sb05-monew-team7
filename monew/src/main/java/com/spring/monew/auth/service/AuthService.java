@@ -2,11 +2,11 @@ package com.spring.monew.auth.service;
 
 import com.spring.monew.user.controller.dto.data.UserDto;
 import com.spring.monew.user.controller.dto.request.UserLoginRequest;
+import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.spring.monew.user.domain.User;
 @Service
 @RequiredArgsConstructor
 public class AuthService {

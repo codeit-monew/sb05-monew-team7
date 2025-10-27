@@ -11,8 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class HeaderUserAuthentication extends AbstractAuthenticationToken {
 
   /**
-   * 요청 헤더에서 전달된 사용자 ID(UUID)와 권한 정보를 담는 인증 객체
+   * 요청 헤더에서 전달된 사용자 ID(UUID)와 권한 정보를 담는 클래스
    */
+
   private final String userId; //헤더에서 추출한 사용자 ID(UUID) 담는 필드
   private final UserRole role;  // 사용자 권한 (USER / ADMIN)
 
