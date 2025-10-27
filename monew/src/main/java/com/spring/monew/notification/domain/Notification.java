@@ -67,11 +67,15 @@ public class Notification {
       String content,
       NotificationResourceType resourceType,
       UUID resourceId) {
+    Objects.requireNonNull(content, "content");
+       if (content.length() > 255) {
+           throw new IllegalArgumentException("Content length must not exceed 255 characters");
+       }
     var now = Instant.now();
     return new Notification(
         UUID.randomUUID(),
         Objects.requireNonNull(userId, "userId"),
-        Objects.requireNonNull(content, "content"),
+        content,
         false,
         resourceType,
         resourceId,
