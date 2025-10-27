@@ -4,7 +4,6 @@ package com.spring.monew.auth.controller;
 import com.spring.monew.auth.service.AuthService;
 import com.spring.monew.user.controller.dto.data.UserDto;
 import com.spring.monew.user.controller.dto.request.UserLoginRequest;
-import com.spring.monew.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

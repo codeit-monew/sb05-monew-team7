@@ -1,0 +1,546 @@
+25-10-27 08:59:15.202 [HikariPool-5:housekeeper]  WARN com.zaxxer.hikari.pool.HikariPool    [ |  | ] - HikariPool-5 - Thread starvation or clock leap detected (housekeeper delta=1d6h48m54s327ms294µs900ns).
+25-10-27 09:10:43.806 [SpringApplicationShutdownHook]  INFO o.s.b.w.e.tomcat.GracefulShutdown    [ |  | ] - Commencing graceful shutdown. Waiting for active requests to complete
+25-10-27 09:10:44.050 [tomcat-shutdown]  INFO o.s.b.w.e.tomcat.GracefulShutdown    [ |  | ] - Graceful shutdown complete
+25-10-27 09:10:44.144 [SpringApplicationShutdownHook]  INFO o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-10-27 09:10:44.189 [SpringApplicationShutdownHook]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-5 - Shutdown initiated...
+25-10-27 09:10:44.204 [SpringApplicationShutdownHook]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-5 - Shutdown completed.
+25-10-27 13:06:19.658 [background-preinit]  INFO o.h.validator.internal.util.Version  [ |  | ] - HV000001: Hibernate Validator 8.0.3.Final
+25-10-27 13:06:19.803 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - Starting MonewApplication using Java 17.0.15 with PID 17536 (C:\dev_source\sb05-monew-team7\monew\build\classes\java\main started by SW in C:\dev_source\sb05-monew-team7)
+25-10-27 13:06:19.806 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - No active profile set, falling back to 1 default profile: "default"
+25-10-27 13:06:19.924 [restartedMain]  INFO o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [ |  | ] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+25-10-27 13:06:19.924 [restartedMain]  INFO o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [ |  | ] - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+25-10-27 13:06:23.499 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-27 13:06:23.502 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-10-27 13:06:23.837 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 320 ms. Found 5 JPA repository interfaces.
+25-10-27 13:06:23.852 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-27 13:06:23.853 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+25-10-27 13:06:23.889 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.commentlike.repository.CommentLikeRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-27 13:06:23.892 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.comment.repository.CommentRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-27 13:06:23.893 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.interest.repository.InterestRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-27 13:06:23.894 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.subscription.repository.SubscriptionRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-27 13:06:23.894 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.spring.monew.user.repository.UserRepository; If you want this repository to be a MongoDB repository, consider annotating your entities with one of these annotations: org.springframework.data.mongodb.core.mapping.Document (preferred), or consider extending one of the following types with your repository: org.springframework.data.mongodb.repository.MongoRepository
+25-10-27 13:06:23.894 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 39 ms. Found 0 MongoDB repository interfaces.
+25-10-27 13:06:23.910 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Multiple Spring Data modules found, entering strict repository configuration mode
+25-10-27 13:06:23.913 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+25-10-27 13:06:23.961 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.commentlike.repository.CommentLikeRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-27 13:06:23.961 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.comment.repository.CommentRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-27 13:06:23.962 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.interest.repository.InterestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-27 13:06:23.963 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.subscription.repository.SubscriptionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-27 13:06:23.963 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationExtensionSupport [ |  | ] - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.spring.monew.user.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+25-10-27 13:06:23.963 [restartedMain]  INFO o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 37 ms. Found 0 Redis repository interfaces.
+25-10-27 13:06:24.862 [restartedMain]  INFO o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat initialized with port 8080 (http)
+25-10-27 13:06:24.879 [restartedMain]  INFO o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Initializing ProtocolHandler ["http-nio-8080"]
+25-10-27 13:06:24.882 [restartedMain]  INFO o.a.catalina.core.StandardService    [ |  | ] - Starting service [Tomcat]
+25-10-27 13:06:24.882 [restartedMain]  INFO o.a.catalina.core.StandardEngine     [ |  | ] - Starting Servlet engine: [Apache Tomcat/10.1.46]
+25-10-27 13:06:24.973 [restartedMain]  INFO o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring embedded WebApplicationContext
+25-10-27 13:06:24.973 [restartedMain]  INFO o.s.b.w.s.c.ServletWebServerApplicationContext [ |  | ] - Root WebApplicationContext: initialization completed in 5047 ms
+25-10-27 13:06:25.247 [restartedMain] DEBUG o.s.w.f.ServerHttpObservationFilter  [ |  | ] - Filter 'webMvcObservationFilter' configured for use
+25-10-27 13:06:25.332 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Starting...
+25-10-27 13:06:25.664 [restartedMain]  INFO com.zaxxer.hikari.pool.HikariPool    [ |  | ] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@d22d65d
+25-10-27 13:06:25.668 [restartedMain]  INFO com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Start completed.
+25-10-27 13:06:25.861 [restartedMain]  INFO o.h.jpa.internal.util.LogHelper      [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-10-27 13:06:25.974 [restartedMain]  INFO org.hibernate.Version                [ |  | ] - HHH000412: Hibernate ORM core version 6.6.29.Final
+25-10-27 13:06:26.036 [restartedMain]  INFO o.h.c.i.RegionFactoryInitiator       [ |  | ] - HHH000026: Second-level cache disabled
+25-10-27 13:06:26.508 [restartedMain]  INFO o.s.o.j.p.SpringPersistenceUnitInfo  [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-10-27 13:06:26.647 [restartedMain]  WARN org.hibernate.orm.deprecation        [ |  | ] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+25-10-27 13:06:26.676 [restartedMain]  INFO o.hibernate.orm.connections.pooling  [ |  | ] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-10-27 13:06:26.687 [restartedMain] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry      [ |  | ] - addDescriptor(2003, org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@6db33a60) replaced previous registration(org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@71719bcd)
+25-10-27 13:06:26.688 [restartedMain] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry      [ |  | ] - addDescriptor(6, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@5f898490) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@6da44df8)
+25-10-27 13:06:27.908 [restartedMain]  INFO o.h.e.t.j.p.i.JtaPlatformInitiator   [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-10-27 13:06:28.169 [restartedMain]  INFO o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-10-27 13:06:28.720 [restartedMain]  WARN o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [ |  | ] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+25-10-27 13:06:28.755 [restartedMain]  INFO o.s.b.a.w.s.WelcomePageHandlerMapping [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-10-27 13:06:28.843 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - 21 mappings in 'requestMappingHandlerMapping'
+25-10-27 13:06:28.949 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+25-10-27 13:06:29.207 [restartedMain]  INFO org.mongodb.driver.client            [ |  | ] - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "5.5.1"}, "os": {"type": "Windows", "name": "Windows 11", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.15+9-LTS-241"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=null, transportSettings=null, commandListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsCommandListener@7c32ba7b], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@1fc5dc6, com.mongodb.Jep395RecordCodecProvider@6b3dae91, com.mongodb.KotlinCodecProvider@70f4cef3]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsConnectionPoolListener@4b00516f], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+25-10-27 13:06:29.249 [cluster-ClusterId{value='68feefc5898ea3ce09a7db3b', description='null'}-localhost:27017]  INFO org.mongodb.driver.cluster           [ |  | ] - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=27, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=59722700, minRoundTripTimeNanos=0}
+25-10-27 13:06:29.771 [restartedMain]  INFO o.s.b.a.e.web.EndpointLinksResolver  [ |  | ] - Exposing 3 endpoints beneath base path '/actuator'
+25-10-27 13:06:29.802 [restartedMain]  WARN o.s.b.a.s.s.UserDetailsServiceAutoConfiguration [ |  | ] - 
+
+Using generated security password: 98a43de7-3cde-433e-9708-33165d02a4a7
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+25-10-27 13:06:29.810 [restartedMain]  INFO o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer [ |  | ] - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+25-10-27 13:06:29.974 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter [ |  | ] - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+25-10-27 13:06:30.034 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver [ |  | ] - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+25-10-27 13:06:30.476 [restartedMain]  INFO o.s.b.a.h.H2ConsoleAutoConfiguration [ |  | ] - H2 console available at '/h2-console'. Database available at 'jdbc:postgresql://localhost:5432/monew'
+25-10-27 13:06:30.545 [restartedMain]  INFO o.s.b.d.a.OptionalLiveReloadServer   [ |  | ] - LiveReload server is running on port 35729
+25-10-27 13:06:30.611 [restartedMain]  INFO o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Starting ProtocolHandler ["http-nio-8080"]
+25-10-27 13:06:30.634 [restartedMain]  INFO o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat started on port 8080 (http) with context path '/'
+25-10-27 13:06:30.655 [restartedMain]  INFO com.spring.monew.MonewApplication    [ |  | ] - Started MonewApplication in 12.189 seconds (process running for 13.778)
+25-10-27 13:06:31.279 [RMI TCP Connection(1)-192.168.32.1]  INFO o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-10-27 13:06:31.279 [RMI TCP Connection(1)-192.168.32.1]  INFO o.s.web.servlet.DispatcherServlet    [ |  | ] - Initializing Servlet 'dispatcherServlet'
+25-10-27 13:06:31.279 [RMI TCP Connection(1)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected StandardServletMultipartResolver
+25-10-27 13:06:31.279 [RMI TCP Connection(1)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected AcceptHeaderLocaleResolver
+25-10-27 13:06:31.280 [RMI TCP Connection(1)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected FixedThemeResolver
+25-10-27 13:06:31.282 [RMI TCP Connection(1)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@45cf4ac0
+25-10-27 13:06:31.283 [RMI TCP Connection(1)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Detected org.springframework.web.servlet.support.SessionFlashMapManager@17b1b2d0
+25-10-27 13:06:31.283 [RMI TCP Connection(1)-192.168.32.1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+25-10-27 13:06:31.283 [RMI TCP Connection(1)-192.168.32.1]  INFO o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed initialization in 4 ms
+25-10-27 13:06:31.830 [boundedElastic-1]  WARN o.s.b.a.d.r.RedisReactiveHealthIndicator [ |  | ] - Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1866)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1797)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1594)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1574)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1535)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1571)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1282)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1157)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:121)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to localhost/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:63)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:41)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:354)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:220)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1795)
+	... 16 common frames omitted
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:6379
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:336)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:339)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:784)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-10-27 13:08:42.220 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users", parameters={}
+25-10-27 13:08:42.231 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.user.controller.UserController#userAdd(UserRegisterRequest)
+25-10-27 13:08:42.428 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserRegisterRequest[email=whroql999@naver.com, nickname=g하람짱, password=rosekoa99!]]
+25-10-27 13:08:42.787 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=? 
+    fetch
+        first ? rows only
+25-10-27 13:08:43.084 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    insert 
+    into
+        users
+        (created_at, deleted_at, email, is_deleted, nickname, password, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+25-10-27 13:08:43.125 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:08:43.128 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [UserDto[id=8d4cf57a-a701-4d5a-b464-517010fbd974, email=whroql999@naver.com, nickname=g하람짱, createdAt (truncated)...]
+25-10-27 13:08:43.145 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 201 CREATED
+25-10-27 13:08:51.143 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users/login", parameters={}
+25-10-27 13:08:51.144 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.auth.controller.AuthController#login(UserLoginRequest)
+25-10-27 13:08:51.146 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserLoginRequest[email=whroql999@naver.com, password=rosekoa99!]]
+25-10-27 13:08:51.158 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.is_deleted,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=?
+25-10-27 13:08:51.258 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:08:51.258 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [UserDto[id=8d4cf57a-a701-4d5a-b464-517010fbd974, email=whroql999@naver.com, nickname=g하람짱, createdAt (truncated)...]
+25-10-27 13:08:51.259 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 200 OK
+25-10-27 13:08:51.328 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/articles/sources", parameters={}
+25-10-27 13:08:51.329 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974", parameters={}
+25-10-27 13:08:51.330 [http-nio-8080-exec-3] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:08:51.330 [http-nio-8080-exec-5] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:08:51.343 [http-nio-8080-exec-3] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:08:51.343 [http-nio-8080-exec-5] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:08:51.348 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/articles/sources.]
+25-10-27 13:08:51.349 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:08:51.349 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974.]
+25-10-27 13:08:51.349 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:08:51.354 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/notifications?limit=50", parameters={masked}
+25-10-27 13:08:51.354 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/articles?keyword=&interestId=&publishDateFrom=&publishDateTo=&orderBy=publishDate&direction=DESC&limit=10", parameters={masked}
+25-10-27 13:08:51.355 [http-nio-8080-exec-6] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:08:51.355 [http-nio-8080-exec-9] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:08:51.359 [http-nio-8080-exec-6] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:08:51.359 [http-nio-8080-exec-9] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:08:51.360 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/notifications.]
+25-10-27 13:08:51.360 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/articles.]
+25-10-27 13:08:51.360 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:08:51.360 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:08:51.362 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error", parameters={}
+25-10-27 13:08:51.362 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error", parameters={}
+25-10-27 13:08:51.362 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error?limit=50", parameters={masked}
+25-10-27 13:08:51.362 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:08:51.362 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:08:51.362 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error?keyword=&interestId=&publishDateFrom=&publishDateTo=&orderBy=publishDate&direction=DESC&limit=10", parameters={masked}
+25-10-27 13:08:51.362 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:08:51.364 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:08:51.376 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:08:51.376 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:08:51.376 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:08:51.376 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:08:51.376 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:08:51 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:08:51.376 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:08:51 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:08:51.376 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:08:51 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:08:51.376 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:08:51 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:08:51.385 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:08:51.386 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:08:51.386 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:08:51.390 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:09:02.426 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974", parameters={}
+25-10-27 13:09:02.427 [http-nio-8080-exec-7] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:09:02.430 [http-nio-8080-exec-7] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:09:02.431 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974.]
+25-10-27 13:09:02.431 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:09:02.433 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error", parameters={}
+25-10-27 13:09:02.433 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:09:02.435 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:02.435 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:09:02 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:09:02.436 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:09:02.449 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974", parameters={}
+25-10-27 13:09:02.450 [http-nio-8080-exec-8] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:09:02.452 [http-nio-8080-exec-8] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:09:02.452 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974.]
+25-10-27 13:09:02.453 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:09:02.455 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error", parameters={}
+25-10-27 13:09:02.456 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:09:02.457 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:02.458 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:09:02 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:09:02.459 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:09:02.681 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/interests?keyword=&orderBy=name&direction=DESC&limit=6", parameters={masked}
+25-10-27 13:09:02.682 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.interest.controller.InterestController#interestList()
+25-10-27 13:09:02.697 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:02.697 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Nothing to write: null body
+25-10-27 13:09:02.699 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 200 OK
+25-10-27 13:09:36.977 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users/login", parameters={}
+25-10-27 13:09:36.978 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.auth.controller.AuthController#login(UserLoginRequest)
+25-10-27 13:09:36.981 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserLoginRequest[email=whroql999@naver.com, password=rosekoa99!]]
+25-10-27 13:09:36.991 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.is_deleted,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=?
+25-10-27 13:09:37.136 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:37.137 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [UserDto[id=8d4cf57a-a701-4d5a-b464-517010fbd974, email=whroql999@naver.com, nickname=g하람짱, createdAt (truncated)...]
+25-10-27 13:09:37.140 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 200 OK
+25-10-27 13:09:37.203 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/notifications?limit=50", parameters={masked}
+25-10-27 13:09:37.204 [http-nio-8080-exec-1] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:09:37.208 [http-nio-8080-exec-1] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:09:37.208 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974", parameters={}
+25-10-27 13:09:37.208 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/articles/sources", parameters={}
+25-10-27 13:09:37.208 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - GET "/api/articles?keyword=&interestId=&publishDateFrom=&publishDateTo=&orderBy=publishDate&direction=DESC&limit=10", parameters={masked}
+25-10-27 13:09:37.209 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/notifications.]
+25-10-27 13:09:37.209 [http-nio-8080-exec-5] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:09:37.209 [http-nio-8080-exec-2] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:09:37.209 [http-nio-8080-exec-3] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping    [ |  | ] - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+25-10-27 13:09:37.209 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:09:37.215 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error?limit=50", parameters={masked}
+25-10-27 13:09:37.215 [http-nio-8080-exec-5] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:09:37.215 [http-nio-8080-exec-2] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:09:37.215 [http-nio-8080-exec-3] DEBUG o.s.w.s.r.ResourceHttpRequestHandler [ |  | ] - Resource not found
+25-10-27 13:09:37.216 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/articles/sources.]
+25-10-27 13:09:37.216 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/articles.]
+25-10-27 13:09:37.216 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/user-activities/8d4cf57a-a701-4d5a-b464-517010fbd974.]
+25-10-27 13:09:37.216 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:09:37.216 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:09:37.216 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:09:37.216 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 404 NOT_FOUND
+25-10-27 13:09:37.217 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:37.218 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error", parameters={}
+25-10-27 13:09:37.218 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error", parameters={}
+25-10-27 13:09:37.218 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:09:37 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:09:37.218 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:09:37.218 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:09:37.218 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for GET "/error?keyword=&interestId=&publishDateFrom=&publishDateTo=&orderBy=publishDate&direction=DESC&limit=10", parameters={masked}
+25-10-27 13:09:37.219 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:09:37.219 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:37.219 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:37.220 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:09:37 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:09:37.220 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:09:37.220 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:09:37.220 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:09:37 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:09:37.220 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:09:37 KST 2025, status=404, error=Not Found, trace=org.springframework.web. (truncated)...]
+25-10-27 13:09:37.222 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:09:37.224 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:09:37.224 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 404
+25-10-27 13:15:21.656 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users/login", parameters={}
+25-10-27 13:15:21.694 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.auth.controller.AuthController#login(UserLoginRequest)
+25-10-27 13:15:21.862 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserLoginRequest[email=testuser@example.com, password=abcd1234!]]
+25-10-27 13:15:22.030 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.is_deleted,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=?
+25-10-27 13:15:22.278 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Failed to complete request: java.lang.IllegalArgumentException: 이메일이 일치하지 않습니다.
+25-10-27 13:15:22.370 [http-nio-8080-exec-9] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet]  [ |  | ] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.IllegalArgumentException: 이메일이 일치하지 않습니다.] with root cause
+java.lang.IllegalArgumentException: 이메일이 일치하지 않습니다.
+	at com.spring.monew.auth.service.AuthService.lambda$login$0(AuthService.java:24)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.spring.monew.auth.service.AuthService.login(AuthService.java:24)
+	at com.spring.monew.auth.controller.AuthController.login(AuthController.java:23)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:490)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:351)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:83)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:129)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:334)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1776)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:975)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:493)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-10-27 13:15:22.415 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for POST "/error", parameters={}
+25-10-27 13:15:22.416 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:15:22.443 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:15:22.449 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:15:22 KST 2025, status=500, error=Internal Server Error, trace=java.lang.Il (truncated)...]
+25-10-27 13:15:22.475 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 500
+25-10-27 13:15:58.426 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users/login", parameters={}
+25-10-27 13:15:58.445 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.auth.controller.AuthController#login(UserLoginRequest)
+25-10-27 13:15:58.607 [http-nio-8080-exec-7] DEBUG o.s.web.method.HandlerMethod         [ |  | ] - Could not resolve parameter [0] in public org.springframework.http.ResponseEntity<com.spring.monew.user.controller.dto.data.UserDto> com.spring.monew.auth.controller.AuthController.login(com.spring.monew.user.controller.dto.request.UserLoginRequest): JSON parse error: Unrecognized token 'whroql999': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+25-10-27 13:15:58.623 [http-nio-8080-exec-7]  WARN o.s.w.s.m.s.DefaultHandlerExceptionResolver [ |  | ] - Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Unrecognized token 'whroql999': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')]
+25-10-27 13:15:58.625 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 400 BAD_REQUEST
+25-10-27 13:15:58.637 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - "ERROR" dispatch for POST "/error", parameters={}
+25-10-27 13:15:58.637 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+25-10-27 13:15:58.662 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:15:58.666 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [{timestamp=Mon Oct 27 13:15:58 KST 2025, status=400, error=Bad Request, trace=org.springframework.ht (truncated)...]
+25-10-27 13:15:58.675 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Exiting from "ERROR" dispatch, status 400
+25-10-27 13:16:13.860 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users/login", parameters={}
+25-10-27 13:16:13.861 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.auth.controller.AuthController#login(UserLoginRequest)
+25-10-27 13:16:13.869 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserLoginRequest[email=whroql999@naver.com, password=rosekoa99!]]
+25-10-27 13:16:14.019 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.is_deleted,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=?
+25-10-27 13:16:14.259 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:16:14.264 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [UserDto[id=8d4cf57a-a701-4d5a-b464-517010fbd974, email=whroql999@naver.com, nickname=g하람짱, createdAt (truncated)...]
+25-10-27 13:16:14.278 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 200 OK
+25-10-27 13:17:28.346 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users", parameters={}
+25-10-27 13:17:28.347 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.user.controller.UserController#userAdd(UserRegisterRequest)
+25-10-27 13:17:28.355 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserRegisterRequest[email=testuser@example.com, nickname=테스트유저, password=abcd1234!]]
+25-10-27 13:17:28.412 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=? 
+    fetch
+        first ? rows only
+25-10-27 13:17:28.735 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    insert 
+    into
+        users
+        (created_at, deleted_at, email, is_deleted, nickname, password, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+25-10-27 13:17:28.761 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:17:28.762 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [UserDto[id=92c5c1ed-edf8-425c-8c0f-7a2b95a44938, email=testuser@example.com, nickname=테스트유저, created (truncated)...]
+25-10-27 13:17:28.763 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 201 CREATED
+25-10-27 13:17:40.973 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - POST "/api/users/login", parameters={}
+25-10-27 13:17:40.974 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping [ |  | ] - Mapped to com.spring.monew.auth.controller.AuthController#login(UserLoginRequest)
+25-10-27 13:17:40.977 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor [ |  | ] - Read "application/json;charset=UTF-8" to [UserLoginRequest[email=testuser@example.com, password=abcd1234!]]
+25-10-27 13:17:40.980 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL                    [ |  | ] - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.deleted_at,
+        u1_0.email,
+        u1_0.is_deleted,
+        u1_0.nickname,
+        u1_0.password,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        (
+            u1_0.is_deleted = false
+        ) 
+        and u1_0.email=?
+25-10-27 13:17:41.121 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/yaml]
+25-10-27 13:17:41.121 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor [ |  | ] - Writing [UserDto[id=92c5c1ed-edf8-425c-8c0f-7a2b95a44938, email=testuser@example.com, nickname=테스트유저, created (truncated)...]
+25-10-27 13:17:41.122 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed 200 OK
