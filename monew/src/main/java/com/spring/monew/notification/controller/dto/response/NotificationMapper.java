@@ -18,7 +18,7 @@ public final class NotificationMapper {
           e.getUserId(),       // UUID
           e.getContent(),
           e.getResourceType(), // ENUM
-          e.getResourceId()    // UUID (
+          e.getResourceId()    // UUID
       );
     }
   }
