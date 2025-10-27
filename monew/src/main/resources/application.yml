@@ -1,6 +1,8 @@
 spring:
   application:
     name: monew
+  profiles:
+    active: local
   datasource:
     url: jdbc:postgresql://localhost:5432/monew
     username: postgres
@@ -26,9 +28,9 @@ spring:
 
   batch:
     job:
-      enabled: false
+      enabled: true
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
 
   servlet:
     multipart:
@@ -43,9 +45,11 @@ server:
 logging:
   level:
     root: INFO
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
+    org.springframework.batch: INFO
+    com.spring.monew: INFO
 
 management:
   endpoints:
@@ -71,3 +75,42 @@ aws:
     region: ap-northeast-2
     access-key: ${AWS_ACCESS_KEY_ID:dummy-access}
     secret-key: ${AWS_SECRET_ACCESS_KEY:dummy-secret}
+
+naver:
+  api:
+    client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
+    client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
+
+batch:
+  trigger:
+    enabled: ${BATCH_TRIGGER_ENABLED:true}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+batch:
+  trigger:
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+batch:
+  trigger:
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+batch:
+  trigger:
+    enabled: true
