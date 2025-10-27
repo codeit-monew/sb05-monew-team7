@@ -3,6 +3,7 @@ package com.spring.monew.article.batch.processor;
 import com.spring.monew.article.client.dto.ArticleCandidate;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.interest.domain.Interest;
+import com.spring.monew.interest.repository.InterestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepExecution;
@@ -12,20 +13,28 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ArticleCandidateProcessor implements ItemProcessor<ArticleCandidate, Article> {
 
+    private final InterestRepository interestRepository;
     private List<Interest> cachedInterests;
 
     @BeforeStep
     public void loadInterests(StepExecution stepExecution) {
         @SuppressWarnings("unchecked")
-        List<Interest> interests = (List<Interest>) stepExecution.getExecutionContext().get("interests");
+        List<UUID> interestIds = (List<UUID>) stepExecution.getExecutionContext().get("interestIds");
         
-        cachedInterests = (interests != null && !interests.isEmpty()) ? interests : Collections.emptyList();
+        if (interestIds == null || interestIds.isEmpty()) {
+            cachedInterests = Collections.emptyList();
+            log.warn("ExecutionContext에서 관심사 ID를 찾을 수 없습니다.");
+            return;
+        }
+        
+        cachedInterests = interestRepository.findAllById(interestIds);
         log.info("키워드 매칭을 위해 {} 개의 관심사를 로드했습니다", cachedInterests.size());
     }
 

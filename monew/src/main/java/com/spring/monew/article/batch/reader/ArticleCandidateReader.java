@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -39,11 +41,14 @@ public class ArticleCandidateReader implements ItemReader<ArticleCandidate> {
         List<Interest> interests = interestRepository.findAll();
         if (interests == null || interests.isEmpty()) {
             log.warn("등록된 관심사가 없습니다. 기사 수집을 건너뜁니다.");
-            stepExecution.getExecutionContext().put("interests", new ArrayList<Interest>());
+            stepExecution.getExecutionContext().put("interestIds", new ArrayList<UUID>());
             return;
         }
 
-        stepExecution.getExecutionContext().put("interests", interests);
+        List<UUID> interestIds = interests.stream()
+                .map(Interest::getId)
+                .collect(Collectors.toList());
+        stepExecution.getExecutionContext().put("interestIds", interestIds);
 
         Set<String> allKeywords = new HashSet<>();
         for (Interest interest : interests) {
