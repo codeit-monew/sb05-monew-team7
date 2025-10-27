@@ -53,7 +53,8 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
             interest.name,
             interest.keywords,
             interest.subscriptionsCount,
-            subscription.id.isNotNull() // 내가 구독 중인지 여부
+            subscription.id.isNotNull(), // 내가 구독 중인지 여부
+            interest.createdAt
             )
         )
         .from(interest)
@@ -70,15 +71,7 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
 
     // 커서 계산
     String nextCursor = hasNext ? results.get(results.size() - 1).id().toString() : null;
-    Instant nextAfter = null;
-
-    if (hasNext && nextCursor != null) {
-      nextAfter = queryFactory
-          .select(interest.createdAt)
-          .from(interest)
-          .where(interest.id.eq(UUID.fromString(nextCursor)))
-          .fetchOne();
-    }
+    Instant nextAfter = hasNext ? results.get(results.size() - 1).createdAt() : null;
 
     return new CursorPageResponseInterestDto(
         results,

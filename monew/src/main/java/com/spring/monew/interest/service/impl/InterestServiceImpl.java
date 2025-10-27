@@ -28,14 +28,15 @@ public class InterestServiceImpl implements InterestService {
     if (interestRepository.existsByName(registerRequest.name())) {
       throw new IllegalArgumentException("같은 이름 존재");
     }
-    Interest save = interestRepository.save(
+    Interest interest = interestRepository.save(
         new Interest(registerRequest.name(), registerRequest.keywords()));
     return new InterestDto(
-        save.getId(),
-        save.getName(),
-        save.getKeywords(),
-        save.getSubscriptionsCount(),
-        true);  //일단 트루 처리
+        interest.getId(),
+        interest.getName(),
+        interest.getKeywords(),
+        interest.getSubscriptionsCount(),
+        true,
+        interest.getCreatedAt());  //일단 트루 처리
   }
 
   @Override
@@ -68,7 +69,8 @@ public class InterestServiceImpl implements InterestService {
         interest.getName(),
         interest.getKeywords(),
         interest.getSubscriptionsCount(),
-        true);  //일단 트루 처리
+        true,
+        interest.getCreatedAt());  //일단 트루 처리
   }
 
   @Override
