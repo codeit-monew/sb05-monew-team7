@@ -276,3 +276,10 @@ credentials
 nohup.out
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,gradle,intellij+all,visualstudiocode
+
+# --- 추가 필요: IDE 및 로그 관련 ---
+.idea/
+.idea/**
+*.iml
+.logs/
+*.log
