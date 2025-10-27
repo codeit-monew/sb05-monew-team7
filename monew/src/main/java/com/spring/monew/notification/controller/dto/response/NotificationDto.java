@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.spring.monew.notification.domain.NotificationResourceType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
 import java.time.Instant;
 import java.util.UUID;
+
+// 알림 단건 응답 DTO.
 
 @Schema(name = "NotificationDto", description = "알림 단건 응답 DTO")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,7 +17,6 @@ import java.util.UUID;
     "id", "createdAt", "updatedAt", "confirmed",
     "userId", "content", "resourceType", "resourceId"
 })
-@Builder
 public record NotificationDto(
     @Schema(description = "알림 ID", format = "uuid", example = "70f35bd9-4191-8d1a-8bc6-123456789abc")
     UUID id,

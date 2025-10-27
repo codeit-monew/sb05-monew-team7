@@ -18,7 +18,6 @@ public class NotificationCleanupScheduler {
   private final NotificationRepository repository;
 
   // 매일 03:00(UTC) 실행 - 확인되었고 updatedAt 기준 7일이 지난 알림 삭제
-
   @Transactional
   @Scheduled(cron = "0 0 3 * * *", zone = "UTC")
   public void deleteOldConfirmed() {
