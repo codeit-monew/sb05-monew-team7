@@ -43,6 +43,6 @@ public class Subscription {
     public Subscription(User user, Interest interest) {
         this.user = user;
         this.interest = interest;
-
+        this.createdAt = Instant.now();
     }
 }
