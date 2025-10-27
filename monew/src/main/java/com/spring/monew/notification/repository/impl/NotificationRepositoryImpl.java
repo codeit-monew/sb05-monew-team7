@@ -79,9 +79,8 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
 
   @Override
   public Instant getDatabaseNow() {
-    // DB의 CURRENT_TIMESTAMP 사용
-    return em.createQuery("SELECT CURRENT_TIMESTAMP FROM Notification n", Instant.class)
-        .setMaxResults(1)
+    // DB 서버 시각을 JPQL로 조회 (테이블 참조 없이)
+    return em.createQuery("SELECT CURRENT_TIMESTAMP", Instant.class)
         .getSingleResult();
   }
 }
