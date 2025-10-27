@@ -10,4 +10,5 @@ public interface NotificationRepository
     extends JpaRepository<Notification, UUID>, NotificationRepositoryCustom {
 
   Optional<Notification> findByIdAndUserId(UUID id, UUID userId);
+  boolean existsByUserIdAndConfirmedFalse(UUID userId);
 }

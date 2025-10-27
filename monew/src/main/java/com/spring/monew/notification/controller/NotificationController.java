@@ -10,16 +10,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.time.format.DateTimeParseException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -57,9 +57,7 @@ public class NotificationController {
     var cursorAt = decoded == null ? null : decoded.createdAt;
     var cursorId = decoded == null ? null : decoded.id;
 
-    // limit+1로 다음 페이지 여부
     int fetchSize = limit + 1;
-
     List<Notification> entities = repository.findUnreadByUserIdWithCursor(
         userId, afterOrNow, cursorAt, cursorId, fetchSize);
 
@@ -100,14 +98,14 @@ public class NotificationController {
     boolean already = entity.isConfirmed();
     if (!already) {
       entity.confirm();
-      repository.flush();
+      repository.flush(); // @PreUpdate 반영
     }
 
     return new NotificationConfirmResponseDto(
-        entity.getId().toString(),
+        entity.getId(),                    // UUID
         true,
         already,
-        userId.toString(),
+        userId,                            // UUID
         entity.getUpdatedAt() != null ? entity.getUpdatedAt() : entity.getCreatedAt()
     );
   }
@@ -120,17 +118,18 @@ public class NotificationController {
       @RequestHeader("Monew-Request-User-ID") UUID userId
   ) {
     long updated = repository.confirmAllByUserId(userId);
-    Instant processedAt = repository.getDatabaseNow();
+    boolean hasUnread = repository.existsByUserIdAndConfirmedFalse(userId);
+    boolean allConfirmed = !hasUnread;
 
     return new BulkConfirmResultDto(
         updated,
-        userId.toString(),
-        processedAt
+        allConfirmed,
+        userId,              // UUID
+        Instant.now()        // 처리 시각
     );
   }
 
-
-  // ====== 내부 ======
+  // ===== 내부: 커서 =====
   private record CursorDecoded(Instant createdAt, UUID id) {}
 
   private static String encodeCursor(Instant createdAt, UUID id) {

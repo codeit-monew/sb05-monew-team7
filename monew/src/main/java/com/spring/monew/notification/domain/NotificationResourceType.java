@@ -15,7 +15,7 @@ public enum NotificationResourceType {
     try {
       return NotificationResourceType.valueOf(value.trim().toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException e) {
-      // 운영에서 모니터링 가능하도록 경고 남김 (필요 시 error/metrics로 승격)
+      // 운영에서 모니터링 가능하도록 경고 남김
       log.warn("Unknown NotificationResourceType value: {}", value);
       return null;
     }

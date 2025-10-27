@@ -38,7 +38,7 @@ public record NotificationDto(
     @Schema(description = "알림 내용(최대 255자)", example = "[관심사] 관련 기사가 3건 등록되었습니다.")
     String content,
 
-    @Schema(description = "관련 리소스 타입", requiredMode = Schema.RequiredMode.REQUIRED, readOnly = true)
+    @Schema(description = "관련 리소스 타입", requiredMode = Schema.RequiredMode.REQUIRED)
     NotificationResourceType resourceType,
 
     @Schema(description = "관련 리소스 ID", format = "uuid", example = "de9e6b6e-1e8e-4bf-98db-5f1f37a4e7a2", nullable = true)

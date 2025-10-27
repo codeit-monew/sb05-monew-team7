@@ -30,7 +30,7 @@ public class Notification {
   private boolean confirmed;
 
   @Enumerated(EnumType.STRING)
-  @JdbcTypeCode(SqlTypes.NAMED_ENUM) // PG ENUM에 맞게 바인딩
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM) //ENUM에 맞게
   @Column(name = "resource_type", columnDefinition = "resource_type", nullable = true) // NULL 허용이면 true
   private NotificationResourceType resourceType;
 
