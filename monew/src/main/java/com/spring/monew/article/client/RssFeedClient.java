@@ -6,6 +6,8 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import com.spring.monew.article.client.dto.ArticleCandidate;
 import com.spring.monew.article.domain.ArticleSource;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,6 +23,10 @@ public class RssFeedClient {
     private static final String HANKYUNG_RSS_URL = "https://www.hankyung.com/feed/all-news";
     private static final String CHOSUN_RSS_URL = "https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml";
     private static final String YEONHAP_RSS_URL = "https://www.yna.co.kr/rss/news.xml";
+    
+    private static final int CONNECT_TIMEOUT = 5000;
+    private static final int READ_TIMEOUT = 10000;
+    private static final String USER_AGENT = "Mozilla/5.0 (compatible; MonewNewsBot/1.0)";
 
     public List<ArticleCandidate> fetchHankyungNews() {
         return fetchRssFeed(HANKYUNG_RSS_URL, ArticleSource.HANKYUNG);
@@ -37,10 +43,20 @@ public class RssFeedClient {
     private List<ArticleCandidate> fetchRssFeed(String feedUrl, ArticleSource source) {
         List<ArticleCandidate> candidates = new ArrayList<>();
 
+        HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        
         try {
             URL url = new URL(feedUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT);
+            connection.setReadTimeout(READ_TIMEOUT);
+            connection.setRequestProperty("User-Agent", USER_AGENT);
+            
+            inputStream = connection.getInputStream();
+            
             SyndFeedInput input = new SyndFeedInput();
-            SyndFeed feed = input.build(new XmlReader(url));
+            SyndFeed feed = input.build(new XmlReader(inputStream));
 
             for (SyndEntry entry : feed.getEntries()) {
                 try {
@@ -66,6 +82,17 @@ public class RssFeedClient {
             }
         } catch (Exception e) {
             log.error("{}에서 RSS 피드를 가져오는데 실패했습니다: {}", source, feedUrl, e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                    log.warn("InputStream 닫기 실패", e);
+                }
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
 
         return candidates;

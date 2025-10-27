@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @RequiredArgsConstructor
@@ -24,8 +25,9 @@ import org.springframework.web.client.RestTemplate;
 public class NaverNewsApiClient {
 
     private static final String NAVER_NEWS_API_URL = "https://openapi.naver.com/v1/search/news.json";
+    private static final int MAX_DISPLAY = 100;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${naver.api.client-id}")
     private String clientId;
@@ -38,7 +40,14 @@ public class NaverNewsApiClient {
         headers.set("X-Naver-Client-Id", clientId);
         headers.set("X-Naver-Client-Secret", clientSecret);
 
-        String url = String.format("%s?query=%s&display=%d&sort=date", NAVER_NEWS_API_URL, keyword, display);
+        int cappedDisplay = Math.min(display, MAX_DISPLAY);
+
+        String url = UriComponentsBuilder.fromHttpUrl(NAVER_NEWS_API_URL)
+                .queryParam("query", keyword)
+                .queryParam("display", cappedDisplay)
+                .queryParam("sort", "date")
+                .encode()
+                .toUriString();
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
