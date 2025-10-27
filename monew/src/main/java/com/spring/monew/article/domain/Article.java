@@ -1,6 +1,6 @@
 package com.spring.monew.article.domain;
 
-//import com.spring.monew.interest.domain.Interest;
+import com.spring.monew.interest.domain.Interest;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -16,16 +16,16 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE articles SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("is_deleted = false") // 조회 시 기본적으로 삭제되지 않은 것만 조회
+@SQLRestriction("is_deleted = false")
 public class Article {
 
     @Id
     @Column(name = "id")
     private UUID id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "interest_id", nullable = false)
-//    private Interest interest;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "interest_id", nullable = false)
+    private Interest interest;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false)
@@ -65,5 +65,21 @@ public class Article {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    private Article(Interest interest, ArticleSource source, String sourceUrl, 
+                   String title, Instant publishDate, String summary) {
+        this.id = UUID.randomUUID();
+        this.interest = interest;
+        this.source = source;
+        this.sourceUrl = sourceUrl;
+        this.title = title;
+        this.publishDate = publishDate;
+        this.summary = summary;
+    }
+
+    public static Article of(Interest interest, ArticleSource source, String sourceUrl,
+                             String title, Instant publishDate, String summary) {
+        return new Article(interest, source, sourceUrl, title, publishDate, summary);
+    }
 
 }

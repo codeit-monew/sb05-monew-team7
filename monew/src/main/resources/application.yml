@@ -1,6 +1,8 @@
 spring:
   application:
     name: monew
+  profiles:
+    active: local
   datasource:
     url: jdbc:postgresql://localhost:5432/monew
     username: postgres
@@ -9,8 +11,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # (?? ?) create / update / validate / none
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -21,14 +23,14 @@ spring:
       uri: mongodb://localhost:27017/monew
 
     redis:
-      host: localhost    # 또는 redis service name (docker-compose)
+      host: localhost
       port: 6379
 
   batch:
     job:
-      enabled: false
+      enabled: true
     jdbc:
-      initialize-schema: never
+      initialize-schema: ${BATCH_INITIALIZE_SCHEMA:embedded}
 
   servlet:
     multipart:
@@ -43,9 +45,11 @@ server:
 logging:
   level:
     root: INFO
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
+    org.springframework.batch: INFO
+    com.spring.monew: INFO
 
 management:
   endpoints:
@@ -71,3 +75,12 @@ aws:
     region: ap-northeast-2
     access-key: ${AWS_ACCESS_KEY_ID:dummy-access}
     secret-key: ${AWS_SECRET_ACCESS_KEY:dummy-secret}
+
+naver:
+  api:
+    client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
+    client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
+
+batch:
+  trigger:
+    enabled: ${BATCH_TRIGGER_ENABLED:true}
