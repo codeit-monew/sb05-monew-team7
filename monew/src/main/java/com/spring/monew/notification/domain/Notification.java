@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(
@@ -27,8 +29,9 @@ public class Notification {
   @Column(name = "confirmed", nullable = false)
   private boolean confirmed;
 
-  @Convert(converter = NotificationResourceTypeConverter.class)
-  @Column(name = "resource_type") // NULL 허용
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM) // PG ENUM에 맞게 바인딩
+  @Column(name = "resource_type", columnDefinition = "resource_type", nullable = true) // NULL 허용이면 true
   private NotificationResourceType resourceType;
 
   @Column(name = "resource_id") // NULL 허용

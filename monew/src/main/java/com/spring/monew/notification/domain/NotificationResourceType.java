@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 
 public enum NotificationResourceType {
-  INTEREST, COMMENT;
+  INTEREST, ARTICLE, COMMENT, SUBSCRIPTION;
 
   private static final Logger log = LoggerFactory.getLogger(NotificationResourceType.class);
 
