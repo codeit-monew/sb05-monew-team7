@@ -25,6 +25,12 @@ CREATE TABLE interests
     keywords            TEXT         NOT NULL,
     subscriptions_count BIGINT       NOT NULL DEFAULT 0
 );
+-- pg_trgm 확장 활성화
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- name 컬럼에 트라이그램 인덱스 생성
+CREATE INDEX idx_interests_name_trgm
+    ON interests USING gin (name gin_trgm_ops);
 
 -- ==============================
 -- SUBSCRIPTIONS
