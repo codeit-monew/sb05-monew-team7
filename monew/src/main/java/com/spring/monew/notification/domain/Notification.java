@@ -87,9 +87,13 @@ public class Notification {
     }
   }
 
-  // 내용 수정(필요 시)
+  // 내용 수정
   public void changeContent(String newContent) {
-    this.content = Objects.requireNonNull(newContent, "content");
+    Objects.requireNonNull(newContent, "content");
+    if (newContent.length() > 255) {
+      throw new IllegalArgumentException("Content length must not exceed 255 characters");
+    }
+    this.content = newContent;
   }
 
   // getters
