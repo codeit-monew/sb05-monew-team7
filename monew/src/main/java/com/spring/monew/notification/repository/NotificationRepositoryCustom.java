@@ -17,6 +17,7 @@ public interface NotificationRepositoryCustom {
   );
 
   long confirmAllByUserId(UUID userId);
+  long deleteConfirmedBefore(Instant threshold);
 
   Instant getDatabaseNow();
 }

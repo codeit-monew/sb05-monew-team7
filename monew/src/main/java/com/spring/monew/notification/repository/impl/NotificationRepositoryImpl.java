@@ -6,7 +6,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -17,26 +16,23 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
   @PersistenceContext
   private EntityManager em;
 
+  // ===== 이미 너에게 있던 메서드들 =====
   @Override
   public List<Notification> findUnreadByUserIdWithCursor(
-      UUID userId,
-      Instant afterOrNow,
-      Instant cursorCreatedAt,
-      UUID cursorId,
-      int limitPlusOne
+      UUID userId, Instant afterOrNow, Instant cursorCreatedAt, UUID cursorId, int limitPlusOne
   ) {
     var jpql = new StringBuilder("""
-            SELECT n FROM Notification n
-             WHERE n.userId = :userId
-               AND n.confirmed = FALSE
-               AND n.createdAt <= :after
-        """);
+                SELECT n FROM Notification n
+                 WHERE n.userId = :userId
+                   AND n.confirmed = FALSE
+                   AND n.createdAt <= :after
+                """);
 
     if (cursorCreatedAt != null && cursorId != null) {
       jpql.append("""
-               AND ( n.createdAt < :cursorCreatedAt
-                  OR (n.createdAt = :cursorCreatedAt AND n.id < :cursorId) )
-            """);
+                   AND ( n.createdAt < :cursorCreatedAt
+                      OR (n.createdAt = :cursorCreatedAt AND n.id < :cursorId) )
+                """);
     }
 
     jpql.append(" ORDER BY n.createdAt DESC, n.id DESC");
@@ -57,20 +53,35 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
   @Override
   public long confirmAllByUserId(UUID userId) {
     var q = em.createQuery("""
-        UPDATE Notification n
-           SET n.confirmed = TRUE,
-               n.updatedAt = CURRENT_TIMESTAMP
-         WHERE n.userId = :userId
-           AND n.confirmed = FALSE
-    """);
+            UPDATE Notification n
+               SET n.confirmed = TRUE,
+                   n.updatedAt = CURRENT_TIMESTAMP
+             WHERE n.userId = :userId
+               AND n.confirmed = FALSE
+        """);
     q.setParameter("userId", userId);
+    return q.executeUpdate();
+  }
+
+  // ===== 새로 추가되는 메서드들 =====
+
+  @Override
+  public long deleteConfirmedBefore(Instant threshold) {
+    var q = em.createQuery("""
+            DELETE FROM Notification n
+             WHERE n.confirmed = TRUE
+               AND n.updatedAt IS NOT NULL
+               AND n.updatedAt < :threshold
+        """);
+    q.setParameter("threshold", threshold);
     return q.executeUpdate();
   }
 
   @Override
   public Instant getDatabaseNow() {
-    // CURRENT_TIMESTAMP는 DB 서버 시각
-    Timestamp ts = (Timestamp) em.createNativeQuery("select current_timestamp").getSingleResult();
-    return ts.toInstant();
+    // DB의 CURRENT_TIMESTAMP 사용
+    return em.createQuery("SELECT CURRENT_TIMESTAMP FROM Notification n", Instant.class)
+        .setMaxResults(1)
+        .getSingleResult();
   }
 }
