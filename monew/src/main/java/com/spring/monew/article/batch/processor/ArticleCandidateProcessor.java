@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -26,13 +27,17 @@ public class ArticleCandidateProcessor implements ItemProcessor<ArticleCandidate
     @BeforeStep
     public void loadInterests(StepExecution stepExecution) {
         @SuppressWarnings("unchecked")
-        List<UUID> interestIds = (List<UUID>) stepExecution.getExecutionContext().get("interestIds");
+        List<String> interestIdStrings = (List<String>) stepExecution.getExecutionContext().get("interestIds");
         
-        if (interestIds == null || interestIds.isEmpty()) {
+        if (interestIdStrings == null || interestIdStrings.isEmpty()) {
             cachedInterests = Collections.emptyList();
             log.warn("ExecutionContext에서 관심사 ID를 찾을 수 없습니다.");
             return;
         }
+        
+        List<UUID> interestIds = interestIdStrings.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList());
         
         cachedInterests = interestRepository.findAllById(interestIds);
         log.info("키워드 매칭을 위해 {} 개의 관심사를 로드했습니다", cachedInterests.size());

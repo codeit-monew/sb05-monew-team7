@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -41,12 +40,12 @@ public class ArticleCandidateReader implements ItemReader<ArticleCandidate> {
         List<Interest> interests = interestRepository.findAll();
         if (interests == null || interests.isEmpty()) {
             log.warn("등록된 관심사가 없습니다. 기사 수집을 건너뜁니다.");
-            stepExecution.getExecutionContext().put("interestIds", new ArrayList<UUID>());
+            stepExecution.getExecutionContext().put("interestIds", new ArrayList<String>());
             return;
         }
 
-        List<UUID> interestIds = interests.stream()
-                .map(Interest::getId)
+        List<String> interestIds = interests.stream()
+                .map(interest -> interest.getId().toString())
                 .collect(Collectors.toList());
         stepExecution.getExecutionContext().put("interestIds", interestIds);
 
