@@ -28,6 +28,7 @@ public class CommentServiceImpl implements CommentService {
   private final ArticleRepository articleRepository;
 
   @Override
+  @Transactional
   public CommentDto addComment(CommentRegisterRequest registerRequest) {
     User user = userRepository.findById(registerRequest.userId()).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 유저 입니다."));
@@ -50,6 +51,7 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
+  @Transactional
   public CursorPageResponseCommentDto getComments(UUID articleId, String orderBy,
       String direction, String cursor, Instant after, int limit, UUID userId) {
 
@@ -59,6 +61,7 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
+  @Transactional
   public CommentDto modifyComment(UUID commentId, UUID userId , CommentUpdateRequest updateRequest) {
     Comment comment = commentRepository.findById(commentId).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 댓글입니다."));
@@ -82,6 +85,7 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
+  @Transactional
   public void removeCommentLogical(UUID commentId) {
     if(!commentRepository.existsById(commentId)) {
       throw new NoSuchElementException("존재하지 않는 댓글입니다.");
@@ -91,6 +95,7 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
+  @Transactional
   public void removeCommentHard(UUID commentId) {
     if(!commentRepository.existsById(commentId)) {
       throw new NoSuchElementException("존재하지 않는 댓글입니다.");
