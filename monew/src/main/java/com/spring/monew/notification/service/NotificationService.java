@@ -1,79 +1,172 @@
 package com.spring.monew.notification.service;
 
+import com.spring.monew.notification.controller.dto.response.BulkConfirmResultDto;
+import com.spring.monew.notification.controller.dto.response.CursorPageResponseNotificationDto;
+import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
+import com.spring.monew.notification.controller.dto.response.NotificationDto;
 import com.spring.monew.notification.domain.Notification;
-import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
 
-  private static final int CONTENT_MAX = 255;
+  private static final int MIN_LIMIT = 1;
+  private static final int MAX_LIMIT = 100;
 
-  private final NotificationRepository notificationRepository;
+  private final NotificationRepository repository;
 
-  @Transactional
-  public UUID create(UUID userId, String content,
-      NotificationResourceType type, UUID resourceId) {
-    Notification n = Notification.of(userId, safeContent(content), type, resourceId);
-    return notificationRepository.save(n).getId();
+  // 목록 조회 (커서 기반)
+  @Transactional(readOnly = true)
+  public CursorPageResponseNotificationDto list(UUID userId, String cursor, Instant after, int limit) {
+    Objects.requireNonNull(userId, "userId must not be null");
+
+    // limit 가드(컨트롤러 @Min/@Max 외, 서비스 레벨에서도 방어)
+    final int safeLimit = Math.max(MIN_LIMIT, Math.min(MAX_LIMIT, limit));
+
+    // 시간 기준: DB now()가 있으면 그것을 우선 사용(서버/DB 시간 불일치 방지)
+    final Instant now = getConsistentNow();
+    final Instant afterOrNow = (after == null || after.isAfter(now)) ? now : after;
+
+    final CursorDecoded decoded;
+    try {
+      decoded = decodeCursor(cursor);
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 커서 형식입니다.", e);
+    }
+
+    final Instant cursorAt = (decoded == null) ? null : decoded.createdAt;
+    final UUID cursorId = (decoded == null) ? null : decoded.id;
+
+    final int fetchSize = safeLimit + 1;
+    List<Notification> entities = repository.findUnreadByUserIdWithCursor(
+        userId, afterOrNow, cursorAt, cursorId, fetchSize
+    );
+
+    final boolean hasNext = entities.size() == fetchSize;
+    if (hasNext) {
+      entities = entities.subList(0, fetchSize - 1);
+    }
+
+    // 직접 DTO 조립
+    final List<NotificationDto> content = new ArrayList<>(entities.size());
+    for (Notification n : entities) {
+      NotificationDto dto = new NotificationDto(
+          n.getId(),
+          n.getCreatedAt(),
+          n.getUpdatedAt(),
+          n.isConfirmed(),
+          n.getUserId(),
+          n.getContent(),
+          n.getResourceType(),
+          n.getResourceId()
+      );
+      content.add(dto);
+    }
+
+    String nextCursor = null;
+    if (hasNext && !entities.isEmpty()) {
+      Notification last = entities.get(entities.size() - 1);
+      nextCursor = encodeCursor(last.getCreatedAt(), last.getId());
+    }
+
+    return new CursorPageResponseNotificationDto(
+        content,
+        nextCursor,
+        afterOrNow,
+        content.size(),
+        null,
+        hasNext
+    );
   }
 
+  // 단건 확인
   @Transactional
-  public int createBulk(Collection<UUID> userIds, String content,
-      NotificationResourceType type, UUID resourceId) {
-    if (userIds == null || userIds.isEmpty()) return 0;
+  public NotificationConfirmResponseDto confirmOne(UUID userId, UUID notificationId) {
+    Objects.requireNonNull(userId, "userId must not be null");
+    Objects.requireNonNull(notificationId, "notificationId must not be null");
 
-    final String msg = safeContent(content);
+    Notification entity = repository.findByIdAndUserId(notificationId, userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."));
 
-    List<Notification> batch = userIds.stream()
-        .filter(Objects::nonNull)
-        .distinct()
-        .map(uid -> Notification.of(uid, msg, type, resourceId))
-        .collect(Collectors.toList());
+    boolean already = entity.isConfirmed();
+    if (!already) {
+      entity.confirm();
+      repository.flush(); // @PreUpdate/감사필드 즉시 반영
+    }
 
-    if (batch.isEmpty()) return 0;
-
-    notificationRepository.saveAll(batch); // 필요 시 saveAllAndFlush(batch)
-    return batch.size();
+    return new NotificationConfirmResponseDto(
+        entity.getId(),
+        true,
+        already,
+        userId,
+        (entity.getUpdatedAt() != null) ? entity.getUpdatedAt() : entity.getCreatedAt()
+    );
   }
 
-  private static String safeContent(String content) {
-    if (content == null) return "";
-    if (content.length() <= CONTENT_MAX) return content;
-    return content.substring(0, CONTENT_MAX - 1) + "…";
+  // 전체 확인
+  @Transactional
+  public BulkConfirmResultDto confirmAll(UUID userId) {
+    Objects.requireNonNull(userId, "userId must not be null");
+
+    long updated = repository.confirmAllByUserId(userId);
+    boolean hasUnread = repository.existsByUserIdAndConfirmedFalse(userId);
+    boolean allConfirmed = !hasUnread;
+
+    return new BulkConfirmResultDto(
+        updated,
+        allConfirmed,
+        userId,
+        getConsistentNow()
+    );
   }
 
-  // 관심사 기사 등록 → 구독자 전원 알림 생성
-  @Transactional
-  public int createInterestArticleNotifications(
-      UUID interestId, String interestName, Collection<UUID> subscriberIds, long articleCount) {
+  // 내부 유틸
 
-    if (subscriberIds == null || subscriberIds.isEmpty()) return 0;
-    String msg = String.format(Locale.ROOT,
-        "[%s]와 관련된 기사가 %d건 등록되었습니다.", interestName, articleCount);
-
-    return createBulk(subscriberIds, msg, NotificationResourceType.INTEREST, interestId);
+  private static final class CursorDecoded {
+    private final Instant createdAt;
+    private final UUID id;
+    private CursorDecoded(Instant createdAt, UUID id) {
+      this.createdAt = createdAt;
+      this.id = id;
+    }
   }
 
-  // 내 댓글 좋아요 → 댓글 작성자(본인 제외)에게 알림 생성
-  @Transactional
-  public boolean createCommentLikeNotification(
-      UUID commentId, UUID commentAuthorId, UUID likerUserId, String likerNickname) {
+  private static String encodeCursor(Instant createdAt, UUID id) {
+    String raw = createdAt.toString() + "|" + id;
+    return Base64.getUrlEncoder().withoutPadding()
+        .encodeToString(raw.getBytes(StandardCharsets.UTF_8));
+  }
 
-    if (commentAuthorId == null || likerUserId == null) return false;
-    if (commentAuthorId.equals(likerUserId)) return false;
+  private static CursorDecoded decodeCursor(String cursor) {
+    if (cursor == null || cursor.isBlank()) return null;
+    String raw = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8);
+    String[] parts = raw.split("\\|");
+    if (parts.length != 2) {
+      throw new IllegalArgumentException("Invalid cursor (expected 'createdAt|id').");
+    }
+    return new CursorDecoded(Instant.parse(parts[0]), UUID.fromString(parts[1]));
+  }
 
-    String msg = String.format(Locale.ROOT,
-        "[%s]님이 나의 댓글을 좋아합니다.", likerNickname);
-
-    create(commentAuthorId, msg, NotificationResourceType.COMMENT, commentId);
-    return true;
+  private Instant getConsistentNow() {
+    try {
+      return repository.getDatabaseNow();
+    } catch (Exception ignore) {
+      return Instant.now();
+    }
   }
 }

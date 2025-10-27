@@ -3,39 +3,28 @@ package com.spring.monew.notification.controller;
 import com.spring.monew.notification.controller.dto.response.BulkConfirmResultDto;
 import com.spring.monew.notification.controller.dto.response.CursorPageResponseNotificationDto;
 import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
-import com.spring.monew.notification.controller.dto.response.NotificationMapper;
-import com.spring.monew.notification.domain.Notification;
-import com.spring.monew.notification.repository.NotificationRepository;
+import com.spring.monew.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.util.Base64;
-import java.util.List;
 import java.util.UUID;
 
 @Validated
 @RestController
 @RequestMapping("/api/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
 
-  private final NotificationRepository repository;
+  private final NotificationService notificationService;
 
-  public NotificationController(NotificationRepository repository) {
-    this.repository = repository;
-  }
-
-  // ===== 목록 조회 =====
+  // 알림 목록 조회 (커서 기반)
   @Operation(summary = "알림 목록 조회")
   @GetMapping
   public CursorPageResponseNotificationDto list(
@@ -46,103 +35,25 @@ public class NotificationController {
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant after,
       @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit
   ) {
-    var afterOrNow = (after == null) ? Instant.now() : after;
-
-    CursorDecoded decoded;
-    try {
-      decoded = decodeCursor(cursor);
-    } catch (IllegalArgumentException | DateTimeParseException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 커서 형식입니다.", e);
-    }
-    var cursorAt = decoded == null ? null : decoded.createdAt;
-    var cursorId = decoded == null ? null : decoded.id;
-
-    int fetchSize = limit + 1;
-    List<Notification> entities = repository.findUnreadByUserIdWithCursor(
-        userId, afterOrNow, cursorAt, cursorId, fetchSize);
-
-    boolean hasNext = entities.size() == fetchSize;
-    if (hasNext) entities = entities.subList(0, fetchSize - 1);
-
-    var content = entities.stream()
-        .map(NotificationMapper::toDto)
-        .toList();
-
-    String nextCursor = null;
-    if (hasNext && !entities.isEmpty()) {
-      var last = entities.get(entities.size() - 1);
-      nextCursor = encodeCursor(last.getCreatedAt(), last.getId());
-    }
-
-    return new CursorPageResponseNotificationDto(
-        content,
-        nextCursor,
-        afterOrNow,
-        content.size(),
-        null,
-        hasNext
-    );
+    return notificationService.list(userId, cursor, after, limit);
   }
 
-  // ===== 단건 확인 =====
+  // 알림 확인(단건)
   @Operation(summary = "알림 확인(단건)")
-  @Transactional
   @PatchMapping("/{notificationId}")
   public NotificationConfirmResponseDto confirmOne(
       @RequestHeader("Monew-Request-User-ID") UUID userId,
       @PathVariable UUID notificationId
   ) {
-    var entity = repository.findByIdAndUserId(notificationId, userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."));
-
-    boolean already = entity.isConfirmed();
-    if (!already) {
-      entity.confirm();
-      repository.flush(); // @PreUpdate 반영
-    }
-
-    return new NotificationConfirmResponseDto(
-        entity.getId(),                    // UUID
-        true,
-        already,
-        userId,                            // UUID
-        entity.getUpdatedAt() != null ? entity.getUpdatedAt() : entity.getCreatedAt()
-    );
+    return notificationService.confirmOne(userId, notificationId);
   }
 
-  // ===== 전체 확인 =====
+  // 전체 알림 확인(일괄)
   @Operation(summary = "전체 알림 확인(일괄)")
-  @Transactional
   @PatchMapping
   public BulkConfirmResultDto confirmAll(
       @RequestHeader("Monew-Request-User-ID") UUID userId
   ) {
-    long updated = repository.confirmAllByUserId(userId);
-    boolean hasUnread = repository.existsByUserIdAndConfirmedFalse(userId);
-    boolean allConfirmed = !hasUnread;
-
-    return new BulkConfirmResultDto(
-        updated,
-        allConfirmed,
-        userId,              // UUID
-        Instant.now()        // 처리 시각
-    );
-  }
-
-  // ===== 내부: 커서 =====
-  private record CursorDecoded(Instant createdAt, UUID id) {}
-
-  private static String encodeCursor(Instant createdAt, UUID id) {
-    var raw = createdAt.toString() + "|" + id;
-    return Base64.getUrlEncoder().withoutPadding()
-        .encodeToString(raw.getBytes(StandardCharsets.UTF_8));
-  }
-
-  private static CursorDecoded decodeCursor(String cursor) {
-    if (cursor == null || cursor.isBlank()) return null;
-    var raw = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8);
-    var parts = raw.split("\\|");
-    if (parts.length != 2) throw new IllegalArgumentException("Invalid cursor");
-    return new CursorDecoded(Instant.parse(parts[0]), UUID.fromString(parts[1]));
+    return notificationService.confirmAll(userId);
   }
 }

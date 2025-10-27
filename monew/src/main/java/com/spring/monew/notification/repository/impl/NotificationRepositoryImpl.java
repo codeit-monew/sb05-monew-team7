@@ -4,6 +4,8 @@ import com.spring.monew.notification.domain.Notification;
 import com.spring.monew.notification.repository.NotificationRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -16,71 +18,72 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
   @PersistenceContext
   private EntityManager em;
 
-  // ===== 이미 너에게 있던 메서드들 =====
+  // 커서 기반
   @Override
   public List<Notification> findUnreadByUserIdWithCursor(
-      UUID userId, Instant afterOrNow, Instant cursorCreatedAt, UUID cursorId, int limitPlusOne
+      UUID userId, Instant upperBoundCreatedAt, Instant cursorCreatedAt, UUID cursorId, int limitPlusOne
   ) {
-    var jpql = new StringBuilder("""
-                SELECT n FROM Notification n
-                 WHERE n.userId = :userId
-                   AND n.confirmed = FALSE
-                   AND n.createdAt <= :after
-                """);
+    // 1 이상이어야 함
+    final int safeLimit = (limitPlusOne <= 0) ? 1 : limitPlusOne;
+
+    final StringBuilder jpql = new StringBuilder("""
+        SELECT n FROM Notification n
+         WHERE n.userId = :userId
+           AND n.confirmed = FALSE
+           AND n.createdAt <= :upperBound
+        """);
 
     if (cursorCreatedAt != null && cursorId != null) {
       jpql.append("""
-                   AND ( n.createdAt < :cursorCreatedAt
-                      OR (n.createdAt = :cursorCreatedAt AND n.id < :cursorId) )
-                """);
+           AND ( n.createdAt < :cursorCreatedAt
+              OR (n.createdAt = :cursorCreatedAt AND n.id < :cursorId) )
+        """);
     }
 
     jpql.append(" ORDER BY n.createdAt DESC, n.id DESC");
 
-    var q = em.createQuery(jpql.toString(), Notification.class)
+    final TypedQuery<Notification> query = em.createQuery(jpql.toString(), Notification.class)
         .setParameter("userId", userId)
-        .setParameter("after", afterOrNow)
-        .setMaxResults(limitPlusOne);
+        .setParameter("upperBound", upperBoundCreatedAt)
+        .setMaxResults(safeLimit);
 
     if (cursorCreatedAt != null && cursorId != null) {
-      q.setParameter("cursorCreatedAt", cursorCreatedAt);
-      q.setParameter("cursorId", cursorId);
+      query.setParameter("cursorCreatedAt", cursorCreatedAt);
+      query.setParameter("cursorId", cursorId);
     }
 
-    return q.getResultList();
+    return query.getResultList();
   }
 
   @Override
   public long confirmAllByUserId(UUID userId) {
-    var q = em.createQuery("""
-            UPDATE Notification n
-               SET n.confirmed = TRUE,
-                   n.updatedAt = CURRENT_TIMESTAMP
-             WHERE n.userId = :userId
-               AND n.confirmed = FALSE
+    final Query query = em.createQuery("""
+        UPDATE Notification n
+           SET n.confirmed = TRUE,
+               n.updatedAt = CURRENT_TIMESTAMP
+         WHERE n.userId = :userId
+           AND n.confirmed = FALSE
         """);
-    q.setParameter("userId", userId);
-    return q.executeUpdate();
+    query.setParameter("userId", userId);
+    return query.executeUpdate();
   }
-
-  // ===== 새로 추가되는 메서드들 =====
 
   @Override
   public long deleteConfirmedBefore(Instant threshold) {
-    var q = em.createQuery("""
-            DELETE FROM Notification n
-             WHERE n.confirmed = TRUE
-               AND n.updatedAt IS NOT NULL
-               AND n.updatedAt < :threshold
+    final Query query = em.createQuery("""
+        DELETE FROM Notification n
+         WHERE n.confirmed = TRUE
+           AND n.updatedAt IS NOT NULL
+           AND n.updatedAt < :threshold
         """);
-    q.setParameter("threshold", threshold);
-    return q.executeUpdate();
+    query.setParameter("threshold", threshold);
+    return query.executeUpdate();
   }
 
   @Override
   public Instant getDatabaseNow() {
-    // DB 서버 시각을 JPQL로 조회 (테이블 참조 없이)
-    return em.createQuery("SELECT CURRENT_TIMESTAMP", Instant.class)
-        .getSingleResult();
+    //  CURRENT_TIMESTAMP → Instant
+    final TypedQuery<Instant> query = em.createQuery("SELECT CURRENT_TIMESTAMP", Instant.class);
+    return query.getSingleResult();
   }
 }
