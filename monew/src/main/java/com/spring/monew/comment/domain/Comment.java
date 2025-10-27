@@ -70,4 +70,13 @@ public class Comment {
         if (content != null &&  !content.isEmpty()) this.content = content;
     }
 
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
 }
