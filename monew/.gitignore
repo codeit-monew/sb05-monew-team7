@@ -18,7 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -130,10 +130,7 @@ fabric.properties
 # Ignore everything but code style settings and run configurations
 # that are supposed to be shared within teams.
 
-.idea/*
-
-!.idea/codeStyles
-!.idea/runConfigurations
+.idea/
 
 ### macOS ###
 # General
@@ -244,7 +241,7 @@ gradle-app.setting
 # --- Spring Boot & Custom ---
 # Log files
 *.log
-logs/
+.logs/
 
 # Secret property files (e.g., application-local.properties, application-db.yml)
 # DB/API 키 등을 관리하는 파일
