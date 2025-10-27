@@ -48,6 +48,7 @@ public class InterestServiceImpl implements InterestService {
   }
 
   @Override
+  @Transactional
   public CursorPageResponseInterestDto getInterests(
       String keyword,
       String orderBy,
@@ -62,6 +63,7 @@ public class InterestServiceImpl implements InterestService {
   }
 
   @Override
+  @Transactional
   public InterestDto modifyInterest(UUID interestId, InterestUpdateRequest updateRequest) {
     Interest interest = interestRepository.findById(interestId).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 관심사입니다."));
@@ -78,6 +80,7 @@ public class InterestServiceImpl implements InterestService {
   }
 
   @Override
+  @Transactional
   public void removeInterest(UUID interestId) {
     Interest interest = interestRepository.findById(interestId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관심사입니다."));
