@@ -56,4 +56,14 @@ public class Interest {
     public void update(List<String> keywords) {
         if (keywords != null && !keywords.isEmpty()) this.keywords = keywords;
     }
+
+    public void incrementSubscriptionsCount() {
+        this.subscriptionsCount++;
+    }
+
+    public void decrementSubscriptionsCount() {
+        if (this.subscriptionsCount > 0) {
+            this.subscriptionsCount--;
+        }
+    }
 }

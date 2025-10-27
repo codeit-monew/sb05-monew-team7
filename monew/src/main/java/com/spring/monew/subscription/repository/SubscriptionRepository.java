@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
 
-  Optional<Subscription> findByInterest_IdAndUser_Id(UUID interestId, UUID userId);
+  Optional<Subscription> findByUser_IdAndInterest_Id(UUID userId, UUID interestId);
 
   boolean existsByUser_IdAndInterest_Id(UUID userId, UUID interestId);
 }

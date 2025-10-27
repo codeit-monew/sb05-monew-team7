@@ -26,6 +26,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
   private final InterestRepository interestRepository;
 
   @Override
+  @Transactional
   public SubscriptionDto addSubscription(UUID interestId, UUID userId) {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 유저입니다."));
@@ -36,22 +37,29 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     if(subscriptionRepository.existsByUser_IdAndInterest_Id(userId, interestId)) {
       throw new IllegalArgumentException("이미 존재하는 구독 입니다.");
     }
+    // 구독자 수 증가 카운터
+    interest.incrementSubscriptionsCount();
 
-    Subscription save = subscriptionRepository.save(new Subscription(user, interest));
+    Subscription subscription = subscriptionRepository.save(new Subscription(user, interest));
+
     return new SubscriptionDto(
-        save.getId(),
-        save.getUser().getId(),
-        save.getInterest().getName(),
-        save.getInterest().getKeywords(),
-        save.getInterest().getSubscriptionsCount(),
-        save.getCreatedAt());
+        subscription.getId(),
+        subscription.getUser().getId(),
+        subscription.getInterest().getName(),
+        subscription.getInterest().getKeywords(),
+        subscription.getInterest().getSubscriptionsCount(),
+        subscription.getCreatedAt());
   }
 
   @Override
+  @Transactional
   public void removeSubscription(UUID interestId, UUID userId) {
     Subscription subscription = subscriptionRepository
-        .findByInterest_IdAndUser_Id(interestId, userId)
+        .findByUser_IdAndInterest_Id(userId, interestId)
         .orElseThrow(() -> new NoSuchElementException("관심사 또는 유저가 존재하지 않습니다."));
+
+    // 구독자 수 감소 로직
+    subscription.getInterest().decrementSubscriptionsCount();
 
     subscriptionRepository.delete(subscription);
   }
