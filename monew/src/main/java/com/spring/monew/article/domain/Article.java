@@ -4,7 +4,6 @@ import com.spring.monew.interest.domain.Interest;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
@@ -67,8 +66,7 @@ public class Article {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
-    @Builder
-    public Article(Interest interest, ArticleSource source, String sourceUrl, 
+    private Article(Interest interest, ArticleSource source, String sourceUrl, 
                    String title, Instant publishDate, String summary) {
         this.id = UUID.randomUUID();
         this.interest = interest;
@@ -77,6 +75,11 @@ public class Article {
         this.title = title;
         this.publishDate = publishDate;
         this.summary = summary;
+    }
+
+    public static Article of(Interest interest, ArticleSource source, String sourceUrl,
+                             String title, Instant publishDate, String summary) {
+        return new Article(interest, source, sourceUrl, title, publishDate, summary);
     }
 
 }

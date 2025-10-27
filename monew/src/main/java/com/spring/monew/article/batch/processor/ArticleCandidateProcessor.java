@@ -58,14 +58,14 @@ public class ArticleCandidateProcessor implements ItemProcessor<ArticleCandidate
             }
             
             if (matchesKeywords(candidate, interest.getKeywords())) {
-                return Article.builder()
-                        .interest(interest)
-                        .source(candidate.getSource())
-                        .sourceUrl(candidate.getSourceUrl())
-                        .title(candidate.getTitle())
-                        .publishDate(candidate.getPublishDate())
-                        .summary(candidate.getSummary())
-                        .build();
+                return Article.of(
+                        interest,
+                        candidate.getSource(),
+                        candidate.getSourceUrl(),
+                        candidate.getTitle(),
+                        candidate.getPublishDate(),
+                        candidate.getSummary()
+                );
             }
         }
         
