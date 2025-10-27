@@ -8,6 +8,7 @@ import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.interest.service.InterestService;
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +25,26 @@ public class InterestServiceImpl implements InterestService {
   @Override
   @Transactional
   public InterestDto addInterest(InterestRegisterRequest registerRequest) {
+    List<String> similarNames = interestRepository.findSimilarNames(registerRequest.name(), 0.55);
+
     //예외 처리 필요 interests name exixsts
     if (interestRepository.existsByName(registerRequest.name())) {
       throw new IllegalArgumentException("같은 이름 존재");
     }
+    if(!similarNames.isEmpty()) {
+      throw new IllegalArgumentException("같은 이름 존재 [유사도 높은 이름]");
+    }
+    
     Interest interest = interestRepository.save(
         new Interest(registerRequest.name(), registerRequest.keywords()));
+
     return new InterestDto(
         interest.getId(),
         interest.getName(),
         interest.getKeywords(),
         interest.getSubscriptionsCount(),
-        true,
-        interest.getCreatedAt());  //일단 트루 처리
+        false,
+        interest.getCreatedAt());
   }
 
   @Override
@@ -49,9 +57,6 @@ public class InterestServiceImpl implements InterestService {
       int limit,
       UUID userId
   ) {
-    // 예외 처리 필요 400, 500
-    // 유사도 80% 로직 필요
-    // repository 동적 쿼리 or QueryDSL builder
     return interestRepository.findCursorPagedInterests(
         keyword, orderBy, direction, cursor, after, limit, userId);
   }
@@ -63,14 +68,13 @@ public class InterestServiceImpl implements InterestService {
 
     interest.update(updateRequest.keywords());
 
-
     return new InterestDto(
         interest.getId(),
         interest.getName(),
         interest.getKeywords(),
         interest.getSubscriptionsCount(),
-        true,
-        interest.getCreatedAt());  //일단 트루 처리
+        false,
+        interest.getCreatedAt());
   }
 
   @Override
@@ -78,7 +82,6 @@ public class InterestServiceImpl implements InterestService {
     Interest interest = interestRepository.findById(interestId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관심사입니다."));
 
-    // ✅ Setter나 Builder 없이 물리 삭제
     interestRepository.delete(interest);
   }
 }

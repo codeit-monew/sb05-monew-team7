@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.interest.controller.dto.response.CursorPageResponseInterestDto;
 import com.spring.monew.interest.controller.dto.response.InterestDto;
@@ -35,7 +36,7 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
     if (keyword != null && !keyword.isEmpty()) {
       builder.and(
           interest.name.containsIgnoreCase(keyword)
-              .or(interest.keywordsString.containsIgnoreCase(keyword))  // ✅ JSON 문자열에 LIKE
+              .or(interest.keywordsString.containsIgnoreCase(keyword))  // JSON 문자열에 LIKE
       );
     }
 
@@ -81,6 +82,21 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
         results.size(),
         hasNext
     );
+  }
+
+  @Override
+  public List<String> findSimilarNames(String name, double threshold) {
+    return queryFactory
+        .select(interest.name)
+        .from(interest)
+        .where(
+            interest.name.ne(name)
+                .and(Expressions.booleanTemplate("{0} % {1}", interest.name, name)) // GIN 인덱스
+        )
+        .orderBy(Expressions.numberTemplate(
+            Double.class, "similarity({0}, {1})", interest.name, name).desc())
+        .limit(20)
+        .fetch();
   }
 
   // 유틸 메서드
