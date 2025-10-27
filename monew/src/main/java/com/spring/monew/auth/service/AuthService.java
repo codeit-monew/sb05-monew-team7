@@ -21,10 +21,10 @@ public class AuthService {
   public UserDto login(UserLoginRequest request) {
 
     User user = userRepository.findByEmail(request.email())
-        .orElseThrow(() -> new IllegalArgumentException("이메일이 일치하지 않습니다."));
+        .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다."));
 
     if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+      throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
     }
 
     // Controller로 반환
