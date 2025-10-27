@@ -21,9 +21,16 @@ CREATE TABLE interests
 (
     id                  UUID PRIMARY KEY,
     name                VARCHAR(255) NOT NULL UNIQUE,
+    created_at          TIMESTAMPTZ  NOT NULL,
     keywords            TEXT         NOT NULL,
     subscriptions_count BIGINT       NOT NULL DEFAULT 0
 );
+-- pg_trgm 확장 활성화
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- name 컬럼에 트라이그램 인덱스 생성
+CREATE INDEX idx_interests_name_trgm
+    ON interests USING gin (name gin_trgm_ops);
 
 -- ==============================
 -- SUBSCRIPTIONS
@@ -76,7 +83,7 @@ CREATE TABLE article_views
     id         UUID PRIMARY KEY,
     article_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT fk_view_article FOREIGN KEY (article_id)
         REFERENCES articles (id)
         ON DELETE CASCADE ON UPDATE CASCADE,

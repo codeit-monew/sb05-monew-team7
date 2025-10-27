@@ -8,13 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "interests")
@@ -33,14 +34,36 @@ public class Interest {
     @Column(nullable = false, columnDefinition = "TEXT")
     private List<String> keywords;
 
+    /** ✅ DB TEXT(JSON) 직접 검색용: QueryDSL에서만 사용 */
+    @Column(name = "keywords", insertable = false, updatable = false)
+    private String keywordsString;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant createdAt;
+
     @Column(name = "subscriptions_count", nullable = false)
     @ColumnDefault("0")
     private long subscriptionsCount;
 
-    @Builder
     public Interest(String name, List<String> keywords) {
         this.name = name;
         this.keywords = keywords;
+        this.createdAt = Instant.now();
         this.subscriptionsCount = 0L; // 기본값 설정
+    }
+
+    public void update(List<String> keywords) {
+        if (keywords != null && !keywords.isEmpty()) this.keywords = keywords;
+    }
+
+    public void incrementSubscriptionsCount() {
+        this.subscriptionsCount++;
+    }
+
+    public void decrementSubscriptionsCount() {
+        if (this.subscriptionsCount > 0) {
+            this.subscriptionsCount--;
+        }
     }
 }
