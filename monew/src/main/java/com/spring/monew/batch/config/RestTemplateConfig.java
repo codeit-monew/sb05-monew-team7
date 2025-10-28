@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.config;
+package com.spring.monew.batch.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

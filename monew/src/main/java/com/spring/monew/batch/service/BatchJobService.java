@@ -1,8 +1,8 @@
-package com.spring.monew.article.batch.service;
+package com.spring.monew.batch.service;
 
-import com.spring.monew.article.batch.dto.response.BatchJobExecutionResponse;
-import com.spring.monew.article.batch.dto.response.BatchJobTriggerResponse;
-import com.spring.monew.article.batch.exception.BatchJobExecutionNotFoundException;
+import com.spring.monew.batch.dto.response.BatchJobExecutionResponse;
+import com.spring.monew.batch.dto.response.BatchJobTriggerResponse;
+import com.spring.monew.batch.exception.BatchJobExecutionNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

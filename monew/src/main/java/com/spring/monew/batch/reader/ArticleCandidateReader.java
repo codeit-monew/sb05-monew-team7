@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.reader;
+package com.spring.monew.batch.reader;
 
 import com.spring.monew.article.client.NaverNewsApiClient;
 import com.spring.monew.article.client.RssFeedClient;

@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.dto.response;
+package com.spring.monew.batch.dto.response;
 
 import org.springframework.batch.core.StepExecution;
 

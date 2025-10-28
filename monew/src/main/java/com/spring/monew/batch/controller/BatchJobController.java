@@ -1,8 +1,8 @@
-package com.spring.monew.article.batch.controller;
+package com.spring.monew.batch.controller;
 
-import com.spring.monew.article.batch.dto.response.BatchJobExecutionResponse;
-import com.spring.monew.article.batch.dto.response.BatchJobTriggerResponse;
-import com.spring.monew.article.batch.service.BatchJobService;
+import com.spring.monew.batch.dto.response.BatchJobExecutionResponse;
+import com.spring.monew.batch.dto.response.BatchJobTriggerResponse;
+import com.spring.monew.batch.service.BatchJobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

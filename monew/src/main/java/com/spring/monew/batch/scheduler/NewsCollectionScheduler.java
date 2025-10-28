@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.scheduler;
+package com.spring.monew.batch.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
