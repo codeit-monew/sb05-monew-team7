@@ -1,9 +1,11 @@
 package com.spring.monew.comment.controller;
 
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
+import com.spring.monew.comment.controller.dto.request.CommentUpdateRequest;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
 import com.spring.monew.comment.service.CommentService;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,37 +13,54 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {
+
   private final CommentService commentService;
 
   @PostMapping
-  public CommentDto commentAdd(CommentRegisterRequest registerRequest){
-    return null;
+  public CommentDto commentAdd(
+      @RequestBody CommentRegisterRequest registerRequest) {
+    return commentService.addComment(registerRequest);
   }
 
   @GetMapping
-  public CursorPageResponseCommentDto commentList(){
-    return null;
+  public CursorPageResponseCommentDto commentList(
+      @RequestParam UUID articleId,
+      @RequestParam(defaultValue = "name") String orderBy,          // 정렬 기준 (기본값 name)
+      @RequestParam(defaultValue = "ASC") String direction,         // 정렬 방향 (기본값 ASC)
+      @RequestParam(required = false) String cursor,                // 커서 값
+      @RequestParam(required = false) Instant after,                // 보조 커서(createdAt)
+      @RequestParam(defaultValue = "50") int limit,                 // 페이지 크기
+      @RequestHeader(name = "Monew-Request-User-ID") UUID userId    // 헤더 값
+  ) {
+
+    return commentService.getComments(articleId, orderBy,
+        direction, cursor, after, limit, userId);
   }
 
   @PatchMapping("/{commentId}")
-  public CommentDto commentModify(@PathVariable UUID commentId){
-    return null;
+  public CommentDto commentModify(@PathVariable UUID commentId,
+      @RequestHeader(name = "Monew-Request-User-ID") UUID userId,
+      @RequestBody CommentUpdateRequest updateRequest) {
+    return commentService.modifyComment(commentId, userId, updateRequest);
   }
 
   @DeleteMapping("/{commentId}")
-  public void commentDeleteLogical(@PathVariable UUID commentId){
-
+  public void commentDeleteLogical(@PathVariable UUID commentId) {
+    commentService.removeCommentLogical(commentId);
   }
 
   @DeleteMapping("/{commentId}/hard")
-  public void commentDeleteHard(@PathVariable UUID commentId){
-
+  public void commentDeleteHard(@PathVariable UUID commentId) {
+    commentService.removeCommentHard(commentId);
   }
 }

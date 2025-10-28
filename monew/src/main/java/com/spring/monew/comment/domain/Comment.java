@@ -1,10 +1,15 @@
 package com.spring.monew.comment.domain;
 
+import com.spring.monew.article.domain.Article;
+import com.spring.monew.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
@@ -12,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -27,16 +33,19 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.UUID)   //PK 자동 삽입
     private UUID id;
 
-    @Column(name = "article_id", nullable = false)
-    private UUID articleId;
+    @ManyToOne
+    @JoinColumn(name = "article_id", nullable = false)
+    private Article article;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+     @ManyToOne(fetch = FetchType.LAZY)
+     @JoinColumn(name = "user_id", nullable = false)
+     private User user;
 
     @Column(nullable = false)
     private String content;
 
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private Instant createdAt;
 
     @Column(name = "is_deleted", nullable = false)
@@ -50,7 +59,24 @@ public class Comment {
     @ColumnDefault("0")
     private long likeCount;
 
-    // 연관 관계 (지금은 UUID로만, 이후 필요시 ManyToOne)
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private User user;
+    public Comment(Article article, User user,String content) {
+        this.article = article;
+        this.user = user;
+        this.content = content;
+        this.createdAt = Instant.now();
+    }
+
+    public void update(String content) {
+        if (content != null &&  !content.isEmpty()) this.content = content;
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
 }
