@@ -11,7 +11,10 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate # 처음 생성 none, 생성 후 validate
+  sql:
+    init:
+      mode: never   # 처음 생성 always, 생성 후 never
     show-sql: false
     properties:
       hibernate:
