@@ -28,10 +28,9 @@ CREATE TABLE interests
 -- pg_trgm 확장 활성화
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- name 컬럼에 트라이그램 인덱스 생성
+-- name 컬럼 GIN 트라이그램 인덱스
 CREATE INDEX idx_interests_name_trgm
-    ON interests USING gin (name gin_trgm_ops);
-
+    ON interests USING gin (name public.gin_trgm_ops);
 -- ==============================
 -- SUBSCRIPTIONS
 -- ==============================
@@ -145,7 +144,7 @@ CREATE TABLE notifications
     resource_type resource_type NOT NULL,
     resource_id   UUID          NOT NULL,
     created_at    TIMESTAMPTZ   NOT NULL,
-    updated_at    TIMESTAMPTZ   NULL,
+    updated_at    TIMESTAMPTZ   NOT NULL,
     CONSTRAINT fk_notification_user FOREIGN KEY (user_id)
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE
