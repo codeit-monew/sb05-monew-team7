@@ -92,7 +92,6 @@ CREATE TABLE subscriptions
 -- ==============================
 -- ARTICLES
 -- ==============================
--- CREATE TYPE 삭제
 CREATE TABLE articles
 (
     id            UUID PRIMARY KEY,
@@ -178,9 +177,9 @@ CREATE TABLE notifications
     content       VARCHAR(255)  NOT NULL,
     confirmed     BOOLEAN       NOT NULL,
     resource_type VARCHAR(20)   NOT NULL CHECK (resource_type IN ('ARTICLE', 'COMMENT', 'LIKE', 'SUBSCRIPTION')),
-    resource_id   UUID          NULL,
+    resource_id   UUID          NOT NULL,
     created_at    TIMESTAMPTZ   NOT NULL,
-    updated_at    TIMESTAMPTZ   NULL,
+    updated_at    TIMESTAMPTZ   NOT NULL,
     CONSTRAINT fk_notification_user FOREIGN KEY (user_id)
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE
