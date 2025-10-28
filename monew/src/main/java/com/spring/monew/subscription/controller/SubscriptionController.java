@@ -19,13 +19,13 @@ public class SubscriptionController {
 
   @PostMapping("/{interestId}/subscriptions")
   public SubscriptionDto subscriptionAdd(@PathVariable UUID interestId,
-      @RequestHeader UUID userId) {
+      @RequestHeader(name = "Monew-Request-User-ID") UUID userId) {
     return subscriptionService.addSubscription(interestId, userId);
   }
 
   @DeleteMapping("/{interestId}/subscriptions")
   public void subscriptionRemove(@PathVariable UUID interestId,
-      @RequestHeader UUID userId) {
+      @RequestHeader(name = "Monew-Request-User-ID") UUID userId) {
     subscriptionService.removeSubscription(interestId, userId);
   }
 }

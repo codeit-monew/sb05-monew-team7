@@ -25,14 +25,14 @@ public class InterestServiceImpl implements InterestService {
   @Override
   @Transactional
   public InterestDto addInterest(InterestRegisterRequest registerRequest) {
-    List<String> similarNames = interestRepository.findSimilarNames(registerRequest.name(), 0.55);
+    List<String> similarNames = interestRepository.findSimilarNames(registerRequest.name(), 0.45);
 
     //예외 처리 필요 interests name exixsts
     if (interestRepository.existsByName(registerRequest.name())) {
-      throw new IllegalArgumentException("같은 이름 존재");
+      throw new IllegalArgumentException("같은 이름이 존재합니다.");
     }
     if(!similarNames.isEmpty()) {
-      throw new IllegalArgumentException("같은 이름 존재 [유사도 높은 이름]");
+      throw new IllegalArgumentException("유사도가 높은 이름이 존재합니다.");
     }
     
     Interest interest = interestRepository.save(
