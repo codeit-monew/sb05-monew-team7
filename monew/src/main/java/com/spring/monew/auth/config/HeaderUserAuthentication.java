@@ -33,16 +33,19 @@ public class HeaderUserAuthentication extends AbstractAuthenticationToken {
     setAuthenticated(true);
   }
 
+  //요청을 누가 보낸건지
   @Override
   public Object getPrincipal() {
     return userId;
   }
 
+  //자격 증명이 뭔지 (비밀번호 or 토큰)
   @Override
   public Object getCredentials() {
-    return null;
+    return null; //단순 헤더 인증
   }
 
+  //사용자 역할
   public UserRole getRole() {
     return role;
   }

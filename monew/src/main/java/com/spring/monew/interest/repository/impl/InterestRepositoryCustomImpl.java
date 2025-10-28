@@ -84,7 +84,7 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
     );
   }
 
-  @Override
+  /*@Override
   public List<String> findSimilarNames(String name, double threshold) {
     return queryFactory
         .select(interest.name)
@@ -92,6 +92,26 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
         .where(
             interest.name.ne(name)
                 .and(Expressions.booleanTemplate("{0} % {1}", interest.name, name)) // GIN 인덱스
+        )
+        .orderBy(Expressions.numberTemplate(
+            Double.class, "similarity({0}, {1})", interest.name, name).desc())
+        .limit(20)
+        .fetch();
+  } */
+
+  @Override
+  public List<String> findSimilarNames(String name, double threshold) {
+    return queryFactory
+        .select(interest.name)
+        .from(interest)
+        .where(
+            interest.name.ne(name)
+                .and(Expressions.booleanTemplate(
+                    "similarity({0}, {1}) > {2}",
+                    interest.name,
+                    name,
+                    threshold
+                ))
         )
         .orderBy(Expressions.numberTemplate(
             Double.class, "similarity({0}, {1})", interest.name, name).desc())
