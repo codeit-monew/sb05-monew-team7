@@ -4,19 +4,25 @@ spring:
   profiles:
     active: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/monew
+    url: jdbc:postgresql://localhost:5432/monew?sessionTimezone=UTC
     username: postgres
     password: 1234
     driver-class-name: org.postgresql.Driver
 
-  jpa:
+jpa:
+  hibernate:
+    ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
+  properties:
     hibernate:
-      ddl-auto: update
+      format_sql: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      jdbc:
+        time_zone: UTC
+
+  sql:
+    init:
+      mode: never # 'always' for initial creation, 'never' afterwards
     show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   data:
     mongodb:
@@ -30,7 +36,7 @@ spring:
     job:
       enabled: true
     jdbc:
-      initialize-schema: ${BATCH_INITIALIZE_SCHEMA:always}
+      initialize-schema: ${BATCH_INITIALIZE_SCHEMA:embedded}
 
   servlet:
     multipart:
