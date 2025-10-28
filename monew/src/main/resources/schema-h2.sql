@@ -1,10 +1,4 @@
 -- ==============================
--- 0. 확장 기능 활성화 (가장 먼저)
--- ==============================
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
-
--- ==============================
 -- 1. DROP (FK 의존성 역순으로 삭제)
 -- ==============================
 
@@ -31,11 +25,6 @@ DROP SEQUENCE IF EXISTS BATCH_JOB_SEQ;
 DROP SEQUENCE IF EXISTS BATCH_JOB_EXECUTION_SEQ;
 DROP SEQUENCE IF EXISTS BATCH_STEP_EXECUTION_SEQ;
 
--- 앱 ENUM 타입 삭제 (테이블이 모두 삭제된 후)
-DROP TYPE IF EXISTS user_role;
-DROP TYPE IF EXISTS article_resource;
-DROP TYPE IF EXISTS resource_type;
-
 
 -- ==============================
 -- 2. CREATE (이제부터 생성)
@@ -50,10 +39,10 @@ CREATE TABLE users
     email      VARCHAR(255) NOT NULL UNIQUE,
     nickname   VARCHAR(20)  NOT NULL,
     password   VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ  NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE  NOT NULL,
     role       VARCHAR(20)  NOT NULL CHECK (role IN ('ADMIN', 'USER')),
     is_deleted BOOLEAN      NOT NULL DEFAULT FALSE,
-    deleted_at TIMESTAMPTZ  NULL
+    deleted_at TIMESTAMP WITH TIME ZONE  NULL
 );
 
 -- ==============================
@@ -63,14 +52,12 @@ CREATE TABLE interests
 (
     id                  UUID PRIMARY KEY,
     name                VARCHAR(255) NOT NULL UNIQUE,
-    created_at          TIMESTAMPTZ  NOT NULL,
+    created_at          TIMESTAMP WITH TIME ZONE  NOT NULL,
     keywords            TEXT         NOT NULL,
     subscriptions_count BIGINT       NOT NULL DEFAULT 0
 );
 
--- name 컬럼에 트라이그램 인덱스 생성
-CREATE INDEX idx_interests_name_trgm
-    ON interests USING gin (name gin_trgm_ops);
+-- (참고) H2는 pg_trgm GIN 인덱스를 지원하지 않으므로 관련 인덱스 생성 구문 제거
 
 -- ==============================
 -- SUBSCRIPTIONS
@@ -80,7 +67,7 @@ CREATE TABLE subscriptions
     id          UUID PRIMARY KEY,
     user_id     UUID        NOT NULL,
     interest_id UUID        NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL,
+    created_at  TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_subscription_user FOREIGN KEY (user_id)
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -92,7 +79,6 @@ CREATE TABLE subscriptions
 -- ==============================
 -- ARTICLES
 -- ==============================
--- CREATE TYPE 삭제
 CREATE TABLE articles
 (
     id            UUID PRIMARY KEY,
@@ -100,14 +86,14 @@ CREATE TABLE articles
     source        VARCHAR(20)      NOT NULL CHECK (source IN ('NAVER', 'HANKYUNG', 'CHOSUN', 'YEONHAP')),
     source_url    VARCHAR(255)     NOT NULL UNIQUE,
     title         VARCHAR(255)     NOT NULL,
-    publish_date  TIMESTAMPTZ      NOT NULL,
+    publish_date  TIMESTAMP WITH TIME ZONE      NOT NULL,
     summary       TEXT             NOT NULL,
     comment_count BIGINT           NOT NULL DEFAULT 0,
     view_count    BIGINT           NOT NULL DEFAULT 0,
-    created_at    TIMESTAMPTZ      NOT NULL,
-    updated_at    TIMESTAMPTZ      NOT NULL,
+    created_at    TIMESTAMP WITH TIME ZONE      NOT NULL,
+    updated_at    TIMESTAMP WITH TIME ZONE      NOT NULL,
     is_deleted    BOOLEAN          NOT NULL DEFAULT FALSE,
-    deleted_at    TIMESTAMPTZ      NULL,
+    deleted_at    TIMESTAMP WITH TIME ZONE      NULL,
     CONSTRAINT fk_article_interest FOREIGN KEY (interest_id)
         REFERENCES interests (id)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -121,7 +107,7 @@ CREATE TABLE article_views
     id         UUID PRIMARY KEY,
     article_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_view_article FOREIGN KEY (article_id)
         REFERENCES articles (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -139,9 +125,9 @@ CREATE TABLE comments
     article_id UUID         NOT NULL,
     user_id    UUID         NOT NULL,
     content    VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ  NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE  NOT NULL,
     is_deleted BOOLEAN      NOT NULL DEFAULT FALSE,
-    deleted_at TIMESTAMPTZ  NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE  NULL,
     like_count BIGINT       NOT NULL DEFAULT 0,
     CONSTRAINT fk_comment_article FOREIGN KEY (article_id)
         REFERENCES articles (id)
@@ -159,7 +145,7 @@ CREATE TABLE comment_likes
     id         UUID PRIMARY KEY,
     comment_id UUID        NOT NULL,
     user_id    UUID        NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_like_comment FOREIGN KEY (comment_id)
         REFERENCES comments (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -178,9 +164,9 @@ CREATE TABLE notifications
     content       VARCHAR(255)  NOT NULL,
     confirmed     BOOLEAN       NOT NULL,
     resource_type VARCHAR(20)   NOT NULL CHECK (resource_type IN ('ARTICLE', 'COMMENT', 'LIKE', 'SUBSCRIPTION')),
-    resource_id   UUID          NULL,
-    created_at    TIMESTAMPTZ   NOT NULL,
-    updated_at    TIMESTAMPTZ   NULL,
+    resource_id   UUID          NOT NULL,
+    created_at    TIMESTAMP WITH TIME ZONE   NOT NULL,
+    updated_at    TIMESTAMP WITH TIME ZONE   NOT NULL,
     CONSTRAINT fk_notification_user FOREIGN KEY (user_id)
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -206,13 +192,13 @@ CREATE TABLE batch_job_execution (
                                      job_execution_id BIGINT NOT NULL,
                                      version BIGINT,
                                      job_instance_id BIGINT NOT NULL,
-                                     create_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-                                     start_time TIMESTAMP WITHOUT TIME ZONE,
-                                     end_time TIMESTAMP WITHOUT TIME ZONE,
+                                     create_time TIMESTAMP WITH TIME ZONE NOT NULL,
+                                     start_time TIMESTAMP WITH TIME ZONE,
+                                     end_time TIMESTAMP WITH TIME ZONE,
                                      status VARCHAR(10),
                                      exit_code VARCHAR(2500),
                                      exit_message VARCHAR(2500),
-                                     last_updated TIMESTAMP WITHOUT TIME ZONE,
+                                     last_updated TIMESTAMP WITH TIME ZONE,
                                      job_configuration_location VARCHAR(2500) NULL,
                                      CONSTRAINT batch_job_execution_pkey PRIMARY KEY (job_execution_id)
 );
@@ -222,9 +208,9 @@ CREATE TABLE batch_step_execution (
                                       version BIGINT NOT NULL,
                                       step_name VARCHAR(100) NOT NULL,
                                       job_execution_id BIGINT NOT NULL,
-                                      create_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-                                      start_time TIMESTAMP WITHOUT TIME ZONE,
-                                      end_time TIMESTAMP WITHOUT TIME ZONE,
+                                      create_time TIMESTAMP WITH TIME ZONE NOT NULL,
+                                      start_time TIMESTAMP WITH TIME ZONE,
+                                      end_time TIMESTAMP WITH TIME ZONE,
                                       status VARCHAR(10),
                                       commit_count BIGINT,
                                       read_count BIGINT,
@@ -236,7 +222,7 @@ CREATE TABLE batch_step_execution (
                                       rollback_count BIGINT,
                                       exit_code VARCHAR(2500),
                                       exit_message VARCHAR(2500),
-                                      last_updated TIMESTAMP WITHOUT TIME ZONE,
+                                      last_updated TIMESTAMP WITH TIME ZONE,
                                       CONSTRAINT batch_step_execution_pkey PRIMARY KEY (step_execution_id)
 );
 
