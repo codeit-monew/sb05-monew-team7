@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.config;
+package com.spring.monew.batch.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.SkipListener;

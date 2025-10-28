@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.processor;
+package com.spring.monew.batch.processor;
 
 import com.spring.monew.article.client.dto.ArticleCandidate;
 import com.spring.monew.article.domain.Article;

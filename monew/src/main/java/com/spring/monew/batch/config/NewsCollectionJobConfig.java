@@ -1,8 +1,8 @@
-package com.spring.monew.article.batch.config;
+package com.spring.monew.batch.config;
 
-import com.spring.monew.article.batch.processor.ArticleCandidateProcessor;
-import com.spring.monew.article.batch.reader.ArticleCandidateReader;
-import com.spring.monew.article.batch.writer.ArticleWriter;
+import com.spring.monew.batch.processor.ArticleCandidateProcessor;
+import com.spring.monew.batch.reader.ArticleCandidateReader;
+import com.spring.monew.batch.writer.ArticleWriter;
 import com.spring.monew.article.client.dto.ArticleCandidate;
 import com.spring.monew.article.domain.Article;
 import lombok.RequiredArgsConstructor;

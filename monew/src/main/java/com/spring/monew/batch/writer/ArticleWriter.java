@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.writer;
+package com.spring.monew.batch.writer;
 
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.repository.ArticleRepository;
