@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
@@ -33,32 +34,38 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
     builder.and(comment.article.id.eq(articleId));
     builder.and(comment.isDeleted.eq(false));
 
-    BooleanExpression cursorCondition = buildCursorCondition(direction, cursor, after);
-    if (cursorCondition != null) {
-      builder.and(cursorCondition);
-    }
+    // 커서 조건
+    extracted(direction, cursor, builder);
+
+    BooleanExpression likedByUser = JPAExpressions
+        .selectOne()
+        .from(commentLike)
+        .where(commentLike.comment.id.eq(comment.id)
+            .and(commentLike.user.id.eq(userId)))
+        .exists();
+
     // 정렬 기준
     OrderSpecifier<?> primaryOrder = getOrderSpecifier(orderBy, direction);
     OrderSpecifier<?> secondaryOrder = getCreatedAtOrderSpecifier(direction);
+    OrderSpecifier<?> stabilityOrder = new OrderSpecifier<>(
+        "ASC".equalsIgnoreCase(direction) ? Order.ASC : Order.DESC,
+        comment.id
+    );
 
     List<CommentDto> results = queryFactory
         .select(new QCommentDto(
-                comment.id,
+            comment.id,
             comment.article.id,
             comment.user.id,
             comment.user.nickname,
             comment.content,
             comment.likeCount,
-            commentLike.id.isNotNull(),
+            likedByUser,
             comment.createdAt
-            )
-        )
+        ))
         .from(comment)
-        .leftJoin(commentLike)
-        .on(commentLike.comment.id.eq(comment.id)
-            .and(commentLike.user.id.eq(userId)))
         .where(builder)
-        .orderBy(primaryOrder, secondaryOrder)
+        .orderBy(primaryOrder, secondaryOrder, stabilityOrder)
         .limit(limit + 1)
         .fetch();
 
@@ -79,20 +86,36 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         hasNext
     );
   }
-  // 유틸 메서드
 
-  private BooleanExpression buildCursorCondition(String direction, String cursor, Instant after) {
-    if (cursor == null || after == null) return null;
+  private void extracted(String direction, String cursor, BooleanBuilder builder) {
+    Instant cursorCreatedAt = null;
 
-    UUID cursorId = UUID.fromString(cursor);
-    boolean isAsc = "ASC".equalsIgnoreCase(direction);
+    if (cursor != null) {
+      UUID cursorId = UUID.fromString(cursor);
 
-    return isAsc
-        ? comment.createdAt.after(after)
-        .or(comment.createdAt.eq(after).and(comment.id.gt(cursorId)))
-        : comment.createdAt.before(after)
-            .or(comment.createdAt.eq(after).and(comment.id.lt(cursorId)));
+      cursorCreatedAt = queryFactory
+          .select(comment.createdAt)
+          .from(comment)
+          .where(comment.id.eq(cursorId))
+          .fetchOne();
+
+      if (cursorCreatedAt != null) {
+        boolean isAsc = "ASC".equalsIgnoreCase(direction);
+
+        builder.and(
+            isAsc ?
+                comment.createdAt.gt(cursorCreatedAt)
+                    .or(comment.createdAt.eq(cursorCreatedAt)
+                        .and(comment.id.gt(cursorId)))
+                :
+                    comment.createdAt.lt(cursorCreatedAt)
+                        .or(comment.createdAt.eq(cursorCreatedAt)
+                            .and(comment.id.lt(cursorId)))
+        );
+      }
+    }
   }
+  // 유틸 메서드
 
   private OrderSpecifier<?> getOrderSpecifier(String orderBy, String direction) {
     Order order = "DESC".equalsIgnoreCase(direction) ? Order.DESC : Order.ASC;
