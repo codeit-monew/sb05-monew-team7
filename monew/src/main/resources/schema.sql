@@ -8,6 +8,11 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 -- 1. DROP (FK 의존성 역순으로 삭제)
 -- ==============================
 
+-- ⚠️ 경고: 이 스크립트는 모든 테이블을 삭제합니다!
+-- 프로덕션 환경에서는 절대 실행하지 마세요!
+-- 개발 환경 초기화 전용입니다.
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- 앱 테이블 삭제 (가장 의존성이 많은 것부터)
 DROP TABLE IF EXISTS comment_likes;
 DROP TABLE IF EXISTS comments;
@@ -30,11 +35,6 @@ DROP TABLE IF EXISTS batch_job_instance;
 DROP SEQUENCE IF EXISTS BATCH_JOB_SEQ;
 DROP SEQUENCE IF EXISTS BATCH_JOB_EXECUTION_SEQ;
 DROP SEQUENCE IF EXISTS BATCH_STEP_EXECUTION_SEQ;
-
--- 앱 ENUM 타입 삭제 (테이블이 모두 삭제된 후)
-DROP TYPE IF EXISTS user_role;
-DROP TYPE IF EXISTS article_resource;
-DROP TYPE IF EXISTS resource_type;
 
 
 -- ==============================
@@ -258,7 +258,8 @@ CREATE TABLE batch_job_execution_params (
                                             parameter_name VARCHAR(100) NOT NULL,
                                             parameter_type VARCHAR(100) NOT NULL,
                                             parameter_value VARCHAR(2500),
-                                            identifying CHAR(1) NOT NULL
+                                            identifying CHAR(1) NOT NULL,
+                                            CONSTRAINT batch_job_execution_params_pkey PRIMARY KEY (job_execution_id, parameter_name)
 );
 
 

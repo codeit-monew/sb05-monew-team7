@@ -245,7 +245,8 @@ CREATE TABLE batch_job_execution_params (
                                             parameter_name VARCHAR(100) NOT NULL,
                                             parameter_type VARCHAR(100) NOT NULL,
                                             parameter_value VARCHAR(2500),
-                                            identifying CHAR(1) NOT NULL
+                                            identifying CHAR(1) NOT NULL,
+                                            CONSTRAINT batch_job_execution_params_pkey PRIMARY KEY (job_execution_id, parameter_name)
 );
 
 
