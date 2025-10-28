@@ -1,6 +1,7 @@
 package com.spring.monew.comment.repository.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -35,7 +36,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
     builder.and(comment.isDeleted.eq(false));
 
     // 커서 조건
-    extracted(direction, cursor, builder);
+    applyCursorCondition(orderBy, direction, cursor, builder);
 
     BooleanExpression likedByUser = JPAExpressions
         .selectOne()
@@ -86,35 +87,50 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         hasNext
     );
   }
+    private void applyCursorCondition(String orderBy, String direction, String cursor, BooleanBuilder builder) {
+      if (cursor == null) return;
 
-  private void extracted(String direction, String cursor, BooleanBuilder builder) {
-    Instant cursorCreatedAt = null;
+      UUID cursorId;
+      try {
+        cursorId = UUID.fromString(cursor);
+      } catch (IllegalArgumentException e) {
+        return;
+      }
 
-    if (cursor != null) {
-      UUID cursorId = UUID.fromString(cursor);
-
-      cursorCreatedAt = queryFactory
-          .select(comment.createdAt)
+      // ✅ primary + createdAt 한 번에 조회
+      Tuple row = queryFactory
+          .select(comment.likeCount, comment.createdAt)
           .from(comment)
           .where(comment.id.eq(cursorId))
           .fetchOne();
 
-      if (cursorCreatedAt != null) {
-        boolean isAsc = "ASC".equalsIgnoreCase(direction);
+      if (row == null) return;
 
-        builder.and(
-            isAsc ?
-                comment.createdAt.gt(cursorCreatedAt)
-                    .or(comment.createdAt.eq(cursorCreatedAt)
-                        .and(comment.id.gt(cursorId)))
-                :
-                    comment.createdAt.lt(cursorCreatedAt)
-                        .or(comment.createdAt.eq(cursorCreatedAt)
-                            .and(comment.id.lt(cursorId)))
+      Long cursorLikes = row.get(comment.likeCount);
+      Instant cursorCreatedAt = row.get(comment.createdAt);
+      boolean isAsc = "ASC".equalsIgnoreCase(direction);
+
+      // ✅ tie-breaker: createdAt → id
+      BooleanExpression byCreatedAtThenId = isAsc
+          ? comment.createdAt.gt(cursorCreatedAt)
+          .or(comment.createdAt.eq(cursorCreatedAt)
+              .and(comment.id.gt(cursorId)))
+          : comment.createdAt.lt(cursorCreatedAt)
+              .or(comment.createdAt.eq(cursorCreatedAt)
+                  .and(comment.id.lt(cursorId)));
+
+      // ✅ primary 기준 동적 처리
+      switch (orderBy) {
+        case "likeCount" -> builder.and(
+            isAsc
+                ? comment.likeCount.gt(cursorLikes)
+                .or(comment.likeCount.eq(cursorLikes).and(byCreatedAtThenId))
+                : comment.likeCount.lt(cursorLikes)
+                    .or(comment.likeCount.eq(cursorLikes).and(byCreatedAtThenId))
         );
+        case "createdAt", default -> builder.and(byCreatedAtThenId);
       }
     }
-  }
   // 유틸 메서드
 
   private OrderSpecifier<?> getOrderSpecifier(String orderBy, String direction) {
