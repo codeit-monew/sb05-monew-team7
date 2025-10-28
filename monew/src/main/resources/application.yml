@@ -30,7 +30,7 @@ spring:
     job:
       enabled: true
     jdbc:
-      initialize-schema: ${BATCH_INITIALIZE_SCHEMA:embedded}
+      initialize-schema: ${BATCH_INITIALIZE_SCHEMA:always}
 
   servlet:
     multipart:

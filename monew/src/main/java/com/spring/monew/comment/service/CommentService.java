@@ -1,17 +1,22 @@
 package com.spring.monew.comment.service;
 
+import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
+import com.spring.monew.comment.controller.dto.request.CommentUpdateRequest;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
+import java.time.Instant;
+import java.util.UUID;
 
 public interface CommentService {
 
-  CommentDto addComment();
+  CommentDto addComment(CommentRegisterRequest registerRequest);
 
-  CursorPageResponseCommentDto getComments();
+  CursorPageResponseCommentDto getComments(UUID articleId, String orderBy,
+      String direction, String cursor, Instant after, int limit, UUID userId);
 
-  CommentDto modifyComment();
+  CommentDto modifyComment(UUID commentId, UUID userId, CommentUpdateRequest updateRequest);
 
-  void removeCommentLogical();
+  void removeCommentLogical(UUID commentId);
 
-  void removeCommentHard();
+  void removeCommentHard(UUID commentId);
 }

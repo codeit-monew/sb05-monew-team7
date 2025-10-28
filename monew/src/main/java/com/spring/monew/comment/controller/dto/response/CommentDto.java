@@ -1,5 +1,6 @@
 package com.spring.monew.comment.controller.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,4 +13,7 @@ public record CommentDto(
         long likeCount,
         boolean likedByMe,
         Instant createdAt
-) {}
+) {
+  @QueryProjection
+  public CommentDto {}
+}
