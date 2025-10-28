@@ -1,4 +1,4 @@
-package com.spring.monew.article.batch.scheduler;
+package com.spring.monew.batch.scheduler;
 
 import com.spring.monew.comment.repository.CommentRepository;
 import jakarta.transaction.Transactional;
