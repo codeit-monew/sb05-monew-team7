@@ -143,10 +143,17 @@ CREATE TABLE notifications
     content       VARCHAR(255)  NOT NULL,
     confirmed     BOOLEAN       NOT NULL,
     resource_type resource_type NOT NULL,
-    resource_id   UUID          NULL,
+    resource_id   UUID          NOT NULL,
     created_at    TIMESTAMPTZ   NOT NULL,
     updated_at    TIMESTAMPTZ   NULL,
     CONSTRAINT fk_notification_user FOREIGN KEY (user_id)
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_notif_user_confirm_created_desc
+    ON notifications (user_id, confirmed, created_at DESC, id DESC);
+
+-- 정리 배치(삭제): WHERE confirmed=true AND updated_at < :threshold
+CREATE INDEX IF NOT EXISTS idx_notif_confirmed_updated
+    ON notifications (confirmed, updated_at);
