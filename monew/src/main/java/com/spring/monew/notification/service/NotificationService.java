@@ -79,13 +79,14 @@ public class NotificationService {
       Notification last = entities.get(entities.size() - 1);
       nextCursor = encodeCursor(last.getCreatedAt(), last.getId());
     }
+    long totalUnread = repository.countUnreadByUserId(userId);
 
     return new CursorPageResponseNotificationDto(
         content,
         nextCursor,
         afterOrNow,
         content.size(),
-        null,
+        totalUnread,
         hasNext
     );
   }

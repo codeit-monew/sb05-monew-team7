@@ -81,6 +81,17 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
   }
 
   @Override
+  public long countUnreadByUserId(UUID userId) {
+    return em.createQuery("""
+      SELECT COUNT(n) FROM Notification n
+       WHERE n.userId = :userId
+         AND n.confirmed = FALSE
+      """, Long.class)
+        .setParameter("userId", userId)
+        .getSingleResult();
+  }
+
+  @Override
   public Instant getDatabaseNow() {
     Object v = em.createNativeQuery("select now()").getSingleResult();
 

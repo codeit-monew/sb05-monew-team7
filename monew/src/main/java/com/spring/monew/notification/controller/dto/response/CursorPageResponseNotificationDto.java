@@ -36,7 +36,7 @@ public record CursorPageResponseNotificationDto(
     int size,
 
     @Schema(description = "총 개수(커서 페이징에서는 일반적으로 집계하지 않음)", nullable = true, example = "0")
-    Long totalElements,
+    long totalElements,
 
     @Schema(description = "다음 페이지 존재 여부", example = "true")
     boolean hasNext

@@ -21,6 +21,8 @@ public interface NotificationRepositoryCustom {
   // 사용자 알림을 일괄 확인 처리합니다(confirmed=true).
   long confirmAllByUserId(UUID userId);
 
+  long countUnreadByUserId(UUID userId);
+
   // 기준 시각 이전의 "확인된(confirmed=true)" 알림을 물리 삭제합니다.
   long deleteConfirmedBefore(Instant threshold);
 
