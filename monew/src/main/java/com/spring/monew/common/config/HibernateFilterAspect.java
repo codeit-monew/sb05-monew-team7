@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 public class HibernateFilterAspect {
 
   @PersistenceContext
-  private final EntityManager em;
+  private EntityManager em;
 
   // isDeleted가 false인 데이터만 보이게 해줌.
-  @Before("execution(* com.spring.monew..reposiotry..*(..))")
+  @Before("execution(* com.spring.monew..repository..*(..))")
   public void enableFilter() {
     em.unwrap(Session.class)
         .enableFilter("deletedFilter")

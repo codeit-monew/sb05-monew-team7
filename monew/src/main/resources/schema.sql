@@ -150,3 +150,10 @@ CREATE TABLE notifications
         REFERENCES users (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+SELECT
+    name,
+    similarity(name, '스포츠 센터') AS sim
+FROM interests
+WHERE similarity(name, '스포츠 센터') > 0
+ORDER BY sim DESC;
