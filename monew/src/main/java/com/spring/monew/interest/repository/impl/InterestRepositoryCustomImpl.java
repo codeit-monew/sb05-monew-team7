@@ -91,7 +91,12 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
         .from(interest)
         .where(
             interest.name.ne(name)
-                .and(Expressions.booleanTemplate("{0} % {1}", interest.name, name)) // GIN 인덱스
+                .and(Expressions.booleanTemplate(
+                    "similarity({0}, {1}) > {2}",
+                    interest.name,
+                    name,
+                    threshold
+                ))
         )
         .orderBy(Expressions.numberTemplate(
             Double.class, "similarity({0}, {1})", interest.name, name).desc())
