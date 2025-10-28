@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 @EnableWebSecurity
@@ -21,11 +23,13 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorize -> authorize
             //  모든 경로 허용 (개발용)
             .anyRequest().permitAll()
+        )
+            // 헤더에 담긴 userId를 읽어서 인증 정보를 만들어주는 필터
+            .addFilterBefore(new HeaderAuthFilter(), UsernamePasswordAuthenticationFilter.class);
             // 회원가입 & 로그인만 접근 허용
             //.requestMatchers(HttpMethod.POST, "/api/users", "/api/users/login").permitAll()
             //  나머지 요청은 인증 필요
             //.anyRequest().authenticated()
-        );
 
     return http.build();
   }
