@@ -1,10 +1,12 @@
 package com.spring.monew.interest.repository.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.interest.controller.dto.response.CursorPageResponseInterestDto;
 import com.spring.monew.interest.controller.dto.response.InterestDto;
@@ -27,26 +29,36 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
   private static final QSubscription subscription = QSubscription.subscription;
 
   @Override
-  public CursorPageResponseInterestDto findCursorPagedInterests(String keyword, String orderBy,
-      String direction, String cursor, Instant after, int limit, UUID userId) {
+  public CursorPageResponseInterestDto findCursorPagedInterests(
+      String keyword, String orderBy, String direction,
+      String cursor, Instant after, int limit, UUID userId) {
 
     BooleanBuilder builder = new BooleanBuilder();
 
-    // 검색 조건 (keyword, interestName)
     if (keyword != null && !keyword.isEmpty()) {
       builder.and(
           interest.name.containsIgnoreCase(keyword)
-              .or(interest.keywordsString.containsIgnoreCase(keyword))  // JSON 문자열에 LIKE
+              .or(interest.keywordsString.containsIgnoreCase(keyword))
       );
     }
 
-    BooleanExpression cursorCondition = buildCursorCondition(direction, cursor, after);
-    if (cursorCondition != null) {
-      builder.and(cursorCondition);
-    }
-    // 정렬 기준
+    // 커서 조건
+    applyCursorCondition(orderBy, direction, cursor, builder);
+
+    BooleanExpression subscribedExpression = JPAExpressions
+        .selectOne()
+        .from(subscription)
+        .where(subscription.interest.id.eq(interest.id)
+            .and(subscription.user.id.eq(userId)))
+        .exists();
+
+    // 정렬 옵션
     OrderSpecifier<?> primaryOrder = getOrderSpecifier(orderBy, direction);
     OrderSpecifier<?> secondaryOrder = getCreatedAtOrderSpecifier(direction);
+    OrderSpecifier<?> stabilityOrder = new OrderSpecifier<>(
+        "ASC".equalsIgnoreCase(direction) ? Order.ASC : Order.DESC,
+        interest.id
+    );
 
     List<InterestDto> results = queryFactory
         .select(new QInterestDto(
@@ -54,23 +66,20 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
             interest.name,
             interest.keywords,
             interest.subscriptionsCount,
-            subscription.id.isNotNull(), // 내가 구독 중인지 여부
+            subscribedExpression,
             interest.createdAt
-            )
-        )
+        ))
         .from(interest)
-        .leftJoin(subscription)
-        .on(subscription.interest.id.eq(interest.id)
-            .and(subscription.user.id.eq(userId)))
         .where(builder)
-        .orderBy(primaryOrder, secondaryOrder)
+        .orderBy(primaryOrder, secondaryOrder, stabilityOrder)
         .limit(limit + 1)
         .fetch();
 
     boolean hasNext = results.size() > limit;
-    if (hasNext) results.remove(limit);
+    if (hasNext) {
+      results.remove(limit);
+    }
 
-    // 커서 계산
     String nextCursor = hasNext ? results.get(results.size() - 1).id().toString() : null;
     Instant nextAfter = hasNext ? results.get(results.size() - 1).createdAt() : null;
 
@@ -82,6 +91,69 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
         results.size(),
         hasNext
     );
+  }
+
+  //유틸 메서드
+
+  private void applyCursorCondition(String orderBy, String direction, String cursor,
+      BooleanBuilder builder) {
+    if (cursor == null) {
+      return;
+    }
+
+    UUID cursorId;
+    try {
+      cursorId = UUID.fromString(cursor);
+    } catch (IllegalArgumentException e) {
+      return;
+    }
+
+    // ✅ primary + createdAt 한번에 조회
+    Tuple row = queryFactory
+        .select(interest.name, interest.subscriptionsCount, interest.createdAt)
+        .from(interest)
+        .where(interest.id.eq(cursorId))
+        .fetchOne();
+
+    if (row == null) {
+      return;
+    }
+
+    String cursorName = row.get(interest.name);
+    Long cursorSubs = row.get(interest.subscriptionsCount);
+    Instant cursorCreatedAt = row.get(interest.createdAt);
+
+    boolean isAsc = "ASC".equalsIgnoreCase(direction);
+
+    // ✅ tie-breaker: createdAt → id
+    BooleanExpression byCreatedAtThenId = isAsc
+        ? interest.createdAt.gt(cursorCreatedAt)
+        .or(interest.createdAt.eq(cursorCreatedAt)
+            .and(interest.id.gt(cursorId)))
+        : interest.createdAt.lt(cursorCreatedAt)
+            .or(interest.createdAt.eq(cursorCreatedAt)
+                .and(interest.id.lt(cursorId)));
+
+    // ✅ primary 정렬 기준에 맞춘 cursor 처리
+    switch (orderBy) {
+      case "subscriberCount" -> builder.and(
+          isAsc
+              ? interest.subscriptionsCount.gt(cursorSubs)
+              .or(interest.subscriptionsCount.eq(cursorSubs).and(byCreatedAtThenId))
+              : interest.subscriptionsCount.lt(cursorSubs)
+                  .or(interest.subscriptionsCount.eq(cursorSubs).and(byCreatedAtThenId))
+      );
+
+      case "name" -> builder.and(
+          isAsc
+              ? interest.name.gt(cursorName)
+              .or(interest.name.eq(cursorName).and(byCreatedAtThenId))
+              : interest.name.lt(cursorName)
+                  .or(interest.name.eq(cursorName).and(byCreatedAtThenId))
+      );
+
+      default -> builder.and(byCreatedAtThenId);
+    }
   }
 
   @Override
@@ -104,25 +176,11 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
         .fetch();
   }
 
-  // 유틸 메서드
-
-  private BooleanExpression buildCursorCondition(String direction, String cursor, Instant after) {
-    if (cursor == null || after == null) return null;
-
-    UUID cursorId = UUID.fromString(cursor);
-    boolean isAsc = "ASC".equalsIgnoreCase(direction);
-
-    return isAsc
-        ? interest.createdAt.after(after)
-        .or(interest.createdAt.eq(after).and(interest.id.gt(cursorId)))
-        : interest.createdAt.before(after)
-            .or(interest.createdAt.eq(after).and(interest.id.lt(cursorId)));
-  }
-
   private OrderSpecifier<?> getOrderSpecifier(String orderBy, String direction) {
     Order order = "DESC".equalsIgnoreCase(direction) ? Order.DESC : Order.ASC;
     return switch (orderBy) {
-      case "subscriberCount" -> new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.subscriptionsCount);
+      case "subscriberCount" ->
+          new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.subscriptionsCount);
       case "name" -> new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.name);
       default -> new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.name);
     };

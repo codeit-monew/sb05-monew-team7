@@ -68,10 +68,9 @@ CREATE TABLE interests
     subscriptions_count BIGINT       NOT NULL DEFAULT 0
 );
 
--- name 컬럼에 트라이그램 인덱스 생성
+-- name 컬럼 GIN 트라이그램 인덱스
 CREATE INDEX idx_interests_name_trgm
-    ON interests USING gin (name gin_trgm_ops);
-
+    ON interests USING gin (name public.gin_trgm_ops);
 -- ==============================
 -- SUBSCRIPTIONS
 -- ==============================
@@ -278,3 +277,10 @@ ALTER TABLE batch_job_execution_context
 
 ALTER TABLE batch_step_execution_context
     ADD CONSTRAINT step_exec_ctx_fk FOREIGN KEY (step_execution_id) REFERENCES batch_step_execution(step_execution_id);
+    
+CREATE INDEX IF NOT EXISTS idx_notif_user_confirm_created_desc
+    ON notifications (user_id, confirmed, created_at DESC, id DESC);
+
+-- 정리 배치(삭제): WHERE confirmed=true AND updated_at < :threshold
+CREATE INDEX IF NOT EXISTS idx_notif_confirmed_updated
+    ON notifications (confirmed, updated_at);

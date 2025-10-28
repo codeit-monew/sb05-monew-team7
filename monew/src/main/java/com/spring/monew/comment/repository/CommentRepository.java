@@ -2,6 +2,8 @@ package com.spring.monew.comment.repository;
 
 import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.user.domain.User;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,5 +16,12 @@ public interface CommentRepository extends JpaRepository<Comment, UUID>, Comment
   @Query("DELETE FROM Comment c where c.id = :commentId")
   void deletePhysicalById(@Param("commentId") UUID commentId);
 
-  UUID user(User user);
+  @Modifying
+  @Query(value = """
+    DELETE FROM comments
+    WHERE is_deleted = true
+      AND deleted_at IS NOT NULL
+      AND deleted_at < :threshold
+    """, nativeQuery = true)
+  int deleteSoftDeletedBefore(@Param("threshold") Instant threshold);
 }
