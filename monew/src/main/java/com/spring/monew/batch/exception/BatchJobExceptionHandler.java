@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "com.spring.monew.article.batch.controller")
+@RestControllerAdvice(basePackages = "com.spring.monew.batch.controller")
 public class BatchJobExceptionHandler {
 
     @ExceptionHandler(BatchJobExecutionNotFoundException.class)
