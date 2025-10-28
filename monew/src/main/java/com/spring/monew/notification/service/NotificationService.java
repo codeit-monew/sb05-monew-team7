@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -30,15 +29,14 @@ public class NotificationService {
 
   private final NotificationRepository repository;
 
-  // 목록 조회 (커서 기반)
+  // ===== 목록 조회 (커서 기반) =====
   @Transactional(readOnly = true)
   public CursorPageResponseNotificationDto list(UUID userId, String cursor, Instant after, int limit) {
     Objects.requireNonNull(userId, "userId must not be null");
 
-    // limit 가드(컨트롤러 @Min/@Max 외, 서비스 레벨에서도 방어)
     final int safeLimit = Math.max(MIN_LIMIT, Math.min(MAX_LIMIT, limit));
 
-    // 시간 기준: DB now()가 있으면 그것을 우선 사용(서버/DB 시간 불일치 방지)
+    // DB now() 우선, after가 미래면 now로 보정
     final Instant now = getConsistentNow();
     final Instant afterOrNow = (after == null || after.isAfter(now)) ? now : after;
 
@@ -50,8 +48,9 @@ public class NotificationService {
     }
 
     final Instant cursorAt = (decoded == null) ? null : decoded.createdAt;
-    final UUID cursorId = (decoded == null) ? null : decoded.id;
+    final UUID   cursorId = (decoded == null) ? null : decoded.id;
 
+    // 다음 페이지 여부 확인을 위해 +1
     final int fetchSize = safeLimit + 1;
     List<Notification> entities = repository.findUnreadByUserIdWithCursor(
         userId, afterOrNow, cursorAt, cursorId, fetchSize
@@ -62,21 +61,18 @@ public class NotificationService {
       entities = entities.subList(0, fetchSize - 1);
     }
 
-    // 직접 DTO 조립
-    final List<NotificationDto> content = new ArrayList<>(entities.size());
-    for (Notification n : entities) {
-      NotificationDto dto = new NotificationDto(
-          n.getId(),
-          n.getCreatedAt(),
-          n.getUpdatedAt(),
-          n.isConfirmed(),
-          n.getUserId(),
-          n.getContent(),
-          n.getResourceType(),
-          n.getResourceId()
-      );
-      content.add(dto);
-    }
+    final List<NotificationDto> content = entities.stream()
+        .map(n -> new NotificationDto(
+            n.getId(),
+            n.getCreatedAt(),
+            n.getUpdatedAt(),
+            n.isConfirmed(),
+            n.getUserId(),
+            n.getContent(),
+            n.getResourceType(),   // DTO가 enum(NotificationResourceType) 받음
+            n.getResourceId()
+        ))
+        .toList();
 
     String nextCursor = null;
     if (hasNext && !entities.isEmpty()) {
@@ -94,7 +90,7 @@ public class NotificationService {
     );
   }
 
-  // 단건 확인
+  // ===== 단건 확인 =====
   @Transactional
   public NotificationConfirmResponseDto confirmOne(UUID userId, UUID notificationId) {
     Objects.requireNonNull(userId, "userId must not be null");
@@ -105,8 +101,8 @@ public class NotificationService {
 
     boolean already = entity.isConfirmed();
     if (!already) {
-      entity.confirm();
-      repository.flush(); // @PreUpdate/감사필드 즉시 반영
+      entity.confirm();   // @PreUpdate 로 updatedAt 반영
+      repository.flush(); // 즉시 반영
     }
 
     return new NotificationConfirmResponseDto(
@@ -118,25 +114,23 @@ public class NotificationService {
     );
   }
 
-  // 전체 확인
+  // ===== 전체 확인 =====
   @Transactional
   public BulkConfirmResultDto confirmAll(UUID userId) {
     Objects.requireNonNull(userId, "userId must not be null");
 
-    long updated = repository.confirmAllByUserId(userId);
+    long updated    = repository.confirmAllByUserId(userId);
     boolean hasUnread = repository.existsByUserIdAndConfirmedFalse(userId);
-    boolean allConfirmed = !hasUnread;
 
     return new BulkConfirmResultDto(
         updated,
-        allConfirmed,
+        !hasUnread,
         userId,
         getConsistentNow()
     );
   }
 
-  // 내부 유틸
-
+  // ===== 내부 유틸 =====
   private static final class CursorDecoded {
     private final Instant createdAt;
     private final UUID id;
@@ -157,16 +151,13 @@ public class NotificationService {
     String raw = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8);
     String[] parts = raw.split("\\|");
     if (parts.length != 2) {
-      throw new IllegalArgumentException("Invalid cursor (expected 'createdAt|id').");
+      throw new IllegalArgumentException("Invalid cursor. expected 'createdAt|id'");
     }
     return new CursorDecoded(Instant.parse(parts[0]), UUID.fromString(parts[1]));
   }
 
+  // DB 시간 우선 사용 — 예외를 숨기지 않고 그대로 던져 원인 파악 가능
   private Instant getConsistentNow() {
-    try {
-      return repository.getDatabaseNow();
-    } catch (Exception ignore) {
-      return Instant.now();
-    }
+    return repository.getDatabaseNow();
   }
 }

@@ -82,8 +82,14 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
 
   @Override
   public Instant getDatabaseNow() {
-    //  CURRENT_TIMESTAMP → Instant
-    final TypedQuery<Instant> query = em.createQuery("SELECT CURRENT_TIMESTAMP", Instant.class);
-    return query.getSingleResult();
+    Object v = em.createNativeQuery("select now()").getSingleResult();
+
+    if (v instanceof Instant i) return i;
+    if (v instanceof java.sql.Timestamp ts) return ts.toInstant();
+    if (v instanceof java.time.OffsetDateTime odt) return odt.toInstant();
+    if (v instanceof java.time.LocalDateTime ldt) {
+      return ldt.atOffset(java.time.ZoneOffset.UTC).toInstant();
+    }
+    throw new IllegalStateException("Unexpected DB time type: " + v + " (" + v.getClass() + ")");
   }
 }

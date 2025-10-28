@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Locale;
 
 public enum NotificationResourceType {
-  INTEREST, COMMENT;
+  ARTICLE, COMMENT, LIKE, SUBSCRIPTION;
 
   // 잘못된 값이면 400
   @JsonCreator
