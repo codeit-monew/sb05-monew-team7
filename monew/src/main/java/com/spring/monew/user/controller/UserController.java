@@ -39,20 +39,8 @@ public class UserController {
   @PatchMapping("/{userId}")
   public ResponseEntity<UserDto> userModify(
       @PathVariable UUID userId,
-      HttpServletRequest request,
       @RequestBody @Valid UserUpdateRequest updateRequest
   ) {
-    // 필터에서 넣은 userId 꺼냄
-    String headerUserId = (String) request.getAttribute("userId");
-    if (headerUserId == null) {
-      return ResponseEntity.status(401).build(); // 인증 없음
-    }
-
-    UUID requestUserId = UUID.fromString(headerUserId);
-    if (!userId.equals(requestUserId)) {
-      return ResponseEntity.status(403).build(); // 본인 아님
-    }
-
     UserDto updated = userService.modifyUser(userId, updateRequest);
     return ResponseEntity.ok(updated);
   }
