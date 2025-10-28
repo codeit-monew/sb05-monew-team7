@@ -93,11 +93,17 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
 
   @Override
   public Instant getDatabaseNow() {
-    Object v = em.createNativeQuery("select now()").getSingleResult();
-
-    if (v instanceof Instant i) return i;
+    // 항상 하나의 컬럼
+    var nativeQuery = em.createNativeQuery("select now() as db_now")
+        .unwrap(org.hibernate.query.NativeQuery.class)
+        .addScalar("db_now", org.hibernate.type.StandardBasicTypes.OFFSET_DATE_TIME);
+    Object v = nativeQuery.getSingleResult();
+    // 타입으로 내려오면 바로 변환
+    if (v instanceof java.time.OffsetDateTime odt) {
+      return odt.toInstant();
+    }
+    if (v instanceof java.time.Instant i) return i;
     if (v instanceof java.sql.Timestamp ts) return ts.toInstant();
-    if (v instanceof java.time.OffsetDateTime odt) return odt.toInstant();
     if (v instanceof java.time.LocalDateTime ldt) {
       return ldt.atOffset(java.time.ZoneOffset.UTC).toInstant();
     }
