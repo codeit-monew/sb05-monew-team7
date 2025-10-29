@@ -1,13 +1,20 @@
 package com.spring.monew.article.service.impl;
 
+import com.spring.monew.article.controller.dto.response.ArticleDto;
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
+import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.domain.ArticleSource;
+import com.spring.monew.article.exception.ArticleNotFoundException;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.article.service.ArticleService;
+import com.spring.monew.articleview.domain.ArticleView;
+import com.spring.monew.articleview.repository.ArticleViewRepository;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleServiceImpl implements ArticleService {
 
   private final ArticleRepository articleRepository;
+  private final ArticleViewRepository articleViewRepository;
+  private final RedisTemplate<String, String> redisTemplate;
 
   @Override
   public CursorPageResponseArticleDto getArticles(
@@ -83,5 +92,48 @@ public class ArticleServiceImpl implements ArticleService {
     return java.util.Arrays.stream(ArticleSource.values())
         .map(Enum::name)
         .toList();
+  }
+
+  @Override
+  @Transactional
+  public ArticleDto getArticle(UUID articleId, UUID userId) {
+    Article article = articleRepository.findById(articleId)
+        .orElseThrow(() -> new ArticleNotFoundException(articleId));
+
+    if (userId != null) {
+      trackView(article, userId);
+    }
+
+    boolean viewedByMe = false;
+    if (userId != null) {
+      Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
+      viewedByMe = articleViewRepository.existsByArticleIdAndUserIdAndCreatedAtAfter(
+          articleId, userId, twentyFourHoursAgo
+      );
+    }
+
+    return new ArticleDto(
+        article.getId(),
+        article.getSource(),
+        article.getSourceUrl(),
+        article.getTitle(),
+        article.getPublishDate(),
+        article.getSummary(),
+        article.getCommentCount(),
+        article.getViewCount(),
+        viewedByMe
+    );
+  }
+
+  private void trackView(Article article, UUID userId) {
+    String redisKey = "article:view:" + article.getId() + ":" + userId;
+    Boolean isNewView = redisTemplate.opsForValue()
+        .setIfAbsent(redisKey, "1", Duration.ofHours(24));
+
+    if (Boolean.TRUE.equals(isNewView)) {
+      article.incrementViewCount();
+      ArticleView view = ArticleView.of(article, userId);
+      articleViewRepository.save(view);
+    }
   }
 }

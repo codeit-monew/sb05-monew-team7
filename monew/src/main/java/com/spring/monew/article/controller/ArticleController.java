@@ -1,5 +1,6 @@
 package com.spring.monew.article.controller;
 
+import com.spring.monew.article.controller.dto.response.ArticleDto;
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
 import com.spring.monew.article.service.ArticleService;
 import com.spring.monew.auth.config.HeaderUserAuthentication;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,6 +89,32 @@ public class ArticleController {
         userId
     );
   }
+
+  @GetMapping("/{articleId}")
+  @Operation(
+      summary = "뉴스 기사 단건 조회",
+      description = "뉴스 기사 ID를 사용하여 특정 기사의 상세 정보를 조회합니다. 조회 시 자동으로 조회수가 증가하며, 같은 사용자의 중복 조회는 24시간 동안 1회만 카운트됩니다."
+  )
+  public ArticleDto articleDetails(
+      @Parameter(description = "뉴스 기사 ID", required = true)
+      @PathVariable UUID articleId,
+      Principal principal
+  ) {
+    UUID userId = null;
+    if (principal instanceof HeaderUserAuthentication auth) {
+      String userIdStr = (String) auth.getPrincipal();
+      if (userIdStr != null && !userIdStr.isBlank()) {
+        try {
+          userId = UUID.fromString(userIdStr);
+        } catch (IllegalArgumentException e) {
+          throw new IllegalArgumentException("Invalid user ID format");
+        }
+      }
+    }
+
+    return articleService.getArticle(articleId, userId);
+  }
+
   @GetMapping("/sources")
   @Operation(summary = "기사 출처 목록 조회", description = "뉴스 기사 출처 enum 값 목록 반환")
   public List<String> articleSourceList() {

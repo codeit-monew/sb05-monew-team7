@@ -1,5 +1,6 @@
 package com.spring.monew.common.exception;
 
+import com.spring.monew.article.exception.ArticleNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,18 @@ import java.time.Instant;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ArticleNotFoundException.class)
+    public ProblemDetail handleArticleNotFoundException(ArticleNotFoundException ex) {
+        log.warn("기사를 찾을 수 없음: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("뉴스 기사 정보 없음");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex) {

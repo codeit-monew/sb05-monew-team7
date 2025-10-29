@@ -1,5 +1,6 @@
 package com.spring.monew.article.service;
 
+import com.spring.monew.article.controller.dto.response.ArticleDto;
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
 import java.time.Instant;
 import java.util.List;
@@ -21,4 +22,6 @@ public interface ArticleService {
   );
 
   List<String> getSources();
+
+  ArticleDto getArticle(UUID articleId, UUID userId);
 }

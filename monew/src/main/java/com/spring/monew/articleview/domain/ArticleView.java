@@ -31,4 +31,12 @@ public class ArticleView {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    public static ArticleView of(Article article, UUID userId) {
+        ArticleView view = new ArticleView();
+        view.id = UUID.randomUUID();
+        view.article = article;
+        view.userId = userId;
+        return view;
+    }
+
 }
