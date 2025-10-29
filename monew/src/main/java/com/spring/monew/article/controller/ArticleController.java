@@ -38,7 +38,7 @@ public class ArticleController {
       @RequestParam(required = false) List<String> interests,
 
       @Parameter(description = "출처(포함)")
-      @RequestParam(required = false) List<String> sources,
+      @RequestParam(name = "sourceIn", required = false) List<String> sources,
 
       @Parameter(description = "날짜 시작(범위)")
       @RequestParam(required = false) Instant from,
@@ -86,5 +86,10 @@ public class ArticleController {
         limit,
         userId
     );
+  }
+  @GetMapping("/sources")
+  @Operation(summary = "기사 출처 목록 조회", description = "뉴스 기사 출처 enum 값 목록 반환")
+  public List<String> articleSourceList() {
+    return articleService.getSources();
   }
 }

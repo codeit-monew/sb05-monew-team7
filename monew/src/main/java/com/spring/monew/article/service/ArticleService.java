@@ -19,4 +19,6 @@ public interface ArticleService {
       int limit,
       UUID userId
   );
+
+  List<String> getSources();
 }
