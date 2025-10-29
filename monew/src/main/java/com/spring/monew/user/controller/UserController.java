@@ -2,10 +2,15 @@ package com.spring.monew.user.controller;
 
 import com.spring.monew.user.controller.dto.data.UserDto;
 import com.spring.monew.user.controller.dto.request.UserRegisterRequest;
+import com.spring.monew.user.controller.dto.request.UserUpdateRequest;
 import com.spring.monew.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,4 +31,19 @@ public class UserController {
     UserDto userDto = userService.addUser(request);
     return ResponseEntity.status(201).body(userDto);
   }
+
+  /**
+   * 사용자 정보 수정(닉네임 변경)
+   */
+
+  @PatchMapping("/{userId}")
+  public ResponseEntity<UserDto> userModify(
+      @PathVariable UUID userId,
+      @RequestBody @Valid UserUpdateRequest updateRequest
+  ) {
+    UserDto updated = userService.modifyUser(userId, updateRequest);
+    return ResponseEntity.ok(updated);
+  }
 }
+
+

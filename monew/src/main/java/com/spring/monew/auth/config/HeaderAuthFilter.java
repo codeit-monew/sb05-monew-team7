@@ -25,7 +25,6 @@ public class HeaderAuthFilter extends OncePerRequestFilter {
 
     // 헤더에서 사용자 ID 읽기
     String userId = request.getHeader("MoNew-Request-User-ID");
-    System.out.println("🟢 [HeaderAuthFilter] 들어온 헤더값 = " + userId);
 
 
     // 헤더가 존재할 때만 인증 정보 저장
@@ -38,7 +37,6 @@ public class HeaderAuthFilter extends OncePerRequestFilter {
       // Controller에서 편하게 꺼낼 수 있도록 request에도 저장
       request.setAttribute("userId", userId);
     } else {
-      System.out.println("⚠️ [HeaderAuthFilter] userId 헤더 없음");
     }
 
     // 다음 필터로 요청 전달
