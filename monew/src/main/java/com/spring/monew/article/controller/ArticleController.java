@@ -2,15 +2,19 @@ package com.spring.monew.article.controller;
 
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
 import com.spring.monew.article.service.ArticleService;
+import com.spring.monew.auth.config.HeaderUserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "기사", description = "기사 목록 조회 및 검색 API")
 public class ArticleController {
 
@@ -26,36 +31,49 @@ public class ArticleController {
   @GetMapping
   @Operation(summary = "기사 목록 조회", description = "필터, 검색, 정렬 기능을 지원하는 페이지네이션 기사 목록 조회")
   public CursorPageResponseArticleDto articleList(
-      @Parameter(description = "제목/요약 검색 키워드")
+      @Parameter(description = "검색어(제목, 요약)")
       @RequestParam(required = false) String keyword,
 
-      @Parameter(description = "관심사 이름으로 필터링")
+      @Parameter(description = "관심사 ID")
       @RequestParam(required = false) List<String> interests,
 
-      @Parameter(description = "기사 출처로 필터링")
+      @Parameter(description = "출처(포함)")
       @RequestParam(required = false) List<String> sources,
 
-      @Parameter(description = "이 날짜 이후 발행된 기사 필터링")
+      @Parameter(description = "날짜 시작(범위)")
       @RequestParam(required = false) Instant from,
 
-      @Parameter(description = "이 날짜 이전 발행된 기사 필터링")
+      @Parameter(description = "날짜 끝(범위)")
       @RequestParam(required = false) Instant to,
 
-      @Parameter(description = "정렬 기준 필드 (publishDate, viewCount, commentCount, createdAt)")
-      @RequestParam(defaultValue = "createdAt") String orderBy,
+      @Parameter(description = "정렬 속성 이름", required = true)
+      @RequestParam(required = true) String orderBy,
 
-      @Parameter(description = "정렬 방향 (ASC 또는 DESC)")
-      @RequestParam(defaultValue = "DESC") String direction,
+      @Parameter(description = "정렬 방향 (ASC, DESC)", required = true)
+      @RequestParam(required = true) String direction,
 
-      @Parameter(description = "페이지네이션 커서")
+      @Parameter(description = "커서 값")
       @RequestParam(required = false) String cursor,
 
-      @Parameter(description = "페이지당 항목 수 (1-100)")
-      @RequestParam(defaultValue = "20") int limit,
+      @Parameter(description = "커서 페이지 크기", required = true)
+      @RequestParam(required = true) 
+      @Min(1) 
+      @Max(100) 
+      int limit,
 
-      @Parameter(description = "조회 여부 계산을 위한 사용자 ID")
-      @RequestHeader(name = "Monew-Request-User-ID", required = false) UUID userId
+      Principal principal
   ) {
+    UUID userId = null;
+    if (principal instanceof HeaderUserAuthentication auth) {
+      String userIdStr = (String) auth.getPrincipal();
+      if (userIdStr != null && !userIdStr.isBlank()) {
+        try {
+          userId = UUID.fromString(userIdStr);
+        } catch (IllegalArgumentException ignored) {
+        }
+      }
+    }
+
     return articleService.getArticles(
         keyword,
         interests,

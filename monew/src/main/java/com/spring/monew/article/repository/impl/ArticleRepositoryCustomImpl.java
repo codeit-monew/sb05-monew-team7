@@ -71,26 +71,28 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
       builder.and(article.publishDate.loe(to));
     }
 
-    applyCursorCondition(orderBy, direction, cursor, builder);
-
-    final BooleanExpression viewedByMeExpression;
-    if (userId != null) {
-      Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
-      viewedByMeExpression = JPAExpressions
-          .selectOne()
-          .from(articleView)
-          .where(articleView.article.id.eq(article.id)
-              .and(articleView.createdAt.goe(twentyFourHoursAgo)))
-          .exists();
-    } else {
-      viewedByMeExpression = Expressions.asBoolean(false);
-    }
-
     Long totalCount = queryFactory
         .select(article.count())
         .from(article)
         .where(builder)
         .fetchOne();
+
+    applyCursorCondition(orderBy, direction, cursor, builder);
+
+    final BooleanExpression viewedByMeExpression;
+    if (userId != null) {
+      final UUID userIdFinal = userId;
+      Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
+      viewedByMeExpression = JPAExpressions
+          .selectOne()
+          .from(articleView)
+          .where(articleView.article.id.eq(article.id)
+              .and(articleView.userId.eq(userIdFinal))
+              .and(articleView.createdAt.goe(twentyFourHoursAgo)))
+          .exists();
+    } else {
+      viewedByMeExpression = Expressions.asBoolean(false);
+    }
 
     OrderSpecifier<?> primaryOrder = getOrderSpecifier(orderBy, direction);
     OrderSpecifier<?> secondaryOrder = getCreatedAtOrderSpecifier(direction);
