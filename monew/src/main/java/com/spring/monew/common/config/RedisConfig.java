@@ -1,4 +1,4 @@
-package com.spring.monew.config;
+package com.spring.monew.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

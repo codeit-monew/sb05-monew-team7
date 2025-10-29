@@ -1,4 +1,4 @@
-package com.spring.monew.exception;
+package com.spring.monew.common.exception;
 
 import java.time.Instant;
 
