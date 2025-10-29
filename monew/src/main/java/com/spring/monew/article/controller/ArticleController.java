@@ -30,6 +30,20 @@ public class ArticleController {
 
   private final ArticleService articleService;
 
+  private UUID extractUserId(Principal principal) {
+    if (principal instanceof HeaderUserAuthentication auth) {
+      String userIdStr = (String) auth.getPrincipal();
+      if (userIdStr != null && !userIdStr.isBlank()) {
+        try {
+          return UUID.fromString(userIdStr);
+        } catch (IllegalArgumentException ignored) {
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
   @GetMapping
   @Operation(summary = "기사 목록 조회", description = "필터, 검색, 정렬 기능을 지원하는 페이지네이션 기사 목록 조회")
   public CursorPageResponseArticleDto articleList(
@@ -65,16 +79,7 @@ public class ArticleController {
 
       Principal principal
   ) {
-    UUID userId = null;
-    if (principal instanceof HeaderUserAuthentication auth) {
-      String userIdStr = (String) auth.getPrincipal();
-      if (userIdStr != null && !userIdStr.isBlank()) {
-        try {
-          userId = UUID.fromString(userIdStr);
-        } catch (IllegalArgumentException ignored) {
-        }
-      }
-    }
+    UUID userId = extractUserId(principal);
 
     return articleService.getArticles(
         keyword,
@@ -100,17 +105,7 @@ public class ArticleController {
       @PathVariable UUID articleId,
       Principal principal
   ) {
-    UUID userId = null;
-    if (principal instanceof HeaderUserAuthentication auth) {
-      String userIdStr = (String) auth.getPrincipal();
-      if (userIdStr != null && !userIdStr.isBlank()) {
-        try {
-          userId = UUID.fromString(userIdStr);
-        } catch (IllegalArgumentException e) {
-          throw new IllegalArgumentException("Invalid user ID format");
-        }
-      }
-    }
+    UUID userId = extractUserId(principal);
 
     return articleService.getArticle(articleId, userId);
   }
