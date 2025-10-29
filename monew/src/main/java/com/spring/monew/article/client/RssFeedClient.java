@@ -65,6 +65,11 @@ public class RssFeedClient {
                     String description = entry.getDescription() != null ? entry.getDescription().getValue() : "";
                     Date pubDate = entry.getPublishedDate();
 
+                    if (!containsKorean(title) && !containsKorean(description)) {
+                        log.debug("한글이 포함되지 않은 기사 제외: {}", title);
+                        continue;
+                    }
+
                     Instant publishDate = pubDate != null ? pubDate.toInstant() : Instant.now();
 
                     ArticleCandidate candidate = ArticleCandidate.builder()
@@ -96,5 +101,9 @@ public class RssFeedClient {
         }
 
         return candidates;
+    }
+
+    private boolean containsKorean(String text) {
+        return text != null && text.matches(".*[가-힣]+.*");
     }
 }

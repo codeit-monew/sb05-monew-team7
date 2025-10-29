@@ -9,27 +9,21 @@ spring:
     password: 1234
     driver-class-name: org.postgresql.Driver
 
-  data:
-    mongodb:
-      uuid-representation: standard
-      uri: ${MONGODB_URI}
-
-jpa:
-  hibernate:
-    ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
-  properties:
+  jpa:
     hibernate:
-      format_sql: true
-      dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
       jdbc:
         time_zone: UTC
-
+    show-sql: false
   sql:
     init:
       mode: never # 'always' for initial creation, 'never' afterwards
-    show-sql: false
 
-
+  data:
     redis:
       host: localhost
       port: 6379
@@ -38,7 +32,7 @@ jpa:
     job:
       enabled: true
     jdbc:
-      initialize-schema: ${BATCH_INITIALIZE_SCHEMA:embedded}
+      initialize-schema: never
 
   servlet:
     multipart:

@@ -72,6 +72,13 @@ public class NaverNewsApiClient {
                     String link = item.get("link").asText();
                     String pubDate = item.get("pubDate").asText();
 
+                    description = removeEnglishTranslation(description);
+
+                    if (!containsKorean(title) && !containsKorean(description)) {
+                        log.debug("한글이 포함되지 않은 기사 제외: {}", title);
+                        continue;
+                    }
+
                     Instant publishDate = parseNaverDate(pubDate);
 
                     ArticleCandidate candidate = ArticleCandidate.builder()
@@ -97,8 +104,59 @@ public class NaverNewsApiClient {
                 .replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
     }
 
+    private String removeEnglishTranslation(String text) {
+        if (text == null) {
+            return "";
+        }
+        
+        text = text.replaceAll("(?i)It is assumed that there may be errors in the English translation\\.?\\s*", "");
+        text = text.replaceAll("(?i)It assumes that there may be errors in the English translation\\.?\\s*", "");
+        
+        text = text.replaceAll("(?s)\\s*>\\s*[A-Za-z][A-Za-z0-9\\s.,;:!?'\"-]+$", "");
+        
+        text = cleanSummary(text);
+        
+        return text.trim();
+    }
+
+    private String cleanSummary(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        
+        text = text.replaceAll("https?://[^\\s]+", "");
+        text = text.replaceAll("\\(출처\\d+\\)", "");
+        text = text.replaceAll("☞[^☞]*", "");
+        text = text.replaceAll("\\[[^\\]]*기사\\s*모아보기[^\\]]*\\]", "");
+        text = text.replaceAll("<[^>]+>", "");
+        
+        String[] lines = text.split("\n");
+        StringBuilder result = new StringBuilder();
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (!trimmed.isEmpty() 
+                && !trimmed.startsWith("http") 
+                && !trimmed.matches(".*%[0-9A-F]{2}.*")
+                && trimmed.length() > 10
+                && containsKorean(trimmed)) {
+                result.append(trimmed).append(" ");
+            }
+        }
+        
+        String cleaned = result.toString().trim();
+        if (cleaned.length() > 500) {
+            cleaned = cleaned.substring(0, 500) + "...";
+        }
+        
+        return cleaned;
+    }
+
     private Instant parseNaverDate(String pubDate) {
         DateTimeFormatter formatter = DateTimeFormatter.RFC_1123_DATE_TIME;
         return ZonedDateTime.parse(pubDate, formatter).toInstant();
+    }
+
+    private boolean containsKorean(String text) {
+        return text != null && text.matches(".*[가-힣]+.*");
     }
 }
