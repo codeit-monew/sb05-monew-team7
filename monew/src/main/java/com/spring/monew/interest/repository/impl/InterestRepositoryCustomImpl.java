@@ -135,24 +135,22 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
                 .and(interest.id.lt(cursorId)));
 
     // ✅ primary 정렬 기준에 맞춘 cursor 처리
-    switch (orderBy) {
-      case "subscriberCount" -> builder.and(
+    if (orderBy.equals("subscriberCount")) {
+      builder.and(
           isAsc
               ? interest.subscriptionsCount.gt(cursorSubs)
               .or(interest.subscriptionsCount.eq(cursorSubs).and(byCreatedAtThenId))
               : interest.subscriptionsCount.lt(cursorSubs)
                   .or(interest.subscriptionsCount.eq(cursorSubs).and(byCreatedAtThenId))
       );
-
-      case "name" -> builder.and(
+    } else {
+      builder.and(
           isAsc
               ? interest.name.gt(cursorName)
               .or(interest.name.eq(cursorName).and(byCreatedAtThenId))
               : interest.name.lt(cursorName)
                   .or(interest.name.eq(cursorName).and(byCreatedAtThenId))
       );
-
-      default -> builder.and(byCreatedAtThenId);
     }
   }
 

@@ -3,6 +3,7 @@ package com.spring.monew.common.config;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.hibernate.Session;
@@ -22,5 +23,13 @@ public class HibernateFilterAspect {
     em.unwrap(Session.class)
         .enableFilter("deletedFilter")
         .setParameter("isDeleted", false);
+  }
+
+  @After("execution(* com.spring.monew..repository..*(..))")
+  public void disableFilter() {
+    Session session = em.unwrap(Session.class);
+    if (session.getEnabledFilter("deletedFilter") != null) {
+      session.disableFilter("deletedFilter");
+    }
   }
 }
