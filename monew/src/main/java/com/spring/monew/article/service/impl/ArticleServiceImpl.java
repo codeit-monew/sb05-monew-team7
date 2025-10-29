@@ -78,4 +78,10 @@ public class ArticleServiceImpl implements ArticleService {
         userId
     );
   }
+  @Override
+  public List<String> getSources() {
+    return java.util.Arrays.stream(ArticleSource.values())
+        .map(Enum::name)
+        .toList();
+  }
 }
