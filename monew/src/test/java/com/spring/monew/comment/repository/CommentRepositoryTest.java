@@ -21,31 +21,16 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @ActiveProfiles("test")
-@Testcontainers
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) // ✅ H2 사용 강제
 @DataJpaTest
 class CommentRepositoryTest {
-
-
-  @Container
-  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
-
-  // postgres 설정
-  static {
-    postgres.start();
-    System.setProperty("spring.datasource.url", postgres.getJdbcUrl());
-    System.setProperty("spring.datasource.username", postgres.getUsername());
-    System.setProperty("spring.datasource.password", postgres.getPassword());
-  }
-
   @Autowired
   private CommentRepository commentRepository;
   @Autowired
