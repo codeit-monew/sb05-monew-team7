@@ -1,6 +1,7 @@
 package com.spring.monew.article.service.impl;
 
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
+import com.spring.monew.article.domain.ArticleSource;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.article.service.ArticleService;
 import java.time.Instant;
@@ -52,6 +53,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     if (from != null && to != null && from.isAfter(to)) {
       throw new IllegalArgumentException("시작 날짜는 종료 날짜보다 이전이어야 합니다");
+    }
+
+    if (sources != null && !sources.isEmpty()) {
+      for (String source : sources) {
+        try {
+          ArticleSource.valueOf(source);
+        } catch (IllegalArgumentException e) {
+          throw new IllegalArgumentException("잘못된 소스 값: " + source);
+        }
+      }
     }
 
     return articleRepository.findCursorPagedArticles(
