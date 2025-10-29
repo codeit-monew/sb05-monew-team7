@@ -19,5 +19,8 @@ public interface UserService {
 
   //사용자 논리 삭제 (1일 지난 유저 아예 삭제)
   int removeUsersAfterOneDay();
+
+  //사용자 물리 삭제 ( 즉시 바로 삭제 )
+  void removeUserHard(UUID userId);
 }
 

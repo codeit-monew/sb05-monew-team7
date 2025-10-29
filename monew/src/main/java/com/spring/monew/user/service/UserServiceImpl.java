@@ -69,8 +69,7 @@ public class UserServiceImpl implements UserService {
   }
 
   /**
-   * 사용자 논리 삭제
-   * (is_deleted=true,deleted_at=시간으로 변경)
+   * 사용자 논리 삭제 ( is_deleted=true,deleted_at=시간으로 DB 변경 )
    */
   @Override
   @Transactional
@@ -83,13 +82,24 @@ public class UserServiceImpl implements UserService {
   }
 
   /**
-   * 사용자 논리 삭제
-   * (하루 뒤 DB에서 완전한 삭제 )
+   * 사용자 논리 삭제 (하루 뒤 DB에서 완전한 삭제 )
    */
   @Override
   @Transactional
   public int removeUsersAfterOneDay() {
     Instant threshold = Instant.now().minus(Duration.ofDays(1));
     return userRepository.deletedSoftUsers(threshold);
+  }
+
+  /**
+   * 사용자 물리 삭제 (즉시 바로 삭제)
+   */
+  @Override
+  @Transactional
+  public void removeUserHard(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("사용자 정보가 없습니다."));
+
+    userRepository.deletePhysicalUsers(userId);
   }
 }

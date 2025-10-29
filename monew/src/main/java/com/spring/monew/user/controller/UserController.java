@@ -54,6 +54,16 @@ public class UserController {
     userService.removeUserLogical(userId);
     return ResponseEntity.noContent().build();
   }
+
+  /**
+   * 사용자 정보 물리 삭제
+   */
+  @DeleteMapping("/{userId}/hard")
+  public ResponseEntity<Void> userRemoveHard(@PathVariable UUID userId) {
+    userService.removeUserHard(userId);
+    return ResponseEntity.noContent().build();
+  }
+
 }
 
 

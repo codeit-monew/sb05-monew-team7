@@ -23,4 +23,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     AND deleted_at < :threshold
   """, nativeQuery = true)
   int deletedSoftUsers(@Param("threshold") Instant threshold);
+
+  //즉시 물리 삭제
+  @Modifying
+  @Query(value = "DELETE FROM users WHERE id = :userId", nativeQuery = true)
+  void deletePhysicalUsers(@Param("userId") UUID userId);
 }
+
