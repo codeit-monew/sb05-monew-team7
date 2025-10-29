@@ -4,7 +4,6 @@ import com.spring.monew.user.controller.dto.data.UserDto;
 import com.spring.monew.user.controller.dto.request.UserRegisterRequest;
 import com.spring.monew.user.controller.dto.request.UserUpdateRequest;
 import java.util.UUID;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface UserService {
 

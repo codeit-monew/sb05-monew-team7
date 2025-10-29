@@ -4,7 +4,6 @@ import com.spring.monew.user.controller.dto.data.UserDto;
 import com.spring.monew.user.controller.dto.request.UserRegisterRequest;
 import com.spring.monew.user.controller.dto.request.UserUpdateRequest;
 import com.spring.monew.user.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

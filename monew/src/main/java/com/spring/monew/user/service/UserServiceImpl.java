@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
   /**
    * 회원 등록 처리
    */
+  @Transactional
   public UserDto addUser(UserRegisterRequest request) {
     if (userRepository.existsByEmail(request.email())) {
       throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");

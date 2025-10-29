@@ -9,6 +9,11 @@ spring:
     password: 1234
     driver-class-name: org.postgresql.Driver
 
+  data:
+    mongodb:
+      uuid-representation: standard
+      uri: ${MONGODB_URI}
+
 jpa:
   hibernate:
     ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
@@ -24,9 +29,6 @@ jpa:
       mode: never # 'always' for initial creation, 'never' afterwards
     show-sql: false
 
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/monew
 
     redis:
       host: localhost

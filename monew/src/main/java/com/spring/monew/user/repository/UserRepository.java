@@ -1,13 +1,13 @@
 package com.spring.monew.user.repository;
 
 import com.spring.monew.user.domain.User;
-import io.lettuce.core.dynamic.annotation.Param;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
   boolean existsByEmail(String email);
