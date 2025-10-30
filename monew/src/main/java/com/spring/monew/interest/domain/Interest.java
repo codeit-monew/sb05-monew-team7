@@ -34,7 +34,7 @@ public class Interest {
     @Column(nullable = false, columnDefinition = "TEXT")
     private List<String> keywords;
 
-    /** ✅ DB TEXT(JSON) 직접 검색용: QueryDSL에서만 사용 */
+    /** DB TEXT(JSON) 직접 검색용: QueryDSL에서만 사용 */
     @Column(name = "keywords", insertable = false, updatable = false)
     private String keywordsString;
 

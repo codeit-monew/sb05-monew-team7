@@ -2,19 +2,17 @@ package com.spring.monew.comment.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.domain.ArticleSource;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
 import com.spring.monew.comment.domain.Comment;
+import com.spring.monew.common.config.QuerydslConfig;
 import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.time.Instant;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -22,13 +20,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+@Import(QuerydslConfig.class)
 @ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@AutoConfigureTestDatabase(replace = Replace.ANY)
 @DataJpaTest
 class CommentRepositoryTest {
 
@@ -177,19 +176,5 @@ class CommentRepositoryTest {
     // then
     assertThat(result.content()).extracting(CommentDto::content)
         .containsExactly("like5", "like3", "like0");
-  }
-
-
-  // 테스트 Configuration 주입
-  @TestConfiguration
-  static class QuerydslTestConfig {
-
-    @PersistenceContext
-    private EntityManager em;
-
-    @Bean
-    public JPAQueryFactory queryFactory() {
-      return new JPAQueryFactory(em);
-    }
   }
 }

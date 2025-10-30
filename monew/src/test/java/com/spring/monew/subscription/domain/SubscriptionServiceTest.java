@@ -1,7 +1,10 @@
 package com.spring.monew.subscription.domain;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.verify;
 
 import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
@@ -64,7 +67,8 @@ class SubscriptionServiceTest {
     UUID userId = UUID.randomUUID();
     UUID interestId = UUID.randomUUID();
 
-    given(userRepository.findById(userId)).willReturn(Optional.of(new User("user@test.com", "유저", "password")));
+    given(userRepository.findById(userId)).willReturn(
+        Optional.of(new User("user@test.com", "유저", "password")));
     given(interestRepository.findById(interestId)).willReturn(
         Optional.of(new Interest("야구", List.of("스포츠"))));
     given(subscriptionRepository.existsByUser_IdAndInterest_Id(userId, interestId)).willReturn(
@@ -81,7 +85,8 @@ class SubscriptionServiceTest {
     UUID userId = UUID.randomUUID();
     UUID interestId = UUID.randomUUID();
 
-    given(userRepository.findById(userId)).willReturn(Optional.of(new User("user@test.com", "유저", "password")));
+    given(userRepository.findById(userId)).willReturn(
+        Optional.of(new User("user@test.com", "유저", "password")));
     given(interestRepository.findById(interestId)).willReturn(Optional.empty());
 
     assertThatThrownBy(() -> subscriptionService.addSubscription(interestId, userId))
