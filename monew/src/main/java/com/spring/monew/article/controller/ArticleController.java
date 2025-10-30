@@ -4,6 +4,7 @@ import com.spring.monew.article.controller.dto.response.ArticleDto;
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
 import com.spring.monew.article.service.ArticleService;
 import com.spring.monew.auth.config.HeaderUserAuthentication;
+import com.spring.monew.common.util.RequestUserExtractor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,20 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArticleController {
 
   private final ArticleService articleService;
-
-  private UUID extractUserId(Principal principal) {
-    if (principal instanceof HeaderUserAuthentication auth) {
-      String userIdStr = (String) auth.getPrincipal();
-      if (userIdStr != null && !userIdStr.isBlank()) {
-        try {
-          return UUID.fromString(userIdStr);
-        } catch (IllegalArgumentException ignored) {
-          return null;
-        }
-      }
-    }
-    return null;
-  }
+  private final RequestUserExtractor userExtractor;
 
   @GetMapping
   @Operation(summary = "기사 목록 조회", description = "필터, 검색, 정렬 기능을 지원하는 페이지네이션 기사 목록 조회")
@@ -79,7 +67,7 @@ public class ArticleController {
 
       Principal principal
   ) {
-    UUID userId = extractUserId(principal);
+    UUID userId = userExtractor.extractUserId(principal);
 
     return articleService.getArticles(
         keyword,
@@ -105,7 +93,7 @@ public class ArticleController {
       @PathVariable UUID articleId,
       Principal principal
   ) {
-    UUID userId = extractUserId(principal);
+    UUID userId = userExtractor.extractUserId(principal);
 
     return articleService.getArticle(articleId, userId);
   }
