@@ -10,7 +10,6 @@ import static org.mockito.Mockito.never;
 
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.domain.ArticleSource;
-import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.comment.repository.CommentRepository;
 import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
@@ -66,7 +65,6 @@ class CommentLikeServiceTest {
         .willAnswer(invocation -> invocation.getArgument(0));
 
     // when
-    System.out.println(commentId + " : " + userId);
     CommentLikeDto result = commentLikeService.addCommentLike(commentId, userId);
 
     // then

@@ -1,10 +1,12 @@
 package com.spring.monew.interest.controller;
 
+import com.spring.monew.common.util.RequestUserExtractor;
 import com.spring.monew.interest.controller.dto.request.InterestRegisterRequest;
 import com.spring.monew.interest.controller.dto.request.InterestUpdateRequest;
 import com.spring.monew.interest.controller.dto.response.CursorPageResponseInterestDto;
 import com.spring.monew.interest.controller.dto.response.InterestDto;
 import com.spring.monew.interest.service.InterestService;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InterestController {
 
   private final InterestService interestService;
+  private final RequestUserExtractor userExtractor;
 
   @PostMapping
   public InterestDto interestAdd(@RequestBody InterestRegisterRequest registerRequest) {
@@ -39,8 +42,9 @@ public class InterestController {
       @RequestParam(required = false) String cursor,                // 커서 값
       @RequestParam(required = false) Instant after,                // 보조 커서(createdAt)
       @RequestParam(defaultValue = "50") int limit,                 // 페이지 크기
-      @RequestHeader(name = "Monew-Request-User-ID") UUID userId    // 헤더 값
+      Principal principal
   ) {
+    UUID userId = userExtractor.extractUserId(principal);
     return interestService.getInterests(keyword, orderBy, direction, cursor, after, limit, userId);
   }
 
