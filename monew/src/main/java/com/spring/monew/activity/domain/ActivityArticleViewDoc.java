@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Document(collection = "activity_article_views")
 @CompoundIndexes({
-    @CompoundIndex(name = "idx_aav_user_last_viewed_desc", def = "{'user_id': 1, 'last_viewed_at': -1}"),
+    @CompoundIndex(name = "idx_aav_user_last_viewed_desc", def = "{'user_id': 1, 'last_viewed_at': -1, '_id': -1}"),
     @CompoundIndex(name = "uk_aav_user_article", def = "{'user_id': 1, 'article_id': 1}", unique = true)
 })
 public class ActivityArticleViewDoc {
