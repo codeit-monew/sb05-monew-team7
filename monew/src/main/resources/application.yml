@@ -33,7 +33,7 @@ spring:
     job:
       enabled: true
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
   servlet:
     multipart:
       max-file-size: 10MB
