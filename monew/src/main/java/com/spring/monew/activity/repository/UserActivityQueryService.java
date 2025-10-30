@@ -167,7 +167,7 @@ public class UserActivityQueryService {
     List<UserActivityResponse.CommentLike> items = rows.stream()
         .map(d -> new UserActivityResponse.CommentLike(
             d.getId(),
-            /* displayedAt */ pickInstant(d.getCreatedAt(), d.getCommentCreatedAt()),
+            pickInstant(d.getCreatedAt(), d.getCommentCreatedAt()),
             d.getCommentId(),
             d.getArticleId(),
             nz(d.getArticleTitle()),
@@ -175,7 +175,8 @@ public class UserActivityQueryService {
             nz(d.getCommentUserNickname()),
             nz(d.getCommentContent()),
             d.getCommentLikeCount(),
-            /* commentCreatedAt */ pickInstant(d.getCommentCreatedAt())
+            /* commentCreatedAt: 보조로 전달 */
+            pickInstant(d.getCommentCreatedAt())
         ))
         .toList();
 
@@ -258,9 +259,8 @@ public class UserActivityQueryService {
   // 가장 먼저 존재하는 Instant를 선택, 전부 null이면 현재시각 사용
   private static Instant pickInstant(Instant... cands) {
     for (Instant i : cands) if (i != null) return i;
-    return Instant.now();
+    return null; // now() 금지
   }
-
   private record Cursor(Instant createdAt, UUID id) {}
 
   private String encodeCursor(Instant createdAt, UUID id) {
