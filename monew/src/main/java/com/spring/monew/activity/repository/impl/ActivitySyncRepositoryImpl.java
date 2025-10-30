@@ -140,7 +140,7 @@ public class ActivitySyncRepositoryImpl implements ActivitySyncRepository {
     Query q = byEventId(likeEventId);
     Update u = new Update()
         .setOnInsert("_id", likeEventId)
-        .set("liked_by_user_id", likedByUserId != null ? likedByUserId.toString() : null)
+        .set("user_id", likedByUserId != null ? likedByUserId.toString() : null)
         .set("comment_id", commentId != null ? commentId.toString() : null)
         .set("article_id", articleId != null ? articleId.toString() : null)
         .set("article_title", nz(articleTitleSnapshot))
