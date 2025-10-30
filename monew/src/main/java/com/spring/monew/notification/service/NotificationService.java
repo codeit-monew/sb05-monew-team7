@@ -5,7 +5,10 @@ import com.spring.monew.notification.controller.dto.response.CursorPageResponseN
 import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
 import com.spring.monew.notification.controller.dto.response.NotificationDto;
 import com.spring.monew.notification.domain.Notification;
+import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.notification.repository.NotificationRepository;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -155,6 +158,27 @@ public class NotificationService {
       throw new IllegalArgumentException("Invalid cursor. expected 'createdAt|id'");
     }
     return new CursorDecoded(Instant.parse(parts[0]), UUID.fromString(parts[1]));
+  }
+
+  @Transactional
+  public void create(UUID userId, String content, NotificationResourceType type, UUID resourceId) {
+    Objects.requireNonNull(userId, "userId");
+    Objects.requireNonNull(content, "content");
+    Objects.requireNonNull(type, "type");
+    Objects.requireNonNull(resourceId, "resourceId");
+
+    Notification n = Notification.of(userId, content, type, resourceId);
+    repository.save(n);
+  }
+
+  @Transactional
+  public void createForUsers(Collection<UUID> userIds, String content,
+      NotificationResourceType type, UUID resourceId) {
+    if (userIds == null || userIds.isEmpty()) return;
+    List<Notification> list = userIds.stream()
+        .map(uid -> Notification.of(uid, content, type, resourceId))
+        .toList();
+    repository.saveAll(list);
   }
 
   // DB 시간 우선 사용 — 예외를 숨기지 않고 그대로 던져 원인 파악 가능
