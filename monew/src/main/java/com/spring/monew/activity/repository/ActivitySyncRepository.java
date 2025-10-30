@@ -4,13 +4,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-// PostgreSQL에서 커밋된 이벤트를 기반으로
-// MongoDB 조회용 컬렉션(activity_*)을 업서트/삭제하는 동기 Sync 서비스.
-public interface ActivitySyncService {
+// PostgreSQL에서 커밋된 도메인 이벤트를 기반으로
+// MongoDB 조회용 컬렉션(activity_*)을 업서트/삭제하는 "쓰기 전용" Repository.
+
+public interface ActivitySyncRepository {
 
   // ===== 구독 =====
   void onSubscribed(
-      UUID subscriptionId,
+      UUID subscriptionId,               // _id 로 setOnInsert. 복합키(q)로 매칭
       UUID userId,
       UUID interestId,
       String interestName,
@@ -23,7 +24,7 @@ public interface ActivitySyncService {
 
   // ===== 댓글 =====
   void onCommentCreated(
-      UUID commentId,
+      UUID commentId,                    // _id = commentId
       UUID userId,
       UUID articleId,
       String articleTitleSnapshot,
@@ -37,11 +38,11 @@ public interface ActivitySyncService {
 
   // ===== 댓글 좋아요 =====
   void onCommentLiked(
-      UUID likeEventId,
+      UUID likeEventId,                  // _id = likeEventId (이벤트 로그)
       UUID likedByUserId,
       UUID commentId,
       UUID articleId,
-      String articleTitleSnapshot,          // 추가
+      String articleTitleSnapshot,
       UUID commentUserId,
       String commentUserNicknameSnapshot,
       String commentContentSnapshot,
@@ -54,7 +55,7 @@ public interface ActivitySyncService {
 
   // ===== 기사 조회 =====
   void onArticleViewed(
-      UUID viewEventId,
+      UUID viewEventId,                  // _id setOnInsert. (user_id, article_id) 업서트 기준
       UUID userId,
       UUID articleId,
       String source,
