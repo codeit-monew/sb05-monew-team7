@@ -82,4 +82,8 @@ public class Article {
         return new Article(interest, source, sourceUrl, title, publishDate, summary);
     }
 
+    public void incrementViewCount() {
+        this.viewCount++;
+    }
+
 }

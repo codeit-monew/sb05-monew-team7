@@ -69,6 +69,16 @@ public class Comment {
     this.createdAt = Instant.now();
   }
 
+  /** ✅ 테스트 전용 setter */
+  protected void setIdForTest(UUID id) {
+    this.id = id;
+  }
+
+  /** ✅ 테스트 전용 setter */
+  protected void setCreatedAtForTest(Instant createdAt) {
+    this.createdAt = createdAt;
+  }
+
   public void update(String content) {
       if (content != null && !content.isEmpty()) {
           this.content = content;

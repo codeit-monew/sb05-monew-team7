@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop   # Hibernate가 직접 테이블 생성
+      ddl-auto: none   # Hibernate가 직접 테이블 생성
     show-sql: true
     properties:
       hibernate:
@@ -16,7 +16,8 @@ spring:
 
   sql:
     init:
-      mode: never             # schema.sql 실행하지 않음 ❗
+      mode: always             # schema.sql 실행하지 않음 ❗
+      schema-locations: schema-h2.sql
 
   batch:
     job:

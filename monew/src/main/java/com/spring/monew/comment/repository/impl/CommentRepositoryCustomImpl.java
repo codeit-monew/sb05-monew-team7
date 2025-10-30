@@ -71,8 +71,9 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         .fetch();
 
     boolean hasNext = results.size() > limit;
-    if (hasNext)
+    if (hasNext) {
       results.remove(limit);
+    }
 
     // 커서 계산
     String nextCursor = hasNext ? results.get(results.size() - 1).id().toString() : null;
@@ -87,8 +88,12 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         hasNext
     );
   }
-  private void applyCursorCondition(String orderBy, String direction, String cursor, BooleanBuilder builder) {
-    if (cursor == null) return;
+
+  private void applyCursorCondition(String orderBy, String direction, String cursor,
+      BooleanBuilder builder) {
+    if (cursor == null) {
+      return;
+    }
 
     UUID cursorId;
     try {
@@ -103,7 +108,9 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         .where(comment.id.eq(cursorId))
         .fetchOne();
 
-    if (row == null) return;
+    if (row == null) {
+      return;
+    }
 
     Long cursorLikes = row.get(comment.likeCount);
     Instant cursorCreatedAt = row.get(comment.createdAt);
@@ -117,21 +124,16 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
             .or(comment.createdAt.eq(cursorCreatedAt)
                 .and(comment.id.lt(cursorId)));
 
-    switch (orderBy) {
-      case "likeCount":
-        builder.and(
-            isAsc
-                ? comment.likeCount.gt(cursorLikes)
-                .or(comment.likeCount.eq(cursorLikes).and(byCreatedAtThenId))
-                : comment.likeCount.lt(cursorLikes)
-                    .or(comment.likeCount.eq(cursorLikes).and(byCreatedAtThenId))
-        );
-        break;
-
-      case "createdAt":
-      default:
-        builder.and(byCreatedAtThenId);
-        break;
+    if ("likeCount".equals(orderBy)) {
+      builder.and(
+          isAsc
+              ? comment.likeCount.gt(cursorLikes)
+              .or(comment.likeCount.eq(cursorLikes).and(byCreatedAtThenId))
+              : comment.likeCount.lt(cursorLikes)
+                  .or(comment.likeCount.eq(cursorLikes).and(byCreatedAtThenId))
+      );
+    } else {
+      builder.and(byCreatedAtThenId);
     }
   }
 
@@ -140,8 +142,10 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
   private OrderSpecifier<?> getOrderSpecifier(String orderBy, String direction) {
     Order order = "DESC".equalsIgnoreCase(direction) ? Order.DESC : Order.ASC;
     return switch (orderBy) {
-      case "likeCount" -> new OrderSpecifier<>(order, CommentRepositoryCustomImpl.comment.likeCount);
-      case "createdAt" -> new OrderSpecifier<>(order, CommentRepositoryCustomImpl.comment.createdAt);
+      case "likeCount" ->
+          new OrderSpecifier<>(order, CommentRepositoryCustomImpl.comment.likeCount);
+      case "createdAt" ->
+          new OrderSpecifier<>(order, CommentRepositoryCustomImpl.comment.createdAt);
       default -> new OrderSpecifier<>(order, CommentRepositoryCustomImpl.comment.createdAt);
     };
   }

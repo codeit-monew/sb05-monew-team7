@@ -1,5 +1,6 @@
 package com.spring.monew.article.controller.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.spring.monew.article.domain.ArticleSource;
 
 import java.time.Instant;
@@ -16,4 +17,6 @@ public record ArticleDto(
         long viewCount,
         boolean viewedByMe
 ) {
+    @QueryProjection
+    public ArticleDto {}
 }
