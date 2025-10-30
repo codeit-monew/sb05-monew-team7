@@ -8,6 +8,8 @@ import com.spring.monew.commentlike.domain.CommentLike;
 import com.spring.monew.commentlike.repository.CommentLikeRepository;
 import com.spring.monew.commentlike.service.CommentLikeService;
 import com.spring.monew.interest.domain.Interest;
+import com.spring.monew.notification.domain.NotificationResourceType;
+import com.spring.monew.notification.service.NotificationService;
 import com.spring.monew.subscription.domain.Subscription;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
@@ -27,6 +29,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
   private final ActivitySyncRepository activitySyncRepository;
+  private final NotificationService notificationService;
 
   @Override
   @Transactional
@@ -61,6 +64,17 @@ public class CommentLikeServiceImpl implements CommentLikeService {
           commentLike.getCreatedAt()          // likedAt
       );
     } catch (Exception ignore) {}
+
+    UUID commentAuthorId = comment.getUser().getId();
+    if (!commentAuthorId.equals(userId)) {
+      String content = user.getNickname() + "님이 나의 댓글을 좋아합니다.";
+      notificationService.create(
+          commentAuthorId,
+          content,
+          NotificationResourceType.COMMENT, // 관련 리소스 = 댓글
+          comment.getId()
+      );
+    }
 
     return new CommentLikeDto(
         commentLike.getId(),
