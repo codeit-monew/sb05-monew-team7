@@ -1,7 +1,6 @@
 package com.spring.monew.commentlike.service.impl;
 
-import com.spring.monew.activity.repository.ActivitySyncService;
-import com.spring.monew.article.repository.ArticleRepository;
+import com.spring.monew.activity.repository.ActivitySyncRepository;
 import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.comment.repository.CommentRepository;
 import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
@@ -27,8 +26,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
   private final CommentLikeRepository commentLikeRepository;
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
-  private final ActivitySyncService activitySyncService;
-  private final ArticleRepository articleRepository;
+  private final ActivitySyncRepository activitySyncRepository;
 
   @Override
   @Transactional
@@ -45,29 +43,24 @@ public class CommentLikeServiceImpl implements CommentLikeService {
     }
 
     comment.incrementLikeCount();
-    commentRepository.saveAndFlush(comment);
+
     CommentLike commentLike = commentLikeRepository.save(new CommentLike(comment, user));
 
-    UUID articleId = comment.getArticle().getId();        // 프록시여도 ID 접근은 안전
-    String articleTitle = articleRepository.findTitleOnlyById(articleId);
-    if (articleTitle == null) articleTitle = "";          // 널 세이프
-
-    Instant likedAt = (commentLike.getCreatedAt() != null)
-        ? commentLike.getCreatedAt() : Instant.now();
-
-    activitySyncService.onCommentLiked(
-        commentLike.getId(),
-        user.getId(),
-        comment.getId(),
-        articleId,
-        articleTitle,                      // ← 스냅샷으로 저장
-        comment.getUser().getId(),
-        comment.getUser().getNickname(),
-        comment.getContent(),
-        comment.getLikeCount(),            // 증가된 최신값
-        comment.getCreatedAt(),
-        likedAt
-    );
+    try {
+      activitySyncRepository.onCommentLiked(
+          commentLike.getId(),                // likeEventId
+          user.getId(),                       // likedByUserId
+          comment.getId(),                    // commentId
+          comment.getArticle().getId(),       // articleId
+          comment.getArticle().getTitle(),    // articleTitleSnapshot
+          comment.getUser().getId(),          // commentUserId
+          comment.getUser().getNickname(),    // commentUserNicknameSnapshot
+          comment.getContent(),               // commentContentSnapshot
+          comment.getLikeCount(),             // commentLikeCountSnapshot
+          comment.getCreatedAt(),             // commentCreatedAtSnapshot
+          commentLike.getCreatedAt()          // likedAt
+      );
+    } catch (Exception ignore) {}
 
     return new CommentLikeDto(
         commentLike.getId(),
@@ -92,7 +85,10 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
     commentLike.getComment().decrementLikeCount();
 
+    try {
+      activitySyncRepository.onCommentLikeCanceled(commentLike.getId());
+    } catch (Exception ignore) {}
+
     commentLikeRepository.delete(commentLike);
-    activitySyncService.onCommentLikeCanceled(commentLike.getId());
   }
 }

@@ -1,6 +1,6 @@
 package com.spring.monew.comment.service.impl;
 
-import com.spring.monew.activity.repository.ActivitySyncService;
+import com.spring.monew.activity.repository.ActivitySyncRepository;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
@@ -27,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
   private final ArticleRepository articleRepository;
-  private final ActivitySyncService activitySyncService;
+  private final ActivitySyncRepository activitySyncRepository;
 
   @Override
   @Transactional
@@ -40,16 +40,18 @@ public class CommentServiceImpl implements CommentService {
 
     Comment comment = commentRepository.save(new Comment(article, user, registerRequest.content()));
 
-    activitySyncService.onCommentCreated(
-        comment.getId(),
-        user.getId(),
-        article.getId(),
-        article.getTitle(),
-        user.getNickname(),
-        comment.getContent(),
-        comment.getLikeCount(),
-        comment.getCreatedAt()
-    );
+    try {
+      activitySyncRepository.onCommentCreated(
+          comment.getId(),
+          user.getId(),
+          article.getId(),
+          article.getTitle(),
+          user.getNickname(),
+          comment.getContent(),
+          comment.getLikeCount(),
+          comment.getCreatedAt()
+      );
+    } catch (Exception ignore) {}
 
     return new CommentDto(
         comment.getId(),
@@ -85,16 +87,21 @@ public class CommentServiceImpl implements CommentService {
 
     comment.update(updateRequest.content());
 
-    activitySyncService.onCommentCreated(
-        comment.getId(),
-        comment.getUser().getId(),
-        comment.getArticle().getId(),
-        comment.getArticle().getTitle(),
-        comment.getUser().getNickname(),
-        comment.getContent(),
-        comment.getLikeCount(),
-        comment.getCreatedAt()
-    );
+    Article article = comment.getArticle();
+    User writer = comment.getUser();
+
+    try {
+      activitySyncRepository.onCommentCreated(
+          comment.getId(),
+          writer.getId(),
+          article.getId(),
+          article.getTitle(),
+          writer.getNickname(),
+          comment.getContent(),
+          comment.getLikeCount(),
+          comment.getCreatedAt()
+      );
+    } catch (Exception ignore) {}
 
     return new CommentDto(
         comment.getId(),
@@ -116,6 +123,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     commentRepository.deleteById(commentId);
+
+    try {
+      activitySyncRepository.onCommentDeleted(commentId, Instant.now());
+    } catch (Exception ignore) {}
   }
 
   @Override
@@ -126,6 +137,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     commentRepository.deletePhysicalById(commentId);
-    activitySyncService.onCommentDeleted(commentId, Instant.now());
+
+    try {
+      activitySyncRepository.onCommentDeleted(commentId, Instant.now());
+    } catch (Exception ignore) {}
   }
 }
