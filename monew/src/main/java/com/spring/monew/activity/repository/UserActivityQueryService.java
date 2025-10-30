@@ -178,6 +178,12 @@ public class UserActivityQueryService {
             /* commentCreatedAt: 보조로 전달 */
             pickInstant(d.getCommentCreatedAt())
         ))
+        .sorted(
+            java.util.Comparator
+                .comparing(UserActivityResponse.CommentLike::createdAt,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())) // ASC
+                .thenComparing(UserActivityResponse.CommentLike::id) // 동률일 때 안정적 정렬
+        )
         .toList();
 
     // 커서는 정렬 키(created_at) 기준으로 생성
