@@ -1,6 +1,5 @@
 package com.spring.monew.article.service.impl;
 
-import com.spring.monew.activity.repository.ActivitySyncService;
 import com.spring.monew.article.controller.dto.response.ArticleDto;
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
 import com.spring.monew.article.domain.Article;
@@ -27,7 +26,6 @@ public class ArticleServiceImpl implements ArticleService {
   private final ArticleRepository articleRepository;
   private final ArticleViewRepository articleViewRepository;
   private final RedisTemplate<String, String> redisTemplate;
-  private final ActivitySyncService activitySyncService;
 
   @Override
   public CursorPageResponseArticleDto getArticles(
@@ -134,26 +132,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     if (Boolean.TRUE.equals(isNewView)) {
       article.incrementViewCount();
-      articleRepository.save(article);
       ArticleView view = ArticleView.of(article, userId);
       articleViewRepository.save(view);
-      articleViewRepository.flush();
-      try {
-        activitySyncService.onArticleViewed(
-            view.getId(),                    // viewEventId
-            userId,                          // userId
-            article.getId(),                 // articleId
-            article.getSource().name(),      // source
-            article.getSourceUrl(),          // sourceUrl
-            article.getTitle(),              // articleTitleSnapshot
-            article.getPublishDate(),        // articlePublishDateSnapshot
-            article.getSummary(),            // articleSummarySnapshot
-            article.getCommentCount(),       // articleCommentCountSnapshot
-            article.getViewCount(),          // articleViewCountSnapshot
-            view.getCreatedAt() != null ? view.getCreatedAt() : Instant.now() // viewedAt
-        );
-      } catch (Exception ignore) {
-      }
     }
   }
 }
