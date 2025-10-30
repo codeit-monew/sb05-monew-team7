@@ -5,6 +5,8 @@ import com.spring.monew.batch.reader.ArticleCandidateReader;
 import com.spring.monew.batch.writer.ArticleWriter;
 import com.spring.monew.article.client.dto.ArticleCandidate;
 import com.spring.monew.article.domain.Article;
+import com.spring.monew.batch.listener.ArticleNotificationListener;
+import org.springframework.batch.core.ItemWriteListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -26,6 +28,7 @@ public class NewsCollectionJobConfig {
     private final ArticleCandidateProcessor articleCandidateProcessor;
     private final ArticleWriter articleWriter;
     private final BatchSkipListener batchSkipListener;
+    private final ArticleNotificationListener articleNotificationListener;
 
     @Bean
     public Job newsCollectionJob() {
@@ -44,6 +47,7 @@ public class NewsCollectionJobConfig {
                 .listener(articleCandidateReader)
                 .listener(articleCandidateProcessor)
                 .listener(batchSkipListener)
+                .listener((ItemWriteListener<? super Article>) articleNotificationListener)
                 .faultTolerant()
                 .skip(DataIntegrityViolationException.class)
                 .skipLimit(100)
