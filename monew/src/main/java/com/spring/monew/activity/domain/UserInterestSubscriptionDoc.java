@@ -1,9 +1,9 @@
 package com.spring.monew.activity.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "user_interest_subscriptions")
