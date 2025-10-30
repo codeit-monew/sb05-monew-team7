@@ -24,7 +24,7 @@ public class HeaderAuthFilter extends OncePerRequestFilter {
   ) throws ServletException, IOException {
 
     // 헤더에서 사용자 ID 읽기
-    String userId = request.getHeader("MoNew-Request-User-ID");
+    String userId = request.getHeader("Monew-Request-User-ID");
 
 
     // 헤더가 존재할 때만 인증 정보 저장
