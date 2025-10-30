@@ -81,7 +81,3 @@ naver:
   api:
     client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
     client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
-
-batch:
-  trigger:
-    enabled: ${BATCH_TRIGGER_ENABLED:true}
