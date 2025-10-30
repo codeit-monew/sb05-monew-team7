@@ -1,16 +1,19 @@
 package com.spring.monew.comment.domain;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.spring.monew.article.domain.Article;
+import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
 import com.spring.monew.comment.controller.dto.request.CommentUpdateRequest;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
 import com.spring.monew.comment.repository.CommentRepository;
-import com.spring.monew.article.domain.Article;
-import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.service.impl.CommentServiceImpl;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
@@ -22,17 +25,23 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
 
-  @Mock private CommentRepository commentRepository;
-  @Mock private UserRepository userRepository;
-  @Mock private ArticleRepository articleRepository;
+  @Mock
+  private CommentRepository commentRepository;
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private ArticleRepository articleRepository;
 
-  @InjectMocks private CommentServiceImpl commentService;
+  @InjectMocks
+  private CommentServiceImpl commentService;
 
   UUID userId = UUID.randomUUID();
   UUID articleId = UUID.randomUUID();
@@ -43,7 +52,10 @@ class CommentServiceTest {
 
   @BeforeEach
   void setup() {
-    MockitoAnnotations.openMocks(this);
+    userId = UUID.randomUUID();
+    articleId = UUID.randomUUID();
+    commentId = UUID.randomUUID();
+
     user = new User("nick", "email@e.com", "pass");
     article = Article.of(null, null, "url", "title", Instant.now(), "summary");
   }
@@ -83,13 +95,15 @@ class CommentServiceTest {
     CursorPageResponseCommentDto mockResponse =
         new CursorPageResponseCommentDto(List.of(), null, null, 10, 0, false);
 
-    when(commentRepository.findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(), any()))
+    when(commentRepository.findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(),
+        any()))
         .thenReturn(mockResponse);
 
     var result = commentService.getComments(articleId, "createdAt", "DESC", null, null, 10, userId);
 
     assertThat(result).isNotNull();
-    verify(commentRepository).findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(), any());
+    verify(commentRepository).findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(),
+        any());
   }
 
   @Test
@@ -99,7 +113,8 @@ class CommentServiceTest {
     when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
     when(userRepository.existsById(userId)).thenReturn(true);
 
-    CommentDto result = commentService.modifyComment(commentId, userId, new CommentUpdateRequest("new"));
+    CommentDto result = commentService.modifyComment(commentId, userId,
+        new CommentUpdateRequest("new"));
 
     assertThat(result.content()).isEqualTo("new");
     verify(commentRepository).findById(commentId);

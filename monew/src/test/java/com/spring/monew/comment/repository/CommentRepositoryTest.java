@@ -2,19 +2,17 @@ package com.spring.monew.comment.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.domain.ArticleSource;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
 import com.spring.monew.comment.domain.Comment;
+import com.spring.monew.common.config.QuerydslConfig;
 import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.time.Instant;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -22,15 +20,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+@Import(QuerydslConfig.class)
 @ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) // ✅ H2 사용 강제
+@AutoConfigureTestDatabase(replace = Replace.ANY)
 @DataJpaTest
 class CommentRepositoryTest {
+
   @Autowired
   private CommentRepository commentRepository;
   @Autowired
@@ -39,8 +39,6 @@ class CommentRepositoryTest {
   private ArticleRepository articleRepository;
   @Autowired
   private InterestRepository interestRepository;
-  @Autowired
-  private JPAQueryFactory queryFactory;
 
   // ------------------ create entity -----------------
   private Comment saveComment(Article article, User user, String content) {
@@ -120,8 +118,8 @@ class CommentRepositoryTest {
   @DisplayName("articleId에 해당하는 댓글만 조회")
   void filterByArticle() {
     User user = createUser();
-    Article article1 = createArticle("속도","http://www.dummy1.com");
-    Article article2 = createArticle("운동","http://www.dummy2.com");
+    Article article1 = createArticle("속도", "http://www.dummy1.com");
+    Article article2 = createArticle("운동", "http://www.dummy2.com");
 
     saveComment(article1, user, "test article1 - c1");
     saveComment(article2, user, "test article2 - c2");
@@ -175,24 +173,8 @@ class CommentRepositoryTest {
         commentRepository.findCursorPagedComments(article.getId(), "likeCount", "DESC",
             null, null, 10, user.getId());
 
-
     // then
     assertThat(result.content()).extracting(CommentDto::content)
         .containsExactly("like5", "like3", "like0");
-  }
-
-
-
-  // 테스트 Configuration 주입
-  @TestConfiguration
-  static class QuerydslTestConfig {
-
-    @PersistenceContext
-    private EntityManager em;
-
-    @Bean
-    public JPAQueryFactory queryFactory() {
-      return new JPAQueryFactory(em);
-    }
   }
 }
