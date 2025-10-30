@@ -1,5 +1,6 @@
 package com.spring.monew.subscription.service.impl;
 
+import com.spring.monew.activity.repository.ActivitySyncService;
 import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.subscription.controller.dto.response.SubscriptionDto;
@@ -24,6 +25,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
   private final SubscriptionRepository subscriptionRepository;
   private final UserRepository userRepository;
   private final InterestRepository interestRepository;
+  private final ActivitySyncService activitySyncService;
 
   @Override
   @Transactional
@@ -41,6 +43,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     interest.incrementSubscriptionsCount();
 
     Subscription subscription = subscriptionRepository.save(new Subscription(user, interest));
+
+    activitySyncService.onSubscribed(
+        subscription.getId(),
+        user.getId(),
+        interest.getId(),
+        interest.getName(),
+        interest.getKeywords(),
+        interest.getSubscriptionsCount(),
+        subscription.getCreatedAt()
+    );
 
     return new SubscriptionDto(
         subscription.getId(),
@@ -62,5 +74,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     subscription.getInterest().decrementSubscriptionsCount();
 
     subscriptionRepository.delete(subscription);
+    activitySyncService.onUnsubscribed(userId, interestId);
   }
 }

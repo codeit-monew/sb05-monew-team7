@@ -1,5 +1,6 @@
 package com.spring.monew.comment.service.impl;
 
+import com.spring.monew.activity.repository.ActivitySyncService;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
@@ -26,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
   private final ArticleRepository articleRepository;
+  private final ActivitySyncService activitySyncService;
 
   @Override
   @Transactional
@@ -37,6 +39,17 @@ public class CommentServiceImpl implements CommentService {
         () -> new NoSuchElementException("존재하지 않는 기사입니다."));
 
     Comment comment = commentRepository.save(new Comment(article, user, registerRequest.content()));
+
+    activitySyncService.onCommentCreated(
+        comment.getId(),
+        user.getId(),
+        article.getId(),
+        article.getTitle(),
+        user.getNickname(),
+        comment.getContent(),
+        comment.getLikeCount(),
+        comment.getCreatedAt()
+    );
 
     return new CommentDto(
         comment.getId(),
@@ -72,6 +85,17 @@ public class CommentServiceImpl implements CommentService {
 
     comment.update(updateRequest.content());
 
+    activitySyncService.onCommentCreated(
+        comment.getId(),
+        comment.getUser().getId(),
+        comment.getArticle().getId(),
+        comment.getArticle().getTitle(),
+        comment.getUser().getNickname(),
+        comment.getContent(),
+        comment.getLikeCount(),
+        comment.getCreatedAt()
+    );
+
     return new CommentDto(
         comment.getId(),
         comment.getArticle().getId(),
@@ -102,5 +126,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     commentRepository.deletePhysicalById(commentId);
+    activitySyncService.onCommentDeleted(commentId, Instant.now());
   }
 }
