@@ -1,225 +1,151 @@
-// monew/src/main/java/com/spring/monew/activity/repository/impl/ActivitySyncRepositoryImpl.java
 package com.spring.monew.activity.repository.impl;
 
+import com.mongodb.client.result.UpdateResult;
+import com.spring.monew.activity.domain.ActivityArticleViewDoc;
+import com.spring.monew.activity.domain.ActivityCommentDoc;
+import com.spring.monew.activity.domain.ActivityCommentLikeDoc;
+import com.spring.monew.activity.domain.UserInterestSubscriptionDoc;
 import com.spring.monew.activity.repository.ActivitySyncRepository;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
-@Slf4j
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class ActivitySyncRepositoryImpl implements ActivitySyncRepository {
 
   private final MongoTemplate mongo;
 
-  // ===== 컬렉션 이름(조회/리드 모델) =====
-  private static final String COL_SUBS     = "user_interest_subscriptions";
-  private static final String COL_COMMENTS = "activity_comments";
-  private static final String COL_LIKES    = "activity_comment_likes";
-  private static final String COL_VIEWS    = "activity_article_views";
-
-  // ===== 구독 =====
+  // ====== 구독 ======
   @Override
-  public void onSubscribed(
-      UUID subscriptionId,
-      UUID userId,
-      UUID interestId,
-      String interestName,
-      List<String> interestKeywords,
-      long interestSubscriberCount,
-      Instant createdAt
-  ) {
-    Objects.requireNonNull(subscriptionId, "subscriptionId");
-    Objects.requireNonNull(userId, "userId");
-    Objects.requireNonNull(interestId, "interestId");
-
-    // (user_id, interest_id) 복합키 기준 upsert — UUID/문자열 혼재 대응
-    Query q = new Query(new Criteria().andOperator(
-        Criteria.where("user_id").in(userId, userId.toString()),
-        Criteria.where("interest_id").in(interestId, interestId.toString())
-    ));
-
-    Update u = new Update()
-        .setOnInsert("_id", subscriptionId)
-        .setOnInsert("user_id", userId.toString())
-        .setOnInsert("interest_id", interestId.toString())
-        .setOnInsert("created_at", createdAt != null ? createdAt : Instant.now())
-        .set("interest_name", nz(interestName))
+  public void onSubscribed(UUID subscriptionId, UUID userId, UUID interestId, String interestName,
+      List<String> interestKeywords, long interestSubscriberCount, Instant createdAt) {
+    if (subscriptionId == null || userId == null || interestId == null) {
+      log.warn("onSubscribed skipped: subscriptionId={}, userId={}, interestId={}", subscriptionId, userId, interestId);
+      return;
+    }
+    Update up = new Update()
+        .set("user_id", userId)
+        .set("interest_id", interestId)
+        .set("interest_name", interestName)
         .set("interest_keywords", interestKeywords)
         .set("interest_subscriber_count", interestSubscriberCount)
-        .set("is_deleted", false)
-        .unset("deleted_at");
+        .set("created_at", createdAt);
 
-    mongo.findAndModify(q, u, FindAndModifyOptions.options().upsert(true).returnNew(true), Object.class, COL_SUBS);
-    log.debug("[ActivitySync] subscribed upsert: subId={}, user={}, interest={}", subscriptionId, userId, interestId);
+    UpdateResult r = mongo.upsert(
+        Query.query(Criteria.where("_id").is(subscriptionId.toString())),
+        up, UserInterestSubscriptionDoc.class
+    );
+    log.info("onSubscribed -> matched={}, modified={}, upsertedId={}", r.getMatchedCount(), r.getModifiedCount(), r.getUpsertedId());
+
+    if (r.getMatchedCount() == 0 && r.getUpsertedId() == null) {
+      Query legacyKey = Query.query(
+          Criteria.where("user_id").in(userId, userId.toString())
+              .and("interest_id").in(interestId, interestId.toString())
+      );
+      up.setOnInsert("_id", subscriptionId.toString());
+      UpdateResult r2 = mongo.upsert(legacyKey, up, UserInterestSubscriptionDoc.class);
+      log.info("onSubscribed[legacy-fallback] -> matched={}, modified={}, upsertedId={}",
+          r2.getMatchedCount(), r2.getModifiedCount(), r2.getUpsertedId());
+    }
+  }
+
+  @Override
+  public void onUnsubscribed(UUID subscriptionId) {
+    mongo.remove(Query.query(Criteria.where("_id").is(subscriptionId.toString())),
+        UserInterestSubscriptionDoc.class);
   }
 
   @Override
   public void onUnsubscribed(UUID userId, UUID interestId) {
-    Objects.requireNonNull(userId, "userId");
-    Objects.requireNonNull(interestId, "interestId");
-
-    Query q = new Query(new Criteria().andOperator(
-        Criteria.where("user_id").in(userId, userId.toString()),
-        Criteria.where("interest_id").in(interestId, interestId.toString())
-    ));
-    mongo.remove(q, COL_SUBS);
-    log.debug("[ActivitySync] unsubscribed remove: user={}, interest={}", userId, interestId);
+    Query q = Query.query(
+        Criteria.where("user_id").in(userId, userId.toString())
+            .and("interest_id").in(interestId, interestId.toString())
+    );
+    mongo.remove(q, UserInterestSubscriptionDoc.class);
   }
 
-  // ===== 댓글 =====
+  // ====== 댓글 ======
   @Override
-  public void onCommentCreated(
-      UUID commentId,
-      UUID userId,
-      UUID articleId,
-      String articleTitleSnapshot,
-      String userNicknameSnapshot,
-      String content,
-      long likeCount,
-      Instant createdAt
-  ) {
-    Objects.requireNonNull(commentId, "commentId");
+  public void onCommentCreated(UUID commentId, UUID userId, UUID articleId, String articleTitle,
+      String commentUserNickname, String content, long likeCount, Instant createdAt) {
+    Update up = new Update()
+        .set("userId", userId)
+        .set("articleId", articleId)
+        .set("articleTitle", articleTitle)
+        .set("content", content)
+        .set("likeCount", likeCount)
+        .set("createdAt", createdAt);
+    mongo.upsert(Query.query(Criteria.where("_id").is(commentId.toString())), up, ActivityCommentDoc.class);
+  }
 
-    Query q = byEventId(commentId);
-    Update u = new Update()
-        .setOnInsert("_id", commentId)
-        .setOnInsert("created_at", createdAt)
-        .set("user_id", userId != null ? userId.toString() : null)
-        .set("article_id", articleId != null ? articleId.toString() : null)
-        .set("article_title", nz(articleTitleSnapshot))
-        .set("user_nickname", nz(userNicknameSnapshot))
-        .set("content", nz(content))
-        .set("like_count", likeCount)
-        .set("is_deleted", false)
-        .unset("deleted_at");
-
-    mongo.findAndModify(q, u, FindAndModifyOptions.options().upsert(true).returnNew(true), Object.class, COL_COMMENTS);
-    log.debug("[ActivitySync] comment created upsert: commentId={}, article={}", commentId, articleId);
+  @Override
+  public void onCommentDeleted(UUID commentId) {
+    mongo.remove(Query.query(Criteria.where("_id").is(commentId.toString())), ActivityCommentDoc.class);
   }
 
   @Override
   public void onCommentDeleted(UUID commentId, Instant deletedAt) {
-    Objects.requireNonNull(commentId, "commentId");
-    Query q = byEventId(commentId);
-    Update u = new Update()
-        .set("is_deleted", true)
-        .set("deleted_at", deletedAt);
-    mongo.updateFirst(q, u, COL_COMMENTS);
-    log.debug("[ActivitySync] comment deleted: commentId={}", commentId);
+    onCommentDeleted(commentId); // deletedAt은 현재 미사용
   }
 
-  // ===== 댓글 좋아요 =====
+  // ====== 댓글 좋아요 ======
   @Override
-  public void onCommentLiked(
-      UUID likeEventId,
-      UUID likedByUserId,
-      UUID commentId,
-      UUID articleId,
-      String articleTitleSnapshot,
-      UUID commentUserId,
-      String commentUserNicknameSnapshot,
-      String commentContentSnapshot,
-      long commentLikeCountSnapshot,
-      Instant commentCreatedAtSnapshot,
-      Instant likedAt
-  ) {
-    Objects.requireNonNull(likeEventId, "likeEventId");
-
-    Query q = byEventId(likeEventId);
-    Update u = new Update()
-        .setOnInsert("_id", likeEventId)
-        .set("user_id", likedByUserId != null ? likedByUserId.toString() : null)
-        .set("comment_id", commentId != null ? commentId.toString() : null)
-        .set("article_id", articleId != null ? articleId.toString() : null)
-        .set("article_title", nz(articleTitleSnapshot))
-        .set("comment_user_id", commentUserId != null ? commentUserId.toString() : null)
-        .set("comment_user_nickname", nz(commentUserNicknameSnapshot))
-        .set("comment_content", nz(commentContentSnapshot))
-        .set("comment_like_count", commentLikeCountSnapshot)
-        .set("comment_created_at", commentCreatedAtSnapshot)
-        .set("created_at", likedAt);
-
-    mongo.findAndModify(q, u, FindAndModifyOptions.options().upsert(true).returnNew(true), Object.class, COL_LIKES);
-    log.debug("[ActivitySync] comment liked upsert: likeId={}, comment={}", likeEventId, commentId);
+  public void onCommentLiked(UUID likeEventId, UUID userId, UUID commentId, UUID articleId, String articleTitle,
+      UUID commentUserId, String commentUserNickname, String commentContent,
+      long commentLikeCount, Instant commentCreatedAt, Instant likeCreatedAt) {
+    Update up = new Update()
+        .set("userId", userId) // likedBy
+        .set("commentId", commentId)
+        .set("articleId", articleId)
+        .set("articleTitle", articleTitle)
+        .set("commentUserId", commentUserId)
+        .set("commentUserNickname", commentUserNickname)
+        .set("commentContent", commentContent)
+        .set("commentLikeCount", commentLikeCount)
+        .set("commentCreatedAt", commentCreatedAt)
+        .set("createdAt", likeCreatedAt);
+    mongo.upsert(Query.query(Criteria.where("_id").is(likeEventId.toString())),
+        up, ActivityCommentLikeDoc.class);
   }
 
   @Override
-  public void onCommentLikeCanceled(UUID likeEventId) {
-    Objects.requireNonNull(likeEventId, "likeEventId");
-    mongo.remove(byEventId(likeEventId), COL_LIKES);
-    log.debug("[ActivitySync] comment like canceled: likeId={}", likeEventId);
+  public void onCommentLikeCanceled(UUID likeId) {
+    mongo.remove(Query.query(Criteria.where("_id").is(likeId.toString())), ActivityCommentLikeDoc.class);
   }
 
-  // ===== 기사 조회 =====
+  // ====== 기사 열람 ======
   @Override
-  public void onArticleViewed(
-      UUID viewEventId,
-      UUID userId,
-      UUID articleId,
-      String source,
-      String sourceUrl,
-      String articleTitleSnapshot,
-      Instant articlePublishDateSnapshot,
-      String articleSummarySnapshot,
-      long articleCommentCountSnapshot,
-      long articleViewCountSnapshot,
-      Instant viewedAt
-  ) {
-    Objects.requireNonNull(userId, "userId");
-    Objects.requireNonNull(articleId, "articleId");
+  public void onArticleViewed(UUID viewEventId, UUID userId, UUID articleId, String source, String sourceUrl,
+      String articleTitle, Instant articlePublishedDate, String articleSummary,
+      Long articleCommentCount, Long articleViewCount, Instant createdAt) {
+    Update up = new Update()
+        .setOnInsert("_id", viewEventId.toString())
+        .set("userId", userId)
+        .set("articleId", articleId)
+        .set("source", source)
+        .set("sourceUrl", sourceUrl)
+        .set("title", articleTitle)
+        .set("summary", articleSummary)
+        .set("commentCount", articleCommentCount)
+        .set("viewCount", articleViewCount)
+        .set("publishDate", articlePublishedDate)
+        .setOnInsert("createdAt", createdAt)
+        .set("lastViewedAt", createdAt);
 
-    Instant when = viewedAt != null ? viewedAt : Instant.now();
+    Query q = Query.query(
+        Criteria.where("userId").in(userId, userId.toString())
+            .and("articleId").in(articleId, articleId.toString())
+    );
 
-    // (user_id, article_id) 복합키 기준 upsert — UUID/문자열 혼재 대응
-    Query q = new Query(new Criteria().andOperator(
-        Criteria.where("user_id").in(userId, userId.toString()),
-        Criteria.where("article_id").in(articleId, articleId.toString())
-    ));
-
-    Update u = new Update()
-        // 최초 생성 시 스냅샷
-        .setOnInsert("_id", viewEventId)
-        .setOnInsert("user_id", userId.toString())
-        .setOnInsert("article_id", articleId.toString())
-        .setOnInsert("source", nz(source))
-        .setOnInsert("source_url", nz(sourceUrl))
-        .setOnInsert("article_title", nz(articleTitleSnapshot))
-        .setOnInsert("article_published_date", articlePublishDateSnapshot)
-        .setOnInsert("article_summary", nz(articleSummarySnapshot))
-        .setOnInsert("article_comment_count", articleCommentCountSnapshot)
-        .setOnInsert("article_view_count", articleViewCountSnapshot)
-        .setOnInsert("created_at", when)
-        .setOnInsert("view_count_by_user", 0L)     // 아래 inc 로 1이 됨
-        // 항상 갱신되는 필드
-        .set("last_viewed_at", when)
-        .inc("view_count_by_user", 1L);
-
-    mongo.findAndModify(q, u, FindAndModifyOptions.options().upsert(true).returnNew(true), Object.class, COL_VIEWS);
-    log.debug("[ActivitySync] article viewed upsert: viewId={}, user={}, article={}", viewEventId, userId, articleId);
-  }
-
-  // ===== 유틸 =====
-  private static Query byEventId(UUID id) {
-    // _id 가 UUID/문자열로 섞여 저장된 과거 데이터 대비
-    return new Query(new Criteria().orOperator(
-        Criteria.where("_id").is(id),
-        Criteria.where("_id").is(id != null ? id.toString() : null)
-    ));
-  }
-
-  private static String nz(String v) {
-    return v == null ? "" : v;
+    mongo.upsert(q, up, ActivityArticleViewDoc.class);
   }
 }

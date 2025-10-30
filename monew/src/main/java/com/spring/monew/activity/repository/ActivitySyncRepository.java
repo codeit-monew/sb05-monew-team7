@@ -4,14 +4,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-// PostgreSQL에서 커밋된 도메인 이벤트를 기반으로
-// MongoDB 조회용 컬렉션(activity_*)을 업서트/삭제하는 "쓰기 전용" Repository.
+//RDB 트랜잭션 커밋 이후(AFTER_COMMIT) Activity 스냅샷을 MongoDB에 동기화하기 위한 포트.
+//UUID/String 혼용 매칭은 구현체에서 처리한다.
 
 public interface ActivitySyncRepository {
 
   // ===== 구독 =====
   void onSubscribed(
-      UUID subscriptionId,               // _id 로 setOnInsert. 복합키(q)로 매칭
+      UUID subscriptionId,
       UUID userId,
       UUID interestId,
       String interestName,
@@ -20,51 +20,58 @@ public interface ActivitySyncRepository {
       Instant createdAt
   );
 
+  // subscriptionId 기준 단건 삭제
+  void onUnsubscribed(UUID subscriptionId);
+
+  // (userId, interestId) 복합키 기준 삭제
   void onUnsubscribed(UUID userId, UUID interestId);
 
   // ===== 댓글 =====
   void onCommentCreated(
-      UUID commentId,                    // _id = commentId
+      UUID commentId,
       UUID userId,
       UUID articleId,
-      String articleTitleSnapshot,
-      String userNicknameSnapshot,
+      String articleTitle,
+      String commentUserNickname,
       String content,
       long likeCount,
       Instant createdAt
   );
 
+  void onCommentDeleted(UUID commentId);
+
+  // 삭제 시각은 현재 구현에서 사용하지 않지만 시그니처 유지
   void onCommentDeleted(UUID commentId, Instant deletedAt);
 
   // ===== 댓글 좋아요 =====
   void onCommentLiked(
-      UUID likeEventId,                  // _id = likeEventId (이벤트 로그)
-      UUID likedByUserId,
+      UUID likeEventId,
+      UUID userId,                // likedBy
       UUID commentId,
       UUID articleId,
-      String articleTitleSnapshot,
+      String articleTitle,
       UUID commentUserId,
-      String commentUserNicknameSnapshot,
-      String commentContentSnapshot,
-      long commentLikeCountSnapshot,
-      Instant commentCreatedAtSnapshot,
-      Instant likedAt
+      String commentUserNickname,
+      String commentContent,
+      long commentLikeCount,
+      Instant commentCreatedAt,
+      Instant likeCreatedAt
   );
 
-  void onCommentLikeCanceled(UUID likeEventId);
+  void onCommentLikeCanceled(UUID likeId);
 
-  // ===== 기사 조회 =====
+  // ===== 기사 열람(최근 본 기사) =====
   void onArticleViewed(
-      UUID viewEventId,                  // _id setOnInsert. (user_id, article_id) 업서트 기준
+      UUID viewEventId,
       UUID userId,
       UUID articleId,
       String source,
       String sourceUrl,
-      String articleTitleSnapshot,
-      Instant articlePublishDateSnapshot,
-      String articleSummarySnapshot,
-      long articleCommentCountSnapshot,
-      long articleViewCountSnapshot,
-      Instant viewedAt
+      String articleTitle,
+      Instant articlePublishedDate,
+      String articleSummary,
+      Long articleCommentCount,
+      Long articleViewCount,
+      Instant createdAt
   );
 }
