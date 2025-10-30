@@ -28,9 +28,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) // ✅ H2 사용 강제
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @DataJpaTest
 class CommentRepositoryTest {
+
   @Autowired
   private CommentRepository commentRepository;
   @Autowired
@@ -39,8 +40,6 @@ class CommentRepositoryTest {
   private ArticleRepository articleRepository;
   @Autowired
   private InterestRepository interestRepository;
-  @Autowired
-  private JPAQueryFactory queryFactory;
 
   // ------------------ create entity -----------------
   private Comment saveComment(Article article, User user, String content) {
@@ -120,8 +119,8 @@ class CommentRepositoryTest {
   @DisplayName("articleId에 해당하는 댓글만 조회")
   void filterByArticle() {
     User user = createUser();
-    Article article1 = createArticle("속도","http://www.dummy1.com");
-    Article article2 = createArticle("운동","http://www.dummy2.com");
+    Article article1 = createArticle("속도", "http://www.dummy1.com");
+    Article article2 = createArticle("운동", "http://www.dummy2.com");
 
     saveComment(article1, user, "test article1 - c1");
     saveComment(article2, user, "test article2 - c2");
@@ -175,12 +174,10 @@ class CommentRepositoryTest {
         commentRepository.findCursorPagedComments(article.getId(), "likeCount", "DESC",
             null, null, 10, user.getId());
 
-
     // then
     assertThat(result.content()).extracting(CommentDto::content)
         .containsExactly("like5", "like3", "like0");
   }
-
 
 
   // 테스트 Configuration 주입
