@@ -2,6 +2,7 @@ package com.spring.monew.common.exception;
 
 import com.spring.monew.article.exception.ArticleNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -64,6 +65,15 @@ public class GlobalExceptionHandler {
                 errorMessage
         );
         problemDetail.setTitle("유효성 검증 실패");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ProblemDetail handleNoSuchElementException(NoSuchElementException ex) {
+        log.warn("리소스를 찾을 수 없음: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("리소스 없음");
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
     }
