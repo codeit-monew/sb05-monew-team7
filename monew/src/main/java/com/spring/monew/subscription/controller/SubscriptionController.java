@@ -1,7 +1,9 @@
 package com.spring.monew.subscription.controller;
 
+import com.spring.monew.common.util.RequestUserExtractor;
 import com.spring.monew.subscription.controller.dto.response.SubscriptionDto;
 import com.spring.monew.subscription.service.SubscriptionService;
+import java.security.Principal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,16 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SubscriptionController {
   private final SubscriptionService subscriptionService;
-
+  private final RequestUserExtractor userExtractor;
   @PostMapping("/{interestId}/subscriptions")
   public SubscriptionDto subscriptionAdd(@PathVariable UUID interestId,
-      @RequestHeader(name = "Monew-Request-User-ID") UUID userId) {
+      Principal principal) {
+
+    UUID userId = userExtractor.extractUserId(principal);
     return subscriptionService.addSubscription(interestId, userId);
   }
 
   @DeleteMapping("/{interestId}/subscriptions")
   public void subscriptionRemove(@PathVariable UUID interestId,
-      @RequestHeader(name = "Monew-Request-User-ID") UUID userId) {
+      Principal principal) {
+    UUID userId = userExtractor.extractUserId(principal);
     subscriptionService.removeSubscription(interestId, userId);
   }
 }

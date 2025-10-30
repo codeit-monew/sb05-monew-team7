@@ -5,6 +5,8 @@ import com.spring.monew.comment.controller.dto.request.CommentUpdateRequest;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
 import com.spring.monew.comment.service.CommentService;
+import com.spring.monew.common.util.RequestUserExtractor;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
   private final CommentService commentService;
+  private final RequestUserExtractor userExtractor;
 
   @PostMapping
   public CommentDto commentAdd(
@@ -40,17 +43,18 @@ public class CommentController {
       @RequestParam(required = false) String cursor,                // 커서 값
       @RequestParam(required = false) Instant after,                // 보조 커서(createdAt)
       @RequestParam(defaultValue = "50") int limit,                 // 페이지 크기
-      @RequestHeader(name = "Monew-Request-User-ID") UUID userId    // 헤더 값
+      Principal principal
   ) {
-
+    UUID userId = userExtractor.extractUserId(principal);
     return commentService.getComments(articleId, orderBy,
         direction, cursor, after, limit, userId);
   }
 
   @PatchMapping("/{commentId}")
   public CommentDto commentModify(@PathVariable UUID commentId,
-      @RequestHeader(name = "Monew-Request-User-ID") UUID userId,
+      Principal principal,
       @RequestBody CommentUpdateRequest updateRequest) {
+    UUID userId = userExtractor.extractUserId(principal);
     return commentService.modifyComment(commentId, userId, updateRequest);
   }
 
