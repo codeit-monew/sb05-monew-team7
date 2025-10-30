@@ -51,7 +51,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
           interest.getId(),
           interest.getName(),
           interest.getKeywords(),
-          interest.getSubscriptionsCount(),
+          subscriptionRepository.countByInterest_Id(interest.getId()),
           subscription.getCreatedAt()
       );
     } catch (Exception ignore) {}
@@ -77,7 +77,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     subscriptionRepository.delete(subscription);
     try {
-      activitySyncRepository.onUnsubscribed(userId, interestId);
+      activitySyncRepository.onUnsubscribed(subscription.getId());
     } catch (Exception ignore) {}
   }
 }
