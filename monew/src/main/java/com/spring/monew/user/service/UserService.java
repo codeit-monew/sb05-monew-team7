@@ -12,5 +12,14 @@ public interface UserService {
 
   //사용자 수정
   UserDto modifyUser(UUID userId, UserUpdateRequest request);
+
+  //사용자 논리 삭제 (is_deleted=true,deleted_at=시간으로 상태 변경)
+  void removeUserLogical(UUID userId);
+
+  //사용자 논리 삭제 (1일 지난 유저 아예 삭제)
+  int removeUsersAfterOneDay();
+
+  //사용자 물리 삭제 ( 즉시 바로 삭제 )
+  void removeUserHard(UUID userId);
 }
 
