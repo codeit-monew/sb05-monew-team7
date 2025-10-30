@@ -24,7 +24,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/monew}
       uuid-representation: standard
     redis:
       host: localhost
