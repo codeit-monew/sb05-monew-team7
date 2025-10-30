@@ -116,7 +116,8 @@ public class ActivitySyncServiceImpl implements ActivitySyncService {
     Query qLike = Query.query(Criteria.where("_id").is(likeEventId));
     Update uLike = new Update()
         .setOnInsert("_id", likeEventId)
-        .setOnInsert("created_at", nonNull(likedAt))
+        .setOnInsert("created_at", nonNull(likedAt))                 // 좋아요 시각
+        .setOnInsert("comment_created_at", nonNull(commentCreatedAtSnapshot)) // 댓글 생성 시각
         .set("user_id", likedByUserId)
         .set("comment_id", commentId)
         .set("article_id", articleId)
@@ -124,7 +125,7 @@ public class ActivitySyncServiceImpl implements ActivitySyncService {
         .set("comment_user_id", commentUserId)
         .set("comment_user_nickname", commentUserNicknameSnapshot)
         .set("comment_content", commentContentSnapshot)
-        .set("comment_like_count", commentLikeCountSnapshot);
+        .set("comment_like_count", commentLikeCountSnapshot);        // ★ 빠졌던 라인 추가!
 
     mongo.findAndModify(
         qLike, uLike,
@@ -132,7 +133,7 @@ public class ActivitySyncServiceImpl implements ActivitySyncService {
         Object.class, COL_COMMENT_LIKES
     );
 
-    // 댓글 본문 문서의 like_count 스냅샷도 갱신 (없으면 생성)
+// (기존 그대로) 원문 댓글 문서의 like_count 스냅샷도 갱신
     Query qC = Query.query(Criteria.where("_id").is(commentId));
     Update uC = new Update()
         .setOnInsert("created_at", nonNull(commentCreatedAtSnapshot))
@@ -143,7 +144,6 @@ public class ActivitySyncServiceImpl implements ActivitySyncService {
         Object.class, COL_COMMENTS
     );
   }
-
 
   @Override
   public void onCommentLikeCanceled(UUID likeEventId) {
