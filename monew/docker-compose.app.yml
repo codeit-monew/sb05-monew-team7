@@ -37,15 +37,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: monew
+    container_name: monew-app
     depends_on:
       - postgres
       - redis
       - mongo
     ports:
       - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
+      - "1327:1327" # actuator port (optional)
     networks:
       - monew-net
 
@@ -54,3 +53,4 @@ volumes:
 
 networks:
   monew-net:
+    name: monew-net
