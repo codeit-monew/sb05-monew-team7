@@ -104,7 +104,9 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
 
       UUID interestId = null;
       // FK 필드 직접 접근 우선 (lazy loading 회피)
-      interestId = a.getInterestId();
+      try {
+        interestId = a.getInterestId();
+      } catch (Exception ignore) { /* 안전장치 */ }
       if (interestId == null && a.getInterest() != null) {
         interestId = a.getInterest().getId();
       }
