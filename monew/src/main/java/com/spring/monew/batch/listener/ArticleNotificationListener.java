@@ -18,6 +18,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.Chunk;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,51 +33,69 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
 
   private final SubscriptionRepository subscriptionRepository;
   private final NotificationService notificationService;
-  private final InterestRepository interestRepository; // ★ 이름 벌크 조회용
+  private final InterestRepository interestRepository;
+
+  @Value("${monew.writer.optimize:false}")
+  private boolean optimize; // 설정 주입
 
   // EC에 저장될 집계 구조
   public static final class Agg implements Serializable {
+    public String interestName;
     public int count;
-    public String interestName; // afterStep에서 채움
     public Agg() {}
     public Agg(int count) { this.count = count; }
   }
 
   @Override
   public void beforeStep(@NonNull StepExecution stepExecution) {
-    stepExecution.getExecutionContext().put(COUNT_MAP_KEY, new HashMap<UUID, Agg>());
+    // 최적화 모드라도 listener가 필요시 쓸 수 있도록 키만 초기화(타입은 afterWrite/afterStep에서 보장)
+    if (!stepExecution.getExecutionContext().containsKey(COUNT_MAP_KEY)) {
+      stepExecution.getExecutionContext().put(COUNT_MAP_KEY, new HashMap<>());
+    }
   }
 
   @SuppressWarnings("unchecked")
-  private Map<UUID, Agg> getAggMap() {
-    return (Map<UUID, Agg>) StepSynchronizationManager.getContext()
-        .getStepExecution().getExecutionContext()
-        .get(COUNT_MAP_KEY);
+  private Map<UUID, Agg> getOrInitAggMap() {
+    var ec = StepSynchronizationManager.getContext().getStepExecution().getExecutionContext();
+    Object obj = ec.get(COUNT_MAP_KEY);
+
+    // writer 최적화 모드면 afterWrite는 스킵하므로 여기서 Map<UUID, Agg>를 사용할 일은 거의 없음
+    if (obj instanceof Map) {
+      try {
+        return (Map<UUID, Agg>) obj; // 이미 Agg 맵이면 그대로
+      } catch (ClassCastException ignore) {
+        // 타입이 다르면 새로 초기화
+      }
+    }
+    Map<UUID, Agg> map = new HashMap<>();
+    ec.put(COUNT_MAP_KEY, map);
+    return map;
   }
 
   @Override
   public void afterWrite(@NonNull Chunk<? extends Article> items) {
-    Map<UUID, Agg> map = getAggMap();
-    if (map == null) {
-      log.warn("[알림] 집계 맵 누락 - 스킵");
+    //  최적화 모드에서는 writer가 EC에 Map<UUID,Integer>를 채우므로,
+    //  listener afterWrite 집계는 충돌 방지를 위해 스킵한다.
+    if (optimize) {
+      log.debug("[알림] writer 최적화 모드 - afterWrite 집계 스킵");
       return;
     }
 
+    Map<UUID, Agg> map = getOrInitAggMap();
     int candidates = 0, counted = 0;
+
     for (Article a : items) {
       if (a == null) continue;
       candidates++;
 
-      // 핵심: 연관 ID 우선, 없으면 읽기전용 FK 보조
       UUID interestId = null;
       if (a.getInterest() != null) {
-        // Hibernate 프록시여도 getId()는 초기화 없이 안전
-        interestId = a.getInterest().getId();
+        interestId = a.getInterest().getId(); // 프록시여도 getId()는 안전
       }
       if (interestId == null) {
-        interestId = a.getInterestId();
+        interestId = a.getInterestId(); // 보조
       }
-      if (interestId == null) continue; // 집계 불가
+      if (interestId == null) continue;
 
       map.compute(interestId, (k, v) -> {
         if (v == null) return new Agg(1);
@@ -85,76 +104,62 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
       });
       counted++;
     }
-    log.debug("[알림] afterWrite 집계: 후보 {}건 중 {}건 카운팅", candidates, counted);
+    log.debug("[알림] afterWrite 집계: 후보 {}건 중 {}건 카운팅(optimize={})", candidates, counted, optimize);
   }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public ExitStatus afterStep(@NonNull StepExecution stepExecution) {
-    // Writer가 EC에 Map<UUID,Integer> 형태로 누적해 둔 경우를 흡수/정규화
-    Object raw = stepExecution.getExecutionContext().get(COUNT_MAP_KEY);
-    Map<UUID, Agg> map;
+    var ec = stepExecution.getExecutionContext();
+    Object obj = ec.get(COUNT_MAP_KEY);
 
-    if (raw == null) {
-      log.debug("[알림] 이번 스텝에서 집계 없음(EC 비어있음)");
+    // 아무 것도 없으면 종료
+    if (!(obj instanceof Map) || ((Map<?, ?>) obj).isEmpty()) {
+      log.debug("[알림] 이번 스텝에서 집계 없음(optimize={})", optimize);
       return stepExecution.getExitStatus();
     }
 
-    if (raw instanceof Map<?, ?> anyMap) {
-      if (anyMap.isEmpty()) {
-        // 비어 있어도 타입을 Agg로 확정해 둠
-        map = new HashMap<>();
-        stepExecution.getExecutionContext().put(COUNT_MAP_KEY, map);
+    // 두 케이스 모두 처리:
+    // 1) optimize=false → Map<UUID, Agg>
+    // 2) optimize=true  → Map<UUID, Integer>
+    Map<UUID, Agg> aggMap = new HashMap<>();
+
+    Map<?, ?> raw = (Map<?, ?>) obj;
+    for (Map.Entry<?, ?> e : raw.entrySet()) {
+      Object key = e.getKey();
+      Object val = e.getValue();
+      if (!(key instanceof UUID)) continue;
+
+      UUID interestId = (UUID) key;
+      if (val instanceof Agg) {
+        aggMap.put(interestId, (Agg) val);
+      } else if (val instanceof Integer) {
+        Agg a = new Agg((Integer) val);
+        aggMap.put(interestId, a);
       } else {
-        Object sampleVal = anyMap.values().iterator().next();
-        if (sampleVal instanceof Agg) {
-          // 이미 리스너 집계(Map<UUID, Agg>) 형태
-          @SuppressWarnings("unchecked")
-          Map<UUID, Agg> casted = (Map<UUID, Agg>) anyMap;
-          map = casted;
-        } else if (sampleVal instanceof Integer) {
-          // Writer 집계(Map<UUID, Integer>)를 Agg로 변환하여 대체
-          Map<UUID, Agg> converted = new HashMap<>();
-          for (Map.Entry<?, ?> e : anyMap.entrySet()) {
-            Object k = e.getKey();
-            Object v = e.getValue();
-            if (k instanceof UUID key && v instanceof Integer cnt) {
-              converted.put(key, new Agg(cnt));
-            }
-          }
-          // EC에 Agg 맵으로 치환
-          stepExecution.getExecutionContext().put(COUNT_MAP_KEY, converted);
-          map = converted;
-          log.debug("[알림] Writer 집계를 Agg로 정규화: {}개", map.size());
-        } else {
-          log.warn("[알림] 지원하지 않는 집계 타입: {}", sampleVal.getClass().getName());
-          return stepExecution.getExitStatus();
-        }
+        log.warn("[알림] aggByInterest 값 타입 미지원: key={}, valueType={}", interestId, (val == null ? "null" : val.getClass()));
       }
-    } else {
-      log.warn("[알림] EC '{}' 값이 Map이 아님: {}", COUNT_MAP_KEY, raw.getClass().getName());
+    }
+
+    if (aggMap.isEmpty()) {
+      log.debug("[알림] 집계 변환 결과 없음(optimize={})", optimize);
       return stepExecution.getExitStatus();
     }
 
-    if (map.isEmpty()) {
-      log.debug("[알림] 이번 스텝에서 집계 없음");
-      return stepExecution.getExitStatus();
-    }
-
-    // 관심사 이름 벌크 로딩(지연로딩 금지, 한 번에)
-    Set<UUID> interestIds = map.keySet();
+    // 이름 벌크 로딩
+    Set<UUID> interestIds = aggMap.keySet();
     Map<UUID, String> names = interestRepository.findAllById(interestIds).stream()
         .collect(Collectors.toMap(Interest::getId, it -> {
           String name = it.getName();
           return (name == null || name.isBlank()) ? "관심사" : name;
         }));
 
-    int kinds = map.size();
+    int kinds = aggMap.size();
     int sentBatches = 0;
 
-    for (Map.Entry<UUID, Agg> e : map.entrySet()) {
-      UUID interestId = e.getKey();
-      Agg agg = e.getValue();
+    for (var entry : aggMap.entrySet()) {
+      UUID interestId = entry.getKey();
+      Agg agg = entry.getValue();
       agg.interestName = names.getOrDefault(interestId, "관심사");
 
       try {
@@ -180,7 +185,7 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
       }
     }
 
-    log.info("[알림] 관심사별 배치 알림 생성 완료: 관심사 종류 {}개, 발송 {}건", kinds, sentBatches);
+    log.info("[알림] 관심사별 배치 알림 생성 완료: 관심사 종류 {}개, 발송 {}건(optimize={})", kinds, sentBatches, optimize);
     return stepExecution.getExitStatus();
   }
 }
