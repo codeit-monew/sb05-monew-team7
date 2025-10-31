@@ -21,7 +21,7 @@ public class SecurityConfig {
   private final HeaderAuthFilter headerAuthFilter;
 
   @Value("${monitoring.prometheus.allow-ip}")
-  private String prometheusAllowIp; // ✅ yml 속성 주입 (기본값은 localhost)
+  private String prometheusAllowIp; // yml 속성 주입 (기본값은 localhost)
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,6 +38,7 @@ public class SecurityConfig {
             .requestMatchers("/actuator/health", "/actuator/info",
                 "/actuator/loggers").permitAll() //Actuator 허용 (원래는 이렇게 하면 안됨)
             //  모든 경로 허용 (개발용)
+            .requestMatchers("/api/batch/**").permitAll()
             .anyRequest().permitAll()
         )
         // 헤더에 담긴 userId를 읽어서 인증 정보를 만들어주는 필터

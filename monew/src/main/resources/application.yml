@@ -1,13 +1,16 @@
 spring:
   application:
     name: monew
+
   profiles:
     active: local
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/monew?sessionTimezone=UTC
-    username: postgres
-    password: 1234
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monew?sessionTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
@@ -18,22 +21,27 @@ spring:
         jdbc:
           time_zone: UTC
     show-sql: false
+
   sql:
     init:
       mode: never # 'always' for initial creation, 'never' afterwards
 
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/monew}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/monew}
       uuid-representation: standard
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
   batch:
     job:
       enabled: true
     jdbc:
       initialize-schema: never
+    trigger:
+      enabled: true
+
   servlet:
     multipart:
       max-file-size: 10MB
@@ -88,18 +96,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
-aws:
-  s3:
-    bucket: your-bucket-name
-    region: ap-northeast-2
-    access-key: ${AWS_ACCESS_KEY_ID:dummy-access}
-    secret-key: ${AWS_SECRET_ACCESS_KEY:dummy-secret}
-
 naver:
   api:
     client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
     client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
-
-batch:
-  trigger:
-    enabled: true
