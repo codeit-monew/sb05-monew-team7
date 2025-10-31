@@ -1,7 +1,9 @@
 package com.spring.monew.commentlike.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -9,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
 import com.spring.monew.commentlike.service.CommentLikeService;
+import com.spring.monew.common.util.RequestUserExtractor;
+import com.spring.monew.config.TestSecurityConfig;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -16,16 +20,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CommentLikeController.class)
-@AutoConfigureMockMvc(addFilters = false) // Security 필터 비활성화
+@AutoConfigureMockMvc // Security 필터 비활성화
+@Import(TestSecurityConfig.class)
 class CommentLikeControllerTest {
 
   @Autowired private MockMvc mockMvc;
   @MockitoBean private CommentLikeService commentLikeService;
+  @MockitoBean
+  RequestUserExtractor userExtractor;
 
   @Test
   @DisplayName("댓글 좋아요 추가 성공")
@@ -40,6 +48,7 @@ class CommentLikeControllerTest {
         "작성자 닉네임", "내용", 0, Instant.now()
     );
 
+    when(userExtractor.extractUserId(any())).thenReturn(userId);
     given(commentLikeService.addCommentLike(commentId, userId)).willReturn(responseDto);
 
     // when & then
