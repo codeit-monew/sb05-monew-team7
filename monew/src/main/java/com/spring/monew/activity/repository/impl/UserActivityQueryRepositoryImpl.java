@@ -75,15 +75,46 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
         q.addCriteria(Criteria.where("userId").is(userId));
         q.with(Sort.by(desc("createdAt"), desc("_id")));
         q.limit(topN);
+
         List<ActivityCommentDoc> docs = mongo.find(q, ActivityCommentDoc.class);
-        List<UserActivityDto.Comment> out = new ArrayList<UserActivityDto.Comment>(docs.size());
+        List<UserActivityDto.Comment> out = new ArrayList<>(docs.size());
+
         for (ActivityCommentDoc d : docs) {
+            // ① 스냅샷에서 우선 가져온다
+            String nickname = d.getUserNickname();
+
+            // ② 과거 스냅샷(닉네임 비어 있음) 폴백: RDB에서 한 번 더 조회
+            if (nickname == null || nickname.isBlank()) {
+                nickname = findNicknameFallback(d.getUserId());
+                if (nickname == null || nickname.isBlank()) {
+                    nickname = "(알 수 없음)";
+                }
+            }
             out.add(new UserActivityDto.Comment(
-                UUID.fromString(d.getId()), d.getArticleId(), d.getArticleTitle(),
-                d.getUserId(), null, d.getContent(), d.getLikeCount(), d.getCreatedAt()
+                UUID.fromString(d.getId()),
+                d.getArticleId(),
+                d.getArticleTitle(),
+                d.getUserId(),
+                nickname,
+                d.getContent(),
+                d.getLikeCount(),
+                d.getCreatedAt()
             ));
         }
         return out;
+    }
+
+    private String findNicknameFallback(UUID userId) {
+        try {
+            // users 테이블에 nickname 컬럼 있는 전제
+            return jdbc.queryForObject(
+                "SELECT nickname FROM users WHERE id = ?",
+                String.class,
+                userId
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
