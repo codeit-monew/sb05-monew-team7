@@ -57,13 +57,30 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, prometheus
+        include: health, info, prometheus, loggers
   endpoint:
     health:
       show-details: always
+
   metrics:
     tags:
       application: ${spring.application.name}
+  info:
+    os:
+      enabled:
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    cassandra:
+      enabled: true
+  server:
+    port: 1327
+
+monitoring:
+  prometheus:
+    allow-ip: ${PROMETHEUS_IP:localhost}
 
 springdoc:
   swagger-ui:
