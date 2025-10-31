@@ -9,6 +9,9 @@ import com.spring.monew.subscription.repository.SubscriptionRepository;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,13 +42,16 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
   private boolean optimize; // 설정 주입
 
   // EC에 저장될 집계 구조
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static final class Agg implements Serializable {
-    public String interestName;
-    public int count;
-    public Agg() {}
-    public Agg(int count) { this.count = count; }
+    private String interestName;
+    private int count;
+    public Agg(int count) {
+           this.count = count;
+    }
   }
-
   @Override
   public void beforeStep(@NonNull StepExecution stepExecution) {
     // 최적화 모드라도 listener가 필요시 쓸 수 있도록 키만 초기화(타입은 afterWrite/afterStep에서 보장)
