@@ -24,7 +24,8 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/monew
+      uri: ${MONGODB_URI:mongodb://localhost:27017/monew}
+      uuid-representation: standard
     redis:
       host: localhost
       port: 6379
@@ -81,3 +82,7 @@ naver:
   api:
     client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
     client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
+
+batch:
+  trigger:
+    enabled: true
