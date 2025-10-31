@@ -75,9 +75,23 @@ public class ArticleViewServiceImpl implements ArticleViewService {
             }
             
         } catch (RedisConnectionFailureException e) {
-            log.error("Redis connection failed. View tracking blocked for articleId={}, userId={}", 
+            log.error("Redis connection failed. Proceeding with DB fallback for articleId={}, userId={}", 
                 articleId, userId, e);
-            throw e;
+            
+            Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
+            view = articleViewRepository
+                .findTopByArticleIdAndUserIdAndCreatedAtAfterOrderByCreatedAtDesc(
+                    articleId, userId, twentyFourHoursAgo
+                )
+                .orElseGet(() -> {
+                    log.info("No recent view found in DB, creating new view with count increment");
+                    article.incrementViewCount();
+                    ArticleView newView = ArticleView.of(article, userId);
+                    ArticleView saved = articleViewRepository.save(newView);
+                    saveToMongoDB(article, userId, saved.getId());
+                    return saved;
+                });
+            createdAt = view.getCreatedAt();
         }
 
         return new ArticleViewDto(
