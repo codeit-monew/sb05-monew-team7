@@ -30,6 +30,12 @@
       <maxHistory>30</maxHistory>
     </rollingPolicy>
   </appender>
+  <!-- Micrometer Logback Metrics Appender 추가 -->
+  <appender name="METRICS" class="io.micrometer.core.instrument.binder.logging.LogbackMetrics">
+    <tags>
+      <tag key="application" value="${spring.application.name:monew}"/>
+    </tags>
+  </appender>
 
   <!-- 루트 로거 -->
   <root level="INFO"> <!-- 기본값은 INFO, 프로파일별 application-{profile}.yaml에서 override -->
