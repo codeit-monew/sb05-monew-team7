@@ -95,10 +95,13 @@ public class ArticleServiceImpl implements ArticleService {
     Article article = articleRepository.findById(articleId)
         .orElseThrow(() -> new ArticleNotFoundException(articleId));
 
-    Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
-    boolean viewedByMe = articleViewRepository.existsByArticleIdAndUserIdAndCreatedAtAfter(
-        articleId, userId, twentyFourHoursAgo
-    );
+    boolean viewedByMe = false;
+    if (userId != null) {
+      Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
+      viewedByMe = articleViewRepository.existsByArticleIdAndUserIdAndCreatedAtAfter(
+          articleId, userId, twentyFourHoursAgo
+      );
+    }
 
     return new ArticleDto(
         article.getId(),
