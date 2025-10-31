@@ -39,7 +39,9 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
               "SELECT id, email, nickname, created_at FROM users WHERE id = ?",
               (rs, rowNum) -> new UserSummary(
                   uuid(rs, "id"), rs.getString("email"), rs.getString("nickname"),
-                  rs.getTimestamp("created_at").toInstant()
+                  rs.getTimestamp("created_at") != null
+                      ? rs.getTimestamp("created_at").toInstant()
+                      : Instant.now()
               ),
               userId
           )
