@@ -47,7 +47,7 @@ public class NewsCollectionJobConfig {
                 .listener(articleCandidateReader)
                 .listener(articleCandidateProcessor)
                 .listener(batchSkipListener)
-                .listener((ItemWriteListener<? super Article>) articleNotificationListener)
+                .listener((org.springframework.batch.core.ItemWriteListener<? super Article>) articleNotificationListener)
                 .listener((org.springframework.batch.core.StepExecutionListener) articleNotificationListener)
                 .faultTolerant()
                 .skip(DataIntegrityViolationException.class)
