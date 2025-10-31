@@ -178,6 +178,7 @@ public class ActivitySyncRepositoryImpl implements ActivitySyncRepository {
       Long articleCommentCount, Long articleViewCount, Instant createdAt) {
 
     Update up = new Update()
+        .setOnInsert("_id", viewEventId.toString())
         // view doc은 (userId+articleId) 기준 upsert이므로 _id 세팅은 하지 않음
         .set("userId", userId)
         .set("articleId", articleId)
