@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -46,21 +48,24 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     Subscription subscription = subscriptionRepository.save(new Subscription(user, interest));
 
-    try {
-      activitySyncRepository.onSubscribed(
-          subscription.getId(),
-          user.getId(),
-          interest.getId(),
-          interest.getName(),
-          interest.getKeywords(),
-          interest.getSubscriptionsCount(),
-          subscription.getCreatedAt()
-      );
-    } catch (Exception e) {
-      // 실패 시 본 기능은 유지하고 경고 로그 + 스택트레이스 남김
-      log.warn("활동 동기화 실패 (구독 생성): subscriptionId={}, userId={}, interestId={}",
-          subscription.getId(), user.getId(), interest.getId(), e);
-    }
+    // 커밋 이후에만 읽기 모델(스냅샷) 동기화
+    afterCommit(() -> {
+      try {
+        activitySyncRepository.onSubscribed(
+            subscription.getId(),
+            user.getId(),
+            interest.getId(),
+            interest.getName(),
+            interest.getKeywords(),
+            interest.getSubscriptionsCount(),
+            subscription.getCreatedAt()
+        );
+      } catch (Exception e) {
+        // 실패 시 본 기능은 유지하고 경고 로그 + 스택트레이스 남김
+        log.warn("활동 동기화 실패 (구독 생성 afterCommit): subscriptionId={}, userId={}, interestId={}",
+            subscription.getId(), user.getId(), interest.getId(), e);
+      }
+    });
 
     return new SubscriptionDto(
         subscription.getId(),
@@ -82,11 +87,26 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     subscription.getInterest().decrementSubscriptionsCount();
 
     subscriptionRepository.delete(subscription);
-    try {
-      activitySyncRepository.onUnsubscribed(subscription.getId());
-    } catch (Exception e) {
-      log.warn("활동 동기화 실패 (구독 해제): subscriptionId={}, userId={}, interestId={}",
-          subscription.getId(), userId, interestId, e);
+
+    // 커밋 이후에만 읽기 모델(스냅샷) 동기화
+    afterCommit(() -> {
+      try {
+        activitySyncRepository.onUnsubscribed(subscription.getId());
+      } catch (Exception e) {
+        log.warn("활동 동기화 실패 (구독 해제 afterCommit): subscriptionId={}, userId={}, interestId={}",
+            subscription.getId(), userId, interestId, e);
+      }
+    });
+  }
+
+  // 트랜잭션 커밋 이후(afterCommit)에 작업 실행. 트랜잭션 없으면 즉시 실행(기존 동작 호환)
+  private void afterCommit(Runnable task) {
+    if (TransactionSynchronizationManager.isActualTransactionActive()) {
+      TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+        @Override public void afterCommit() { task.run(); }
+      });
+    } else {
+      task.run();
     }
   }
 }

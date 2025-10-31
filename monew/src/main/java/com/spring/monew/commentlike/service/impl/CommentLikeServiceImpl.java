@@ -1,27 +1,26 @@
 package com.spring.monew.commentlike.service.impl;
 
-import com.spring.monew.activity.repository.ActivitySyncRepository;
+import com.spring.monew.activity.repository.ActivitySyncRepository;              // ★ Added
 import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.comment.repository.CommentRepository;
 import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
 import com.spring.monew.commentlike.domain.CommentLike;
 import com.spring.monew.commentlike.repository.CommentLikeRepository;
 import com.spring.monew.commentlike.service.CommentLikeService;
-import com.spring.monew.interest.domain.Interest;
-import com.spring.monew.notification.domain.NotificationResourceType;
-import com.spring.monew.notification.service.NotificationService;
-import com.spring.monew.subscription.domain.Subscription;
+// import com.spring.monew.notification.domain.NotificationResourceType;        // (알림 재개 시 사용)
+// import com.spring.monew.notification.service.NotificationService;            // (알림 재개 시 사용)
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
-import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;                                               // ★ Added
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;       // ★ Added
+import org.springframework.transaction.support.TransactionSynchronizationManager; // ★ Added
 
-@Slf4j
+@Slf4j                                                                          // ★ Added
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,15 +29,15 @@ public class CommentLikeServiceImpl implements CommentLikeService {
   private final CommentLikeRepository commentLikeRepository;
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
-  private final ActivitySyncRepository activitySyncRepository;
-  private final NotificationService notificationService;
+  private final ActivitySyncRepository activitySyncRepository;                  // ★ Added
+  // private final NotificationService notificationService;                      // (알림 재개 시 사용)
 
   @Override
   @Transactional
   public CommentLikeDto addCommentLike(UUID commentId, UUID userId) {
     Comment comment = commentRepository.findById(commentId).orElseThrow(
-        () -> new NoSuchElementException("존재하지 않는 댓글 입니다."));
-
+        () -> new NoSuchElementException("존재하지 않는 댓글 입니다.")
+    );
     User user = userRepository.findById(userId).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 유저 입니다.")
     );
@@ -51,35 +50,45 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
     CommentLike commentLike = commentLikeRepository.save(new CommentLike(comment, user));
 
-    try {
-      activitySyncRepository.onCommentLiked(
-          commentLike.getId(),                // likeEventId
-          user.getId(),                       // likedByUserId
-          comment.getId(),                    // commentId
-          comment.getArticle().getId(),       // articleId
-          comment.getArticle().getTitle(),    // articleTitleSnapshot
-          comment.getUser().getId(),          // commentUserId
-          comment.getUser().getNickname(),    // commentUserNicknameSnapshot
-          comment.getContent(),               // commentContentSnapshot
-          comment.getLikeCount(),             // commentLikeCountSnapshot (long)
-          comment.getCreatedAt(),             // commentCreatedAtSnapshot (Instant)
-          commentLike.getCreatedAt()          // likedAt (Instant)
-      );
-    } catch (Exception e) {
-      log.warn("활동 동기화 실패 (댓글 좋아요 생성): likeId={}, commentId={}, likedByUserId={}, articleId={}",
-          commentLike.getId(), comment.getId(), user.getId(), comment.getArticle().getId(), e);
-    }
+    afterCommit(() -> {                                                         // ★ Added
+      try {
+        activitySyncRepository.onCommentLiked(
+            commentLike.getId(),                // likeEventId
+            user.getId(),                       // likedByUserId
+            comment.getId(),                    // commentId
+            comment.getArticle().getId(),       // articleId
+            comment.getArticle().getTitle(),    // articleTitleSnapshot
+            comment.getUser().getId(),          // commentUserId
+            comment.getUser().getNickname(),    // commentUserNicknameSnapshot
+            comment.getContent(),               // commentContentSnapshot
+            comment.getLikeCount(),             // commentLikeCountSnapshot
+            comment.getCreatedAt(),             // commentCreatedAtSnapshot
+            commentLike.getCreatedAt()          // likedAt
+        );
+      } catch (Exception e) {
+        log.warn("활동 동기화 실패 (댓글 좋아요 생성 afterCommit): likeId={}, commentId={}, likedByUserId={}, articleId={}",
+            commentLike.getId(), comment.getId(), user.getId(), comment.getArticle().getId(), e);
+      }
+    });
 
-//    UUID commentAuthorId = comment.getUser().getId();
-//    if (!commentAuthorId.equals(userId)) {
-//      String content = user.getNickname() + "님이 나의 댓글을 좋아합니다.";
-//      notificationService.create(
-//          commentAuthorId,
-//          content,
-//          NotificationResourceType.COMMENT, // 관련 리소스 = 댓글
-//          comment.getId()
-//      );
-//    }
+    // 알림 재개 시 커밋 이후로 지연 실행
+    // afterCommit(() -> {
+    //   UUID commentAuthorId = comment.getUser().getId();
+    //   if (!commentAuthorId.equals(userId)) {
+    //     String content = user.getNickname() + "님이 나의 댓글을 좋아합니다.";
+    //     try {
+    //       notificationService.create(
+    //           commentAuthorId,
+    //           content,
+    //           NotificationResourceType.COMMENT,
+    //           comment.getId()
+    //       );
+    //     } catch (Exception e) {
+    //       log.warn("알림 발송 실패 (댓글 좋아요): likeId={}, commentId={}, toUserId={}",
+    //           commentLike.getId(), comment.getId(), commentAuthorId, e);
+    //     }
+    //   }
+    // });
 
     return new CommentLikeDto(
         commentLike.getId(),
@@ -104,13 +113,27 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
     commentLike.getComment().decrementLikeCount();
 
-    try {
-      activitySyncRepository.onCommentLikeCanceled(commentLike.getId());
-    } catch (Exception e) {
-      log.warn("활동 동기화 실패 (댓글 좋아요 취소): likeId={}, commentId={}, userId={}",
-          commentLike.getId(), commentId, userId, e);
-    }
-
     commentLikeRepository.delete(commentLike);
+
+    // 활동 스냅샷 삭제도 커밋 이후로 지연 (정합성 보장)
+    afterCommit(() -> {
+      try {
+        activitySyncRepository.onCommentLikeCanceled(commentLike.getId());
+      } catch (Exception e) {
+        log.warn("활동 동기화 실패 (댓글 좋아요 취소 afterCommit): likeId={}, commentId={}, userId={}",
+            commentLike.getId(), commentId, userId, e);
+      }
+    });
+  }
+
+  // === 커밋 이후 실행 유틸 ===
+  private void afterCommit(Runnable task) {
+    if (TransactionSynchronizationManager.isActualTransactionActive()) {
+      TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+        @Override public void afterCommit() { task.run(); }
+      });
+    } else {
+      task.run();
+    }
   }
 }
