@@ -49,7 +49,7 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
     private String interestName;
     private int count;
     public Agg(int count) {
-           this.count = count;
+      this.count = count;
     }
   }
   @Override
@@ -62,7 +62,12 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
 
   @SuppressWarnings("unchecked")
   private Map<UUID, Agg> getOrInitAggMap() {
-    var ec = StepSynchronizationManager.getContext().getStepExecution().getExecutionContext();
+    var sync = StepSynchronizationManager.getContext();
+    if (sync == null || sync.getStepExecution() == null) {
+      log.debug("[알림] StepSynchronizationContext 미존재 - afterWrite 집계 스킵");
+      return null;
+    }
+    var ec = sync.getStepExecution().getExecutionContext();
     Object obj = ec.get(COUNT_MAP_KEY);
 
     // writer 최적화 모드면 afterWrite는 스킵하므로 여기서 Map<UUID, Agg>를 사용할 일은 거의 없음
@@ -88,6 +93,9 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
     }
 
     Map<UUID, Agg> map = getOrInitAggMap();
+    if (map == null) {
+      return;
+    }
     int candidates = 0, counted = 0;
 
     for (Article a : items) {
@@ -96,9 +104,7 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
 
       UUID interestId = null;
       // FK 필드 직접 접근 우선 (lazy loading 회피)
-      try {
-        interestId = a.getInterestId();
-      } catch (Exception ignore) { /* 안전장치 */ }
+      interestId = a.getInterestId();
       if (interestId == null && a.getInterest() != null) {
         interestId = a.getInterest().getId();
       }
