@@ -62,7 +62,9 @@ public class ArticleViewServiceImpl implements ArticleViewService {
                     .orElseGet(() -> {
                         log.warn("Redis said duplicate but no recent view found in DB, creating new one without incrementing count");
                         ArticleView newView = ArticleView.of(article, userId);
-                        return articleViewRepository.save(newView);
+                        ArticleView saved = articleViewRepository.save(newView);
+                        saveToMongoDB(article, userId, saved.getId());
+                        return saved;
                     });
                 createdAt = view.getCreatedAt();
             } else {
