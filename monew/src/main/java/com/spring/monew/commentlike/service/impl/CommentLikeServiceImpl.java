@@ -61,9 +61,9 @@ public class CommentLikeServiceImpl implements CommentLikeService {
           comment.getUser().getId(),          // commentUserId
           comment.getUser().getNickname(),    // commentUserNicknameSnapshot
           comment.getContent(),               // commentContentSnapshot
-          comment.getLikeCount(),             // commentLikeCountSnapshot
-          comment.getCreatedAt(),             // commentCreatedAtSnapshot
-          commentLike.getCreatedAt()          // likedAt
+          comment.getLikeCount(),             // commentLikeCountSnapshot (long)
+          comment.getCreatedAt(),             // commentCreatedAtSnapshot (Instant)
+          commentLike.getCreatedAt()          // likedAt (Instant)
       );
     } catch (Exception e) {
       log.warn("활동 동기화 실패 (댓글 좋아요 생성): likeId={}, commentId={}, likedByUserId={}, articleId={}",
