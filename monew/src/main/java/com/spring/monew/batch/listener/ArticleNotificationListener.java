@@ -92,7 +92,7 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
       // FK 필드 직접 접근 우선 (lazy loading 회피)
       try {
         interestId = a.getInterestId();
-        } catch (Exception ignore) { /* 안전장치 */ }
+      } catch (Exception ignore) { /* 안전장치 */ }
       if (interestId == null && a.getInterest() != null) {
         interestId = a.getInterest().getId();
       }
