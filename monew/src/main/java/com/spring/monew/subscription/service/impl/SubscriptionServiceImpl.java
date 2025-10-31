@@ -53,7 +53,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
           interest.getId(),
           interest.getName(),
           interest.getKeywords(),
-          subscriptionRepository.countByInterest_Id(interest.getId()),
+          interest.getSubscriptionsCount(),
           subscription.getCreatedAt()
       );
     } catch (Exception e) {
