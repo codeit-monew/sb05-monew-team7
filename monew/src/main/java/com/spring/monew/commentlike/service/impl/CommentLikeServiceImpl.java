@@ -1,5 +1,6 @@
 package com.spring.monew.commentlike.service.impl;
 
+import com.spring.monew.activity.repository.ActivitySyncRepository;
 import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.comment.repository.CommentRepository;
 import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
@@ -7,6 +8,8 @@ import com.spring.monew.commentlike.domain.CommentLike;
 import com.spring.monew.commentlike.repository.CommentLikeRepository;
 import com.spring.monew.commentlike.service.CommentLikeService;
 import com.spring.monew.interest.domain.Interest;
+import com.spring.monew.notification.domain.NotificationResourceType;
+import com.spring.monew.notification.service.NotificationService;
 import com.spring.monew.subscription.domain.Subscription;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
@@ -25,6 +28,8 @@ public class CommentLikeServiceImpl implements CommentLikeService {
   private final CommentLikeRepository commentLikeRepository;
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
+  private final ActivitySyncRepository activitySyncRepository;
+  private final NotificationService notificationService;
 
   @Override
   @Transactional
@@ -43,6 +48,33 @@ public class CommentLikeServiceImpl implements CommentLikeService {
     comment.incrementLikeCount();
 
     CommentLike commentLike = commentLikeRepository.save(new CommentLike(comment, user));
+
+    try {
+      activitySyncRepository.onCommentLiked(
+          commentLike.getId(),                // likeEventId
+          user.getId(),                       // likedByUserId
+          comment.getId(),                    // commentId
+          comment.getArticle().getId(),       // articleId
+          comment.getArticle().getTitle(),    // articleTitleSnapshot
+          comment.getUser().getId(),          // commentUserId
+          comment.getUser().getNickname(),    // commentUserNicknameSnapshot
+          comment.getContent(),               // commentContentSnapshot
+          comment.getLikeCount(),             // commentLikeCountSnapshot
+          comment.getCreatedAt(),             // commentCreatedAtSnapshot
+          commentLike.getCreatedAt()          // likedAt
+      );
+    } catch (Exception ignore) {}
+
+    UUID commentAuthorId = comment.getUser().getId();
+    if (!commentAuthorId.equals(userId)) {
+      String content = user.getNickname() + "님이 나의 댓글을 좋아합니다.";
+      notificationService.create(
+          commentAuthorId,
+          content,
+          NotificationResourceType.COMMENT, // 관련 리소스 = 댓글
+          comment.getId()
+      );
+    }
 
     return new CommentLikeDto(
         commentLike.getId(),
@@ -66,6 +98,10 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 좋아요 입니다"));
 
     commentLike.getComment().decrementLikeCount();
+
+    try {
+      activitySyncRepository.onCommentLikeCanceled(commentLike.getId());
+    } catch (Exception ignore) {}
 
     commentLikeRepository.delete(commentLike);
   }
