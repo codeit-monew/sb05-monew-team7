@@ -7,8 +7,8 @@ import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
 import com.spring.monew.commentlike.domain.CommentLike;
 import com.spring.monew.commentlike.repository.CommentLikeRepository;
 import com.spring.monew.commentlike.service.CommentLikeService;
-// import com.spring.monew.notification.domain.NotificationResourceType;        // (알림 재개 시 사용)
-// import com.spring.monew.notification.service.NotificationService;            // (알림 재개 시 사용)
+import com.spring.monew.notification.domain.NotificationResourceType;        // (알림 재개 시 사용)
+import com.spring.monew.notification.service.NotificationService;            // (알림 재개 시 사용)
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
 import java.util.NoSuchElementException;
@@ -30,7 +30,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
   private final ActivitySyncRepository activitySyncRepository;                  // ★ Added
-  // private final NotificationService notificationService;                      // (알림 재개 시 사용)
+  private final NotificationService notificationService;                      // (알림 재개 시 사용)
 
   @Override
   @Transactional
@@ -71,24 +71,22 @@ public class CommentLikeServiceImpl implements CommentLikeService {
       }
     });
 
-    // 알림 재개 시 커밋 이후로 지연 실행
-    // afterCommit(() -> {
-    //   UUID commentAuthorId = comment.getUser().getId();
-    //   if (!commentAuthorId.equals(userId)) {
-    //     String content = user.getNickname() + "님이 나의 댓글을 좋아합니다.";
-    //     try {
-    //       notificationService.create(
-    //           commentAuthorId,
-    //           content,
-    //           NotificationResourceType.COMMENT,
-    //           comment.getId()
-    //       );
-    //     } catch (Exception e) {
-    //       log.warn("알림 발송 실패 (댓글 좋아요): likeId={}, commentId={}, toUserId={}",
-    //           commentLike.getId(), comment.getId(), commentAuthorId, e);
-    //     }
-    //   }
-    // });
+       //좋아요 알림
+       UUID commentAuthorId = comment.getUser().getId();
+       if (!commentAuthorId.equals(userId)) {
+         String content = user.getNickname() + "님이 나의 댓글을 좋아합니다.";
+         try {
+           notificationService.create(
+               commentAuthorId,
+               content,
+               NotificationResourceType.COMMENT, // 관련 리소스 = 댓글
+               comment.getId()
+           );
+         } catch (Exception e) {
+           log.warn("알림 발송 실패 (댓글 좋아요): likeId={}, commentId={}, toUserId={}",
+               commentLike.getId(), comment.getId(), commentAuthorId, e);
+         }
+       }
 
     return new CommentLikeDto(
         commentLike.getId(),
