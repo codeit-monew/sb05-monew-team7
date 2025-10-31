@@ -15,7 +15,7 @@ public record ArticleDto(
         String summary,
         long commentCount,
         long viewCount,
-        Boolean viewedByMe
+        boolean viewedByMe
 ) {
     @QueryProjection
     public ArticleDto {}

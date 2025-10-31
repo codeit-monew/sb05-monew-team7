@@ -1,5 +1,6 @@
 package com.spring.monew.articleview.controller;
 
+import com.spring.monew.articleview.controller.dto.response.ArticleViewDto;
 import com.spring.monew.articleview.service.ArticleViewService;
 import com.spring.monew.common.util.RequestUserExtractor;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +37,7 @@ public class ArticleViewController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 기사"),
         @ApiResponse(responseCode = "500", description = "서버 오류 (Redis 연결 실패 등)")
     })
-    public ResponseEntity<Void> trackArticleView(
+    public ResponseEntity<ArticleViewDto> trackArticleView(
         @Parameter(description = "기사 ID", required = true)
         @PathVariable UUID articleId,
         Principal principal
@@ -47,7 +48,7 @@ public class ArticleViewController {
             return ResponseEntity.badRequest().build();
         }
 
-        articleViewService.trackView(articleId, userId);
-        return ResponseEntity.ok().build();
+        ArticleViewDto result = articleViewService.trackView(articleId, userId);
+        return ResponseEntity.ok(result);
     }
 }

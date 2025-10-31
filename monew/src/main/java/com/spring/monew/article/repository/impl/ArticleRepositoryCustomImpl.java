@@ -113,7 +113,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
             tuple.get(article.summary),
             tuple.get(article.commentCount),
             tuple.get(article.viewCount),
-            null
+            false
         ))
         .toList();
 
