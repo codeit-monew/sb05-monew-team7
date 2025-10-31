@@ -89,11 +89,12 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
       candidates++;
 
       UUID interestId = null;
-      if (a.getInterest() != null) {
-        interestId = a.getInterest().getId(); // 프록시여도 getId()는 안전
-      }
-      if (interestId == null) {
-        interestId = a.getInterestId(); // 보조
+      // FK 필드 직접 접근 우선 (lazy loading 회피)
+      try {
+        interestId = a.getInterestId();
+        } catch (Exception ignore) { /* 안전장치 */ }
+      if (interestId == null && a.getInterest() != null) {
+        interestId = a.getInterest().getId();
       }
       if (interestId == null) continue;
 
