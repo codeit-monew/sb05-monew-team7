@@ -34,13 +34,20 @@ public class UserActivityController {
     return ResponseEntity.ok(userActivityService.getUserActivity(userId));
   }
 
-  // 2) 특정 사용자 활동내역 (헤더 없어도 허용, 있으면 불일치 시 403 선택 적용)
+  // 2) 특정 사용자 활동내역
   @GetMapping("/api/user-activities/{userId}")
   public ResponseEntity<UserActivityDto> userActivityById(
       @PathVariable UUID userId,
       Principal principal
   ) {
+    // 헤더가 없으면 null을 반환하도록 구현되어 있어야 합니다.
     UUID reqUserId = userExtractor.extractUserId(principal);
+    // 헤더가 있을 때만 소유자 검증
+    if (reqUserId != null && !reqUserId.equals(userId)) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "다른 사용자의 활동 내역을 조회할 수 없습니다."
+      );
+    }
     return ResponseEntity.ok(userActivityService.getUserActivity(userId));
   }
 }
