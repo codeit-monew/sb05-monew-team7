@@ -11,7 +11,7 @@ import lombok.Getter;
 public class Notification {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
