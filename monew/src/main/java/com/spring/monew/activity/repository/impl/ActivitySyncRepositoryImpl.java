@@ -80,6 +80,7 @@ public class ActivitySyncRepositoryImpl implements ActivitySyncRepository {
             .set("userId", userId)
             .set("articleId", articleId)
             .set("articleTitle", articleTitle)
+            .set("commentUserNickname", commentUserNickname)
             .set("content", content)
             .set("likeCount", likeCount)
             .set("createdAt", createdAt);
