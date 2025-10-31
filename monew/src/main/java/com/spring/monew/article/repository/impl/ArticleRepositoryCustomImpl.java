@@ -5,16 +5,12 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.article.controller.dto.response.ArticleDto;
 import com.spring.monew.article.controller.dto.response.CursorPageResponseArticleDto;
 import com.spring.monew.article.domain.ArticleSource;
 import com.spring.monew.article.domain.QArticle;
 import com.spring.monew.article.repository.ArticleRepositoryCustom;
-import com.spring.monew.articleview.domain.QArticleView;
-import com.spring.monew.interest.domain.QInterest;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +23,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
   private final JPAQueryFactory queryFactory;
   private static final QArticle article = QArticle.article;
-  private static final QArticleView articleView = QArticleView.articleView;
-  private static final QInterest interest = QInterest.interest;
 
   @Override
   public CursorPageResponseArticleDto findCursorPagedArticles(
@@ -79,21 +73,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
     applyCursorCondition(orderBy, direction, cursor, builder);
 
-    final BooleanExpression viewedByMeExpression;
-    if (userId != null) {
-      final UUID userIdFinal = userId;
-      Instant twentyFourHoursAgo = Instant.now().minusSeconds(24 * 60 * 60);
-      viewedByMeExpression = JPAExpressions
-          .selectOne()
-          .from(articleView)
-          .where(articleView.article.id.eq(article.id)
-              .and(articleView.userId.eq(userIdFinal))
-              .and(articleView.createdAt.goe(twentyFourHoursAgo)))
-          .exists();
-    } else {
-      viewedByMeExpression = Expressions.asBoolean(false);
-    }
-
     OrderSpecifier<?> primaryOrder = getOrderSpecifier(orderBy, direction);
     OrderSpecifier<?> secondaryOrder = getCreatedAtOrderSpecifier(direction);
     OrderSpecifier<?> stabilityOrder = new OrderSpecifier<>(
@@ -111,8 +90,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
             article.summary,
             article.commentCount,
             article.viewCount,
-            article.createdAt,
-            viewedByMeExpression
+            article.createdAt
         )
         .from(article)
         .where(builder)
@@ -135,7 +113,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
             tuple.get(article.summary),
             tuple.get(article.commentCount),
             tuple.get(article.viewCount),
-            tuple.get(viewedByMeExpression)
+            null
         ))
         .toList();
 
