@@ -72,6 +72,6 @@ public class ArticleNotificationListener extends ItemListenerSupport<Article, Ar
       sent++;
     }
     aggByInterest.clear();
-    return ExitStatus.COMPLETED;
+    return stepExecution.getExitStatus();
   }
 }
