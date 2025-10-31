@@ -7,7 +7,6 @@ import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.notification.service.NotificationService;
 import com.spring.monew.subscription.repository.SubscriptionRepository;
 import java.util.*;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
