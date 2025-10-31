@@ -39,9 +39,7 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
                     "SELECT id, email, nickname, created_at FROM users WHERE id = ?",
                     (rs, rowNum) -> new UserSummary(
                         uuid(rs, "id"), rs.getString("email"), rs.getString("nickname"),
-                        rs.getTimestamp("created_at") != null
-                            ? rs.getTimestamp("created_at").toInstant()
-                            : Instant.now()
+                        rs.getTimestamp("created_at").toInstant()  // NPE 발생 시 데이터 문제로 간주
                     ),
                     userId
                 )
@@ -155,7 +153,7 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
             out.add(new UserActivityDto.ArticleView(
                 UUID.fromString(d.getId()),
                 d.getUserId(),
-                d.getCreatedAt(),      // 필요시 d.getLastViewedAt()로 교체 가능
+                d.getLastViewedAt(),   // 최근 조회 시각     // 필요시 d.getLastViewedAt()로 교체 가능
                 d.getArticleId(),
                 d.getSource(),
                 d.getSourceUrl(),
