@@ -98,7 +98,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
       }
     });
   }
-
   // 트랜잭션 커밋 이후(afterCommit)에 작업 실행. 트랜잭션 없으면 즉시 실행(기존 동작 호환)
   private void afterCommit(Runnable task) {
     if (TransactionSynchronizationManager.isActualTransactionActive()) {

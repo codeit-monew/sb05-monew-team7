@@ -153,7 +153,7 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
             out.add(new UserActivityDto.ArticleView(
                 UUID.fromString(d.getId()),
                 d.getUserId(),
-                d.getLastViewedAt(),   // 최근 조회 시각     // 필요시 d.getLastViewedAt()로 교체 가능
+                d.getLastViewedAt(),   // 최근 조회 시각
                 d.getArticleId(),
                 d.getSource(),
                 d.getSourceUrl(),
