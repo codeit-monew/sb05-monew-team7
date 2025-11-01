@@ -42,5 +42,8 @@ public record NotificationDto(
     NotificationResourceType resourceType,
 
     @Schema(description = "관련 리소스 ID", format = "uuid", example = "de9e6b6e-1e8e-4bf-98db-5f1f37a4e7a2", requiredMode = Schema.RequiredMode.REQUIRED)
-    UUID resourceId
+    UUID resourceId,
+
+    @Schema(description = "관련 리소스 표시명(예: 관심사명)", example = "게임")
+    String resourceName
 ) {}

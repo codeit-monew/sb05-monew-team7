@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -25,4 +26,6 @@ public class ActivityCommentDoc {
     private String content;
     private long likeCount;
     private Instant createdAt;
+    @Field("user_nickname")
+    private String userNickname;
 }

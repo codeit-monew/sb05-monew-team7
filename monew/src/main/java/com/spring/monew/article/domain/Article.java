@@ -27,6 +27,9 @@ public class Article {
     @JoinColumn(name = "interest_id", nullable = false)
     private Interest interest;
 
+    @Column(name = "interest_id", insertable = false, updatable = false)
+    private UUID interestId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false)
     private ArticleSource source;
