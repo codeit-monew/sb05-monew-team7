@@ -1,24 +1,20 @@
 package com.spring.monew.commentlike.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.domain.ArticleSource;
 import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.comment.repository.CommentRepository;
-import com.spring.monew.commentlike.controller.dto.response.CommentLikeDto;
 import com.spring.monew.commentlike.repository.CommentLikeRepository;
 import com.spring.monew.commentlike.service.impl.CommentLikeServiceImpl;
-import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,57 +35,67 @@ class CommentLikeServiceTest {
 
   @InjectMocks private CommentLikeServiceImpl commentLikeService;
 
-  private UUID userId;
+  private UUID commentLikeId;
   private UUID commentId;
+  private UUID userId;
+
   private User user;
+  private Article article;
   private Comment comment;
 
   @BeforeEach
-  void setup() {
-    userId = UUID.randomUUID();
+  void setUp() {
+    commentLikeId = UUID.randomUUID();
     commentId = UUID.randomUUID();
-    user = new User("email@test.com", "nick", "password");
-    Article article = Article.of(mock(Interest.class), ArticleSource.CHOSUN, "http://dummy.com",
-        "title", Instant.now(), "요약");
-    comment = new Comment(article, user, "테스트 댓글");
+    userId = UUID.randomUUID();
+
+    user = new User("email@gmail.com", "user", "password");
+
+    article =
+        new Article(
+            UUID.randomUUID(),
+            new com.spring.monew.interest.domain.Interest("관심사 테스트", List.of()),
+            ArticleSource.CHOSUN,
+            "https://test.com/news/123",
+            "테스트 기사",
+            Instant.now(),
+            "이것은 테스트용 기사 요약",
+            3L, // commentCount
+            50L, // viewCount
+            false, // isDeleted
+            Instant.now(),
+            Instant.now());
+
+    comment = new Comment(commentId, user, article, "내용", false, 0, Instant.now());
   }
 
   @Test
-  @DisplayName("좋아요 추가 성공")
+  @DisplayName("댓글 좋아요 추가 성공")
   void addCommentLike_success() {
     // given
     given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
     given(userRepository.findById(userId)).willReturn(Optional.of(user));
-    given(commentLikeRepository.existsByComment_IdAndUser_Id(commentId, userId)).willReturn(false);
-    given(commentLikeRepository.save(any(CommentLike.class)))
-        .willAnswer(invocation -> invocation.getArgument(0));
+    given(commentLikeRepository.existsByComment_IdAndUser_Id(commentId, userId))
+        .willReturn(false);
+
+    CommentLike savedLike =
+        new CommentLike(commentLikeId, comment, user, Instant.now());
+
+    given(commentLikeRepository.save(any(CommentLike.class))).willReturn(savedLike);
 
     // when
-    CommentLikeDto result = commentLikeService.addCommentLike(commentId, userId);
+    CommentLike result = commentLikeService.addCommentLike(commentId, userId);
 
     // then
     assertThat(result).isNotNull();
-    then(commentRepository).should().findById(commentId);
-    then(commentLikeRepository).should().save(any(CommentLike.class));
+    assertThat(result.getUser()).isEqualTo(user);
+    assertThat(result.getComment()).isEqualTo(comment);
+    verify(commentLikeRepository).save(any(CommentLike.class));
   }
 
   @Test
-  @DisplayName("이미 좋아요가 존재하면 예외 발생")
-  void addCommentLike_duplicateError() {
-    given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
-    given(userRepository.findById(userId)).willReturn(Optional.of(user));
-    given(commentLikeRepository.existsByComment_IdAndUser_Id(commentId, userId)).willReturn(true);
-
-    assertThatThrownBy(() -> commentLikeService.addCommentLike(commentId, userId))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("이미 존재하는 좋아요");
-
-    then(commentLikeRepository).should(never()).save(any());
-  }
-
-  @Test
-  @DisplayName("존재하지 않는 댓글이면 예외 발생")
-  void addCommentLike_noComment() {
+  @DisplayName("댓글 좋아요 추가 실패 - 존재하지 않는 댓글")
+  void addCommentLike_commentNotFound() {
     given(commentRepository.findById(commentId)).willReturn(Optional.empty());
 
     assertThatThrownBy(() -> commentLikeService.addCommentLike(commentId, userId))
@@ -98,30 +104,38 @@ class CommentLikeServiceTest {
   }
 
   @Test
-  @DisplayName("존재하지 않는 유저면 예외 발생")
-  void addCommentLike_noUser() {
+  @DisplayName("댓글 좋아요 추가 실패 - 이미 존재하는 좋아요")
+  void addCommentLike_alreadyExists() {
     given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
-    given(userRepository.findById(userId)).willReturn(Optional.empty());
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
+    given(commentLikeRepository.existsByComment_IdAndUser_Id(commentId, userId)).willReturn(true);
 
     assertThatThrownBy(() -> commentLikeService.addCommentLike(commentId, userId))
-        .isInstanceOf(NoSuchElementException.class)
-        .hasMessageContaining("존재하지 않는 유저");
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("이미 존재하는 좋아요");
   }
 
   @Test
-  @DisplayName("좋아요 삭제 성공")
+  @DisplayName("댓글 좋아요 제거 성공")
   void removeCommentLike_success() {
-    CommentLike like = new CommentLike(comment, user);
+    // given
+    CommentLike commentLike =
+        new CommentLike(commentLikeId, comment, user, Instant.now());
+
     given(commentLikeRepository.findByComment_IdAndUser_Id(commentId, userId))
-        .willReturn(Optional.of(like));
+        .willReturn(Optional.of(commentLike));
 
-    commentLikeService.removeCommentLike(commentId, userId);
+    // when
+    CommentLike result = commentLikeService.removeCommentLike(commentId, userId);
 
-    then(commentLikeRepository).should().delete(like);
+    // then
+    assertThat(result).isNotNull();
+    assertThat(result.getComment()).isEqualTo(comment);
+    verify(commentLikeRepository).delete(commentLike);
   }
 
   @Test
-  @DisplayName("존재하지 않는 좋아요 삭제 시 예외 발생")
+  @DisplayName("댓글 좋아요 제거 실패 - 존재하지 않음")
   void removeCommentLike_notFound() {
     given(commentLikeRepository.findByComment_IdAndUser_Id(commentId, userId))
         .willReturn(Optional.empty());
