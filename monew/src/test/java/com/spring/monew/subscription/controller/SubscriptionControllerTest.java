@@ -3,6 +3,7 @@ package com.spring.monew.subscription.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -78,6 +79,8 @@ class SubscriptionControllerTest {
         .andExpect(jsonPath("$.interestName").value("야구"))
         .andExpect(jsonPath("$.interestKeywords[0]").value("스포츠"))
         .andExpect(jsonPath("$.interestSubscriberCount").value(3));
+
+    verify(userActivityService).addSubscriptionActivity(any());
   }
 
   @Test
@@ -112,5 +115,7 @@ class SubscriptionControllerTest {
     mockMvc.perform(delete("/api/interests/{interestId}/subscriptions", interestId)
             .header("Monew-Request-User-ID", userId))
         .andExpect(status().isOk());
+
+    verify(userActivityService).removeSubscriptionActivity(any());
   }
 }
