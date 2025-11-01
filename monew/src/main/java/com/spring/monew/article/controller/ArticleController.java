@@ -45,10 +45,12 @@ public class ArticleController {
       @RequestParam(name = "sourceIn", required = false) List<String> sources,
 
       @Parameter(description = "날짜 시작(범위)")
-      @RequestParam(required = false) Instant from,
+      @RequestParam(required = false)
+      Instant publishDateFrom,
 
       @Parameter(description = "날짜 끝(범위)")
-      @RequestParam(required = false) Instant to,
+      @RequestParam(required = false)
+      Instant publishDateTo,
 
       @Parameter(description = "정렬 속성 이름", required = true)
       @RequestParam(required = true) String orderBy,
@@ -73,8 +75,8 @@ public class ArticleController {
         keyword,
         interests,
         sources,
-        from,
-        to,
+        publishDateFrom,
+        publishDateTo,
         orderBy,
         direction,
         cursor,

@@ -29,8 +29,8 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
       String keyword,
       List<String> interests,
       List<String> sources,
-      Instant from,
-      Instant to,
+      Instant publishDateFrom,
+      Instant publishDateTo,
       String orderBy,
       String direction,
       String cursor,
@@ -57,12 +57,12 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
       builder.and(article.source.in(sourceEnums));
     }
 
-    if (from != null) {
-      builder.and(article.publishDate.goe(from));
+    if (publishDateFrom != null) {
+      builder.and(article.publishDate.goe(publishDateFrom));
     }
 
-    if (to != null) {
-      builder.and(article.publishDate.loe(to));
+    if (publishDateTo != null) {
+      builder.and(article.publishDate.loe(publishDateTo));
     }
 
     Long totalCount = queryFactory
