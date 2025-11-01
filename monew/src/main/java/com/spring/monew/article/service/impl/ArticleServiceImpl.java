@@ -28,8 +28,8 @@ public class ArticleServiceImpl implements ArticleService {
       String keyword,
       List<String> interests,
       List<String> sources,
-      Instant from,
-      Instant to,
+      Instant publishDateFrom,
+      Instant publishDateTo,
       String orderBy,
       String direction,
       String cursor,
@@ -56,7 +56,7 @@ public class ArticleServiceImpl implements ArticleService {
       throw new IllegalArgumentException("정렬 방향은 ASC 또는 DESC여야 합니다");
     }
 
-    if (from != null && to != null && from.isAfter(to)) {
+    if (publishDateFrom != null && publishDateTo != null && publishDateFrom.isAfter(publishDateTo)) {
       throw new IllegalArgumentException("시작 날짜는 종료 날짜보다 이전이어야 합니다");
     }
 
@@ -74,8 +74,8 @@ public class ArticleServiceImpl implements ArticleService {
         keyword,
         interests,
         sources,
-        from,
-        to,
+        publishDateFrom,
+        publishDateTo,
         orderBy,
         direction.toUpperCase(),
         cursor,
