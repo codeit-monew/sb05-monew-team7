@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/batch")
 @RequiredArgsConstructor
 @Profile({"dev", "staging", "local"})
-@ConditionalOnProperty(name = "batch.trigger.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.batch.trigger.enabled", havingValue = "true")
 public class BatchJobController {
 
     private final BatchJobService batchJobService;

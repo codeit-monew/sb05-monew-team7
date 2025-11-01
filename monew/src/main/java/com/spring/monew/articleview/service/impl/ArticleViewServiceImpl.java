@@ -132,7 +132,7 @@ public class ArticleViewServiceImpl implements ArticleViewService {
                     viewEventId.toString(),
                     userId,
                     article.getId(),
-                    article.getSource().name(),
+                    article.getSource(),
                     article.getSourceUrl(),
                     article.getTitle(),
                     article.getSummary(),

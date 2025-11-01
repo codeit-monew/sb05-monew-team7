@@ -1,5 +1,6 @@
 package com.spring.monew.activity.domain;
 
+import com.spring.monew.article.domain.ArticleSource;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ public class ActivityArticleViewDoc {
     @Id private String id;        // viewEventId (최초 삽입 시)
     private UUID userId;
     private UUID articleId;
-    private String source;
+    private ArticleSource source;
     private String sourceUrl;
     private String title;
     private String summary;

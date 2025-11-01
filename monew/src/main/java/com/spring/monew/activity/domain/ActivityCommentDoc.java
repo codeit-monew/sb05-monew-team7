@@ -25,4 +25,5 @@ public class ActivityCommentDoc {
     private String content;
     private long likeCount;
     private Instant createdAt;
+    private String userNickname;
 }

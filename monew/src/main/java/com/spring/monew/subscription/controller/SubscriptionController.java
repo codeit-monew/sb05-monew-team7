@@ -1,7 +1,10 @@
 package com.spring.monew.subscription.controller;
 
+import com.spring.monew.activity.service.UserActivityService;
 import com.spring.monew.common.util.RequestUserExtractor;
+import com.spring.monew.notification.service.NotificationService;
 import com.spring.monew.subscription.controller.dto.response.SubscriptionDto;
+import com.spring.monew.subscription.domain.Subscription;
 import com.spring.monew.subscription.service.SubscriptionService;
 import java.security.Principal;
 import java.util.UUID;
@@ -19,18 +22,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubscriptionController {
   private final SubscriptionService subscriptionService;
   private final RequestUserExtractor userExtractor;
+  private final UserActivityService userActivityService;
+
   @PostMapping("/{interestId}/subscriptions")
   public SubscriptionDto subscriptionAdd(@PathVariable UUID interestId,
       Principal principal) {
 
     UUID userId = userExtractor.extractUserId(principal);
-    return subscriptionService.addSubscription(interestId, userId);
+    Subscription subscription = subscriptionService.addSubscription(interestId, userId);
+
+    userActivityService.addSubscriptionActivity(subscription);
+
+    return new SubscriptionDto(
+        subscription.getId(),
+        subscription.getUser().getId(),
+        subscription.getInterest().getName(),
+        subscription.getInterest().getKeywords(),
+        subscription.getInterest().getSubscriptionsCount(),
+        subscription.getCreatedAt());
   }
 
   @DeleteMapping("/{interestId}/subscriptions")
   public void subscriptionRemove(@PathVariable UUID interestId,
       Principal principal) {
     UUID userId = userExtractor.extractUserId(principal);
-    subscriptionService.removeSubscription(interestId, userId);
+    Subscription subscription = subscriptionService.removeSubscription(interestId, userId);
+
+    userActivityService.removeSubscriptionActivity(subscription.getId());
   }
 }

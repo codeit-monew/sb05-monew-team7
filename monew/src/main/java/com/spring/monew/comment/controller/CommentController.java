@@ -1,9 +1,11 @@
 package com.spring.monew.comment.controller;
 
+import com.spring.monew.activity.service.UserActivityService;
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
 import com.spring.monew.comment.controller.dto.request.CommentUpdateRequest;
 import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
+import com.spring.monew.comment.domain.Comment;
 import com.spring.monew.comment.service.CommentService;
 import com.spring.monew.common.util.RequestUserExtractor;
 import java.security.Principal;
@@ -28,11 +30,23 @@ public class CommentController {
 
   private final CommentService commentService;
   private final RequestUserExtractor userExtractor;
+  private final UserActivityService userActivityService;
 
   @PostMapping
   public CommentDto commentAdd(
       @RequestBody CommentRegisterRequest registerRequest) {
-    return commentService.addComment(registerRequest);
+    Comment comment = commentService.addComment(registerRequest);
+    userActivityService.addCommentActivity(comment);
+    return new CommentDto(
+        comment.getId(),
+        comment.getArticle().getId(),
+        comment.getUser().getId(),
+        comment.getUser().getNickname(),
+        comment.getContent(),
+        comment.getLikeCount(),
+        false,
+        comment.getCreatedAt()
+    );
   }
 
   @GetMapping
@@ -55,16 +69,31 @@ public class CommentController {
       Principal principal,
       @RequestBody CommentUpdateRequest updateRequest) {
     UUID userId = userExtractor.extractUserId(principal);
-    return commentService.modifyComment(commentId, userId, updateRequest);
+    Comment comment = commentService.modifyComment(commentId, userId, updateRequest);
+
+    userActivityService.addCommentActivity(comment);
+
+    return new CommentDto(
+        comment.getId(),
+        comment.getArticle().getId(),
+        comment.getUser().getId(),
+        comment.getUser().getNickname(),
+        comment.getContent(),
+        comment.getLikeCount(),
+        false,
+        comment.getCreatedAt()
+    );
   }
 
   @DeleteMapping("/{commentId}")
   public void commentDeleteLogical(@PathVariable UUID commentId) {
     commentService.removeCommentLogical(commentId);
+    userActivityService.removeCommentActivity(commentId);
   }
 
   @DeleteMapping("/{commentId}/hard")
   public void commentDeleteHard(@PathVariable UUID commentId) {
     commentService.removeCommentHard(commentId);
+    userActivityService.removeCommentActivity(commentId);
   }
 }

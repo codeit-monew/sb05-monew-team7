@@ -5,20 +5,21 @@ import com.spring.monew.notification.controller.dto.response.CursorPageResponseN
 import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
 import com.spring.monew.notification.controller.dto.response.NotificationDto;
 import com.spring.monew.notification.domain.Notification;
+import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.notification.repository.NotificationRepository;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,8 @@ public class NotificationService {
 
   // ===== 목록 조회 (커서 기반) =====
   @Transactional(readOnly = true)
-  public CursorPageResponseNotificationDto list(UUID userId, String cursor, Instant after, int limit) {
+  public CursorPageResponseNotificationDto list(UUID userId, String cursor, Instant after,
+      int limit) {
     Objects.requireNonNull(userId, "userId must not be null");
 
     final int safeLimit = Math.max(MIN_LIMIT, Math.min(MAX_LIMIT, limit));
@@ -48,7 +50,7 @@ public class NotificationService {
     }
 
     final Instant cursorAt = (decoded == null) ? null : decoded.createdAt;
-    final UUID   cursorId = (decoded == null) ? null : decoded.id;
+    final UUID cursorId = (decoded == null) ? null : decoded.id;
 
     // 다음 페이지 여부 확인을 위해 +1
     final int fetchSize = safeLimit + 1;
@@ -65,11 +67,11 @@ public class NotificationService {
         .map(n -> new NotificationDto(
             n.getId(),
             n.getCreatedAt(),
-            n.getUpdatedAt(),
+            n.getUpdatedAt(),   // 없다면 null 유지
             n.isConfirmed(),
             n.getUserId(),
             n.getContent(),
-            n.getResourceType(),   // DTO가 enum(NotificationResourceType) 받음
+            n.getResourceType(),
             n.getResourceId()
         ))
         .toList();
@@ -120,7 +122,7 @@ public class NotificationService {
   public BulkConfirmResultDto confirmAll(UUID userId) {
     Objects.requireNonNull(userId, "userId must not be null");
 
-    long updated    = repository.confirmAllByUserId(userId);
+    long updated = repository.confirmAllByUserId(userId);
     boolean hasUnread = repository.existsByUserIdAndConfirmedFalse(userId);
 
     return new BulkConfirmResultDto(
@@ -133,8 +135,10 @@ public class NotificationService {
 
   // ===== 내부 유틸 =====
   private static final class CursorDecoded {
+
     private final Instant createdAt;
     private final UUID id;
+
     private CursorDecoded(Instant createdAt, UUID id) {
       this.createdAt = createdAt;
       this.id = id;
@@ -148,13 +152,39 @@ public class NotificationService {
   }
 
   private static CursorDecoded decodeCursor(String cursor) {
-    if (cursor == null || cursor.isBlank()) return null;
+    if (cursor == null || cursor.isBlank()) {
+      return null;
+    }
     String raw = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8);
     String[] parts = raw.split("\\|");
     if (parts.length != 2) {
       throw new IllegalArgumentException("Invalid cursor. expected 'createdAt|id'");
     }
     return new CursorDecoded(Instant.parse(parts[0]), UUID.fromString(parts[1]));
+  }
+
+  @Transactional
+  public void create(UUID userId, String nickname, NotificationResourceType type, UUID resourceId) {
+    String content = nickname + "님이 나의 댓글을 좋아합니다.";
+    Objects.requireNonNull(userId, "userId");
+    Objects.requireNonNull(content, "content");
+    Objects.requireNonNull(type, "type");
+    Objects.requireNonNull(resourceId, "resourceId");
+
+    Notification n = Notification.of(userId, content, type, resourceId);
+    repository.save(n);
+  }
+
+  @Transactional
+  public void createForUsers(Collection<UUID> userIds, String content,
+      NotificationResourceType type, UUID resourceId) {
+    if (userIds == null || userIds.isEmpty()) {
+      return;
+    }
+    List<Notification> list = userIds.stream()
+        .map(uid -> Notification.of(uid, content, type, resourceId))
+        .toList();
+    repository.saveAll(list);
   }
 
   // DB 시간 우선 사용 — 예외를 숨기지 않고 그대로 던져 원인 파악 가능

@@ -11,7 +11,6 @@ import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
 import com.spring.monew.comment.controller.dto.request.CommentUpdateRequest;
-import com.spring.monew.comment.controller.dto.response.CommentDto;
 import com.spring.monew.comment.controller.dto.response.CursorPageResponseCommentDto;
 import com.spring.monew.comment.repository.CommentRepository;
 import com.spring.monew.comment.service.impl.CommentServiceImpl;
@@ -69,13 +68,16 @@ class CommentServiceTest {
     when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
     when(commentRepository.save(any())).thenAnswer(inv -> {
       Comment c = inv.getArgument(0);
-      c.setIdForTest(commentId); // 테스트용 ID setter 필요!
+      c.setIdForTest(commentId); // 테스트용 ID 세터
       return c;
     });
 
-    CommentDto result = commentService.addComment(req);
+    Comment result = commentService.addComment(req);
 
-    assertThat(result.content()).isEqualTo("내용");
+    assertThat(result).isNotNull();
+    assertThat(result.getContent()).isEqualTo("내용");
+    assertThat(result.getUser()).isEqualTo(user);
+    assertThat(result.getArticle()).isEqualTo(article);
     verify(commentRepository).save(any(Comment.class));
   }
 
@@ -95,15 +97,13 @@ class CommentServiceTest {
     CursorPageResponseCommentDto mockResponse =
         new CursorPageResponseCommentDto(List.of(), null, null, 10, 0, false);
 
-    when(commentRepository.findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(),
-        any()))
+    when(commentRepository.findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(), any()))
         .thenReturn(mockResponse);
 
     var result = commentService.getComments(articleId, "createdAt", "DESC", null, null, 10, userId);
 
     assertThat(result).isNotNull();
-    verify(commentRepository).findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(),
-        any());
+    verify(commentRepository).findCursorPagedComments(any(), any(), any(), any(), any(), anyInt(), any());
   }
 
   @Test
@@ -113,10 +113,10 @@ class CommentServiceTest {
     when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
     when(userRepository.existsById(userId)).thenReturn(true);
 
-    CommentDto result = commentService.modifyComment(commentId, userId,
+    Comment result = commentService.modifyComment(commentId, userId,
         new CommentUpdateRequest("new"));
 
-    assertThat(result.content()).isEqualTo("new");
+    assertThat(result.getContent()).isEqualTo("new");
     verify(commentRepository).findById(commentId);
   }
 

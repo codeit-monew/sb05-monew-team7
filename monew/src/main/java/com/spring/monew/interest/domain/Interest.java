@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+import org.jetbrains.annotations.TestOnly;
 
 @Entity
 @Table(name = "interests")
@@ -65,5 +66,17 @@ public class Interest {
         if (this.subscriptionsCount > 0) {
             this.subscriptionsCount--;
         }
+    }
+
+    // 테스트 용
+    @TestOnly
+    public Interest(UUID id, String name, List<String> keywords, String keywordsString,
+        Instant createdAt, long subscriptionsCount) {
+        this.id = id;
+        this.name = name;
+        this.keywords = keywords;
+        this.keywordsString = keywordsString;
+        this.createdAt = createdAt;
+        this.subscriptionsCount = subscriptionsCount;
     }
 }

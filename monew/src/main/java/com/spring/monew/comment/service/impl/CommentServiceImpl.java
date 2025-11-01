@@ -29,27 +29,16 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   @Transactional
-  public CommentDto addComment(CommentRegisterRequest registerRequest) {
+  public Comment addComment(CommentRegisterRequest registerRequest) {
     User user = userRepository.findById(registerRequest.userId()).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 유저 입니다."));
 
     Article article = articleRepository.findById(registerRequest.articleId()).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 기사입니다."));
 
-    Comment comment = commentRepository.save(new Comment(article, user, registerRequest.content()));
-
     article.incrementCommentCount();
 
-    return new CommentDto(
-        comment.getId(),
-        comment.getArticle().getId(),
-        comment.getUser().getId(),
-        comment.getUser().getNickname(),
-        comment.getContent(),
-        comment.getLikeCount(),
-        false,
-        comment.getCreatedAt()
-    );
+    return commentRepository.save(new Comment(article, user, registerRequest.content()));
   }
 
   @Override
@@ -64,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   @Transactional
-  public CommentDto modifyComment(UUID commentId, UUID userId , CommentUpdateRequest updateRequest) {
+  public Comment modifyComment(UUID commentId, UUID userId , CommentUpdateRequest updateRequest) {
     Comment comment = commentRepository.findById(commentId).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 댓글입니다."));
 
@@ -74,16 +63,7 @@ public class CommentServiceImpl implements CommentService {
 
     comment.update(updateRequest.content());
 
-    return new CommentDto(
-        comment.getId(),
-        comment.getArticle().getId(),
-        comment.getUser().getId(),
-        comment.getUser().getNickname(),
-        comment.getContent(),
-        comment.getLikeCount(),
-        false,
-        comment.getCreatedAt()
-    );
+    return comment;
   }
 
   @Override
