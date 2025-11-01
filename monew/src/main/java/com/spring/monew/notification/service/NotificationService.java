@@ -1,15 +1,11 @@
 package com.spring.monew.notification.service;
 
-import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.notification.controller.dto.response.BulkConfirmResultDto;
 import com.spring.monew.notification.controller.dto.response.CursorPageResponseNotificationDto;
 import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
 import com.spring.monew.notification.controller.dto.response.NotificationDto;
 import com.spring.monew.notification.domain.Notification;
-import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.notification.repository.NotificationRepository;
-import java.util.Collection;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,7 +28,6 @@ public class NotificationService {
   private static final int MAX_LIMIT = 100;
 
   private final NotificationRepository repository;
-  private final InterestRepository interestRepository;
 
   // ===== 목록 조회 (커서 기반) =====
   @Transactional(readOnly = true)
@@ -67,25 +62,16 @@ public class NotificationService {
     }
 
     final List<NotificationDto> content = entities.stream()
-        .map(n -> {
-          String resourceName = null;
-          if (n.getResourceType() == NotificationResourceType.SUBSCRIPTION && n.getResourceId() != null) {
-            resourceName = interestRepository.findById(n.getResourceId())
-                .map(i -> i.getName())     // import 없이 이름만 가져오기
-                .orElse(null);
-          }
-          return new NotificationDto(
-              n.getId(),
-              n.getCreatedAt(),
-              n.getUpdatedAt(),   // 없다면 null 유지
-              n.isConfirmed(),
-              n.getUserId(),
-              n.getContent(),
-              n.getResourceType(),
-              n.getResourceId(),
-              resourceName        // ✅ 여기 채워 넣기
-          );
-        })
+        .map(n -> new NotificationDto(
+            n.getId(),
+            n.getCreatedAt(),
+            n.getUpdatedAt(),
+            n.isConfirmed(),
+            n.getUserId(),
+            n.getContent(),
+            n.getResourceType(),   // DTO가 enum(NotificationResourceType) 받음
+            n.getResourceId()
+        ))
         .toList();
 
     String nextCursor = null;
@@ -169,27 +155,6 @@ public class NotificationService {
       throw new IllegalArgumentException("Invalid cursor. expected 'createdAt|id'");
     }
     return new CursorDecoded(Instant.parse(parts[0]), UUID.fromString(parts[1]));
-  }
-
-  @Transactional
-  public void create(UUID userId, String content, NotificationResourceType type, UUID resourceId) {
-    Objects.requireNonNull(userId, "userId");
-    Objects.requireNonNull(content, "content");
-    Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(resourceId, "resourceId");
-
-    Notification n = Notification.of(userId, content, type, resourceId);
-    repository.save(n);
-  }
-
-  @Transactional
-  public void createForUsers(Collection<UUID> userIds, String content,
-      NotificationResourceType type, UUID resourceId) {
-    if (userIds == null || userIds.isEmpty()) return;
-    List<Notification> list = userIds.stream()
-        .map(uid -> Notification.of(uid, content, type, resourceId))
-        .toList();
-    repository.saveAll(list);
   }
 
   // DB 시간 우선 사용 — 예외를 숨기지 않고 그대로 던져 원인 파악 가능
