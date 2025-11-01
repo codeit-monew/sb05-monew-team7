@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.jetbrains.annotations.TestOnly;
 
 @Entity
 @Table(name = "comment_likes", uniqueConstraints = {
@@ -46,5 +47,13 @@ public class CommentLike {
     this.comment = comment;
     this.user = user;
     this.createdAt = Instant.now();
+  }
+
+  @TestOnly
+  public CommentLike(UUID id, Comment comment, User user, Instant createdAt) {
+    this.id = id;
+    this.comment = comment;
+    this.user = user;
+    this.createdAt = createdAt;
   }
 }

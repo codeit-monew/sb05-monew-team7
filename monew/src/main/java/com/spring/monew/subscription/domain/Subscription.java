@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.jetbrains.annotations.TestOnly;
 
 @Entity
 @Table(name = "subscriptions")
@@ -44,5 +45,13 @@ public class Subscription {
         this.user = user;
         this.interest = interest;
         this.createdAt = Instant.now();
+    }
+
+    @TestOnly
+    public Subscription(UUID id, User user, Interest interest, Instant createdAt) {
+        this.id = id;
+        this.user = user;
+        this.interest = interest;
+        this.createdAt = createdAt;
     }
 }

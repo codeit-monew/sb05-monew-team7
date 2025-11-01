@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -22,6 +23,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
+import org.jetbrains.annotations.TestOnly;
 
 @Entity
 @Table(name = "comments")
@@ -68,18 +70,7 @@ public class Comment {
     this.content = content;
     this.createdAt = Instant.now();
   }
-
-  /** 테스트 전용 setter */
-  protected void setIdForTest(UUID id) {
-    this.id = id;
-  }
-
-  public void update(String content) {
-      if (content != null && !content.isEmpty()) {
-          this.content = content;
-      }
-  }
-
+  
   public void incrementLikeCount() {
     this.likeCount++;
   }
@@ -88,5 +79,28 @@ public class Comment {
     if (this.likeCount > 0) {
       this.likeCount--;
     }
+  }
+
+  // 테스트 용
+  protected void setIdForTest(UUID id) {
+    this.id = id;
+  }
+
+  public void update(String content) {
+    if (content != null && !content.isEmpty()) {
+      this.content = content;
+    }
+  }
+
+  @TestOnly
+  public Comment(UUID id, User user, Article article,
+      String content, boolean isDeleted, int likeCount, Instant createdAt) {
+    this.id = id;
+    this.user = user;
+    this.article = article;
+    this.content = content;
+    this.isDeleted = isDeleted;
+    this.likeCount = likeCount;
+    this.createdAt = createdAt;
   }
 }

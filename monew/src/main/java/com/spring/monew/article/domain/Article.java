@@ -10,6 +10,7 @@ import org.hibernate.annotations.*;
 
 import java.time.Instant;
 import java.util.UUID;
+import org.jetbrains.annotations.TestOnly;
 
 @Entity
 @Table(name = "articles")
@@ -94,6 +95,37 @@ public class Article {
         if (this.commentCount > 0) {
             this.commentCount--;
         }
+    }
+    
+    
+    // 테스트용
+    @TestOnly
+    public Article(
+        UUID id,
+        Interest interest,
+        ArticleSource source,
+        String sourceUrl,
+        String title,
+        Instant publishDate,
+        String summary,
+        long commentCount,
+        long viewCount,
+        boolean isDeleted,
+        Instant createdAt,
+        Instant updatedAt
+    ) {
+        this.id = id;
+        this.interest = interest;
+        this.source = source;
+        this.sourceUrl = sourceUrl;
+        this.title = title;
+        this.publishDate = publishDate;
+        this.summary = summary;
+        this.commentCount = commentCount;
+        this.viewCount = viewCount;
+        this.isDeleted = isDeleted;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
 }

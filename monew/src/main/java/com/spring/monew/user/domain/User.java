@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
+import org.jetbrains.annotations.TestOnly;
 
 @Entity
 @Table(name = "users")
@@ -73,4 +74,15 @@ public class User {
     this.nickname = nickname;
   }
 
+  //테스트용
+  @TestOnly
+  public User(UUID id, String email, String nickname, String password) {
+    this.id = id;
+    this.email = email;
+    this.nickname = nickname;
+    this.password = password;
+    this.createdAt = Instant.now();
+    this.role = UserRole.USER;
+    this.isDeleted = false;
+  }
 }
