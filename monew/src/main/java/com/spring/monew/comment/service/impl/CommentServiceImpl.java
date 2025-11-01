@@ -36,6 +36,8 @@ public class CommentServiceImpl implements CommentService {
     Article article = articleRepository.findById(registerRequest.articleId()).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 기사입니다."));
 
+    article.incrementCommentCount();
+
     Comment comment = commentRepository.save(new Comment(article, user, registerRequest.content()));
 
     return new CommentDto(
@@ -87,9 +89,10 @@ public class CommentServiceImpl implements CommentService {
   @Override
   @Transactional
   public void removeCommentLogical(UUID commentId) {
-    if(!commentRepository.existsById(commentId)) {
-      throw new NoSuchElementException("존재하지 않는 댓글입니다.");
-    }
+    Comment comment = commentRepository.findById(commentId).orElseThrow(
+        () -> new NoSuchElementException("존재하지 않는 댓글입니다."));
+
+    comment.getArticle().decrementCommentCount();
 
     commentRepository.deleteById(commentId);
   }
