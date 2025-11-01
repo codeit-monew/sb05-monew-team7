@@ -36,9 +36,9 @@ public class CommentServiceImpl implements CommentService {
     Article article = articleRepository.findById(registerRequest.articleId()).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 기사입니다."));
 
-    article.incrementCommentCount();
-
     Comment comment = commentRepository.save(new Comment(article, user, registerRequest.content()));
+
+    article.incrementCommentCount();
 
     return new CommentDto(
         comment.getId(),
