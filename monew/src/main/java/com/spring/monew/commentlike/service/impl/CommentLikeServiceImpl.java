@@ -28,7 +28,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
   @Override
   @Transactional
-  public CommentLikeDto addCommentLike(UUID commentId, UUID userId) {
+  public CommentLike addCommentLike(UUID commentId, UUID userId) {
     Comment comment = commentRepository.findById(commentId).orElseThrow(
         () -> new NoSuchElementException("존재하지 않는 댓글 입니다."));
 
@@ -42,25 +42,12 @@ public class CommentLikeServiceImpl implements CommentLikeService {
 
     comment.incrementLikeCount();
 
-    CommentLike commentLike = commentLikeRepository.save(new CommentLike(comment, user));
-
-    return new CommentLikeDto(
-        commentLike.getId(),
-        commentLike.getUser().getId(),
-        commentLike.getCreatedAt(),
-        comment.getId(),
-        comment.getArticle().getId(),
-        comment.getUser().getId(),
-        comment.getUser().getNickname(),
-        comment.getContent(),
-        comment.getLikeCount(),
-        comment.getCreatedAt()
-    );
+    return commentLikeRepository.save(new CommentLike(comment, user));
   }
 
   @Override
   @Transactional
-  public void removeCommentLike(UUID commentId, UUID userId) {
+  public CommentLike removeCommentLike(UUID commentId, UUID userId) {
     CommentLike commentLike = commentLikeRepository.findByComment_IdAndUser_Id(commentId,
             userId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 좋아요 입니다"));
@@ -68,5 +55,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
     commentLike.getComment().decrementLikeCount();
 
     commentLikeRepository.delete(commentLike);
+
+    return commentLike;
   }
 }
