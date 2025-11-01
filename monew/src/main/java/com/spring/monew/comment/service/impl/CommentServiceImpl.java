@@ -1,6 +1,5 @@
 package com.spring.monew.comment.service.impl;
 
-import com.spring.monew.activity.repository.ActivitySyncRepository;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.comment.controller.dto.request.CommentRegisterRequest;
@@ -16,11 +15,9 @@ import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -29,7 +26,6 @@ public class CommentServiceImpl implements CommentService {
   private final CommentRepository commentRepository;
   private final UserRepository userRepository;
   private final ArticleRepository articleRepository;
-  private final ActivitySyncRepository activitySyncRepository;
 
   @Override
   @Transactional
@@ -41,22 +37,6 @@ public class CommentServiceImpl implements CommentService {
         () -> new NoSuchElementException("존재하지 않는 기사입니다."));
 
     Comment comment = commentRepository.save(new Comment(article, user, registerRequest.content()));
-
-    try {
-      activitySyncRepository.onCommentCreated(
-          comment.getId(),
-          user.getId(),
-          article.getId(),
-          article.getTitle(),
-          user.getNickname(),
-          comment.getContent(),
-          comment.getLikeCount(),
-          comment.getCreatedAt()
-      );
-    } catch (Exception e) {
-      log.warn("활동 동기화 실패 (댓글 생성): commentId={}, userId={}, articleId={}",
-          comment.getId(), user.getId(), article.getId(), e);
-    }
 
     return new CommentDto(
         comment.getId(),
@@ -92,25 +72,6 @@ public class CommentServiceImpl implements CommentService {
 
     comment.update(updateRequest.content());
 
-    Article article = comment.getArticle();
-    User writer = comment.getUser();
-
-    try {
-      activitySyncRepository.onCommentCreated(
-          comment.getId(),
-          writer.getId(),
-          article.getId(),
-          article.getTitle(),
-          writer.getNickname(),
-          comment.getContent(),
-          comment.getLikeCount(),
-          comment.getCreatedAt()
-      );
-    } catch (Exception e) {
-      log.warn("활동 동기화 실패 (댓글 수정→스냅샷 갱신): commentId={}, userId={}, articleId={}",
-          comment.getId(), writer.getId(), article.getId(), e);
-    }
-
     return new CommentDto(
         comment.getId(),
         comment.getArticle().getId(),
@@ -131,10 +92,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     commentRepository.deleteById(commentId);
-
-    try {
-      activitySyncRepository.onCommentDeleted(commentId, Instant.now());
-    } catch (Exception ignore) {}
   }
 
   @Override
@@ -145,10 +102,5 @@ public class CommentServiceImpl implements CommentService {
     }
 
     commentRepository.deletePhysicalById(commentId);
-    try {
-      activitySyncRepository.onCommentDeleted(commentId, Instant.now());
-    } catch (Exception e) {
-      log.warn("활동 동기화 실패 (댓글 물리 삭제): commentId={}", commentId, e);
-    }
   }
 }

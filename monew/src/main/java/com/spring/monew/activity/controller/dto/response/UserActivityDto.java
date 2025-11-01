@@ -65,7 +65,7 @@ public record UserActivityDto(
       String articleTitle,
       @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "UTC") Instant articlePublishedDate,
       String articleSummary,
-      long commentCount,
-      long viewCount
+      Long articleCommentCount,
+      Long articleViewCount
   ) {}
 }
