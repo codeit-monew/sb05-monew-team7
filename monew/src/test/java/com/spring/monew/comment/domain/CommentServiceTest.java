@@ -135,7 +135,8 @@ class CommentServiceTest {
   @Test
   @DisplayName("댓글 논리 삭제 성공")
   void removeCommentLogical() {
-    when(commentRepository.existsById(commentId)).thenReturn(true);
+    Comment comment = new Comment(article, user, "content");
+    when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
     commentService.removeCommentLogical(commentId);
 
