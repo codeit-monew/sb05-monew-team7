@@ -1,18 +1,16 @@
 package com.spring.monew.notification.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spring.monew.auth.config.HeaderUserAuthentication;
+import com.spring.monew.common.util.RequestUserExtractor;
 import com.spring.monew.config.TestSecurityConfig;
+import com.spring.monew.notification.controller.dto.response.BulkConfirmResultDto;
 import com.spring.monew.notification.controller.dto.response.CursorPageResponseNotificationDto;
 import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
 import com.spring.monew.notification.controller.dto.response.NotificationDto;
@@ -27,86 +25,167 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(NotificationController.class)
+@WebMvcTest(controllers = NotificationController.class)
 @Import(TestSecurityConfig.class)
-@AutoConfigureMockMvc // 보안 필터 활성화
+@AutoConfigureMockMvc
 class NotificationControllerTest {
 
-  @Autowired
-  MockMvc mvc;
-  @Autowired
-  ObjectMapper mapper;
+  @Autowired MockMvc mvc;
+  @Autowired ObjectMapper mapper;
 
-  @MockitoBean
-  NotificationService notificationService;
-  // ⚠️ RequestUserExtractor는 사용되지 않으므로 목/스터빙/검증을 두지 않습니다.
+  @MockitoBean NotificationService notificationService;
+  @MockitoBean RequestUserExtractor userExtractor;
 
-  final UUID userId = UUID.randomUUID();
-  final UUID notificationId = UUID.randomUUID();
-
+  // ===== 목록 =====
   @Test
-  @DisplayName("알림 목록 조회 성공 (커서 페이지)")
-  void notificationList_success() throws Exception {
-    String cursor = "encoded-cursor";
-    Instant after = Instant.parse("2025-11-01T09:00:00Z");
-    int limit = 50;
-
-    NotificationDto row = new NotificationDto(
-        UUID.randomUUID(),
-        Instant.parse("2025-11-01T09:00:00Z"),
-        Instant.parse("2025-11-01T09:00:00Z"),
-        false,
-        userId,
-        "[알림] 새 기사 알림입니다.",
-        NotificationResourceType.ARTICLE,
-        UUID.randomUUID()
+  @DisplayName("GET /api/notifications - 정상 조회 (non-empty)")
+  void list_ok() throws Exception {
+    UUID userId = UUID.randomUUID();
+    var page = new CursorPageResponseNotificationDto(
+        List.of(
+            new NotificationDto(UUID.randomUUID(), Instant.now(), null, false, userId,
+                "테스트 알림-기사", NotificationResourceType.ARTICLE, UUID.randomUUID()),
+            new NotificationDto(UUID.randomUUID(), Instant.now(), null, false, userId,
+                "테스트 알림-댓글", NotificationResourceType.COMMENT, UUID.randomUUID())
+        ),
+        null, Instant.now(), 2, 2L, false
     );
-    CursorPageResponseNotificationDto page =
-        new CursorPageResponseNotificationDto(List.of(row), cursor, after, 1, 0L, true);
-
-    when(notificationService.list(eq(userId), eq(cursor), eq(after), eq(limit))).thenReturn(page);
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.list(eq(userId), any(), any(), anyInt())).willReturn(page);
 
     mvc.perform(get("/api/notifications")
-            // 실제 인증 컨텍스트 채움 (메서드 보안/필터 통과)
-            .with(authentication(new HeaderUserAuthentication(userId.toString())))
-            // 일부 구현은 헤더도 참고하므로 함께 제공(안전장치)
-            .header("Monew-Request-User-ID", userId.toString())
-            .param("cursor", cursor)
-            .param("after", after.toString())
-            .param("limit", String.valueOf(limit))
+            .param("limit", "50")
+            .header("Monew-Request-User-ID", userId) // 실제 추출은 userExtractor가 처리
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content[0].userId", is(userId.toString())))
-        .andExpect(jsonPath("$.content[0].content", is("[알림] 새 기사 알림입니다.")))
-        .andExpect(jsonPath("$.hasNext", is(true)))
-        .andExpect(jsonPath("$.nextCursor", is(cursor)));
-
-    verify(notificationService).list(eq(userId), eq(cursor), eq(after), eq(limit));
+        .andExpect(jsonPath("$.content").isArray())
+        .andExpect(jsonPath("$.size").value(2))
+        .andExpect(jsonPath("$.totalElements").value(2))
+        .andExpect(jsonPath("$.hasNext").value(false));
   }
 
   @Test
-  @DisplayName("알림 단건 확인 성공")
-  void notificationConfirmOne_success() throws Exception {
-    Instant now = Instant.parse("2025-11-01T10:00:00Z");
-    NotificationConfirmResponseDto res =
-        new NotificationConfirmResponseDto(notificationId, true, false, userId, now);
+  @DisplayName("GET /api/notifications - 빈 목록")
+  void list_empty() throws Exception {
+    UUID userId = UUID.randomUUID();
+    var empty = new CursorPageResponseNotificationDto(List.of(), null, null, 0, 0L, false);
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.list(eq(userId), eq(null), eq(null), eq(20))).willReturn(empty);
 
-    when(notificationService.confirmOne(eq(userId), eq(notificationId))).thenReturn(res);
-
-    mvc.perform(patch("/api/notifications/{notificationId}", notificationId)
-            .with(authentication(new HeaderUserAuthentication(userId.toString())))
-            .header("Monew-Request-User-ID", userId.toString())
+    mvc.perform(get("/api/notifications")
+            .param("limit", "20")
+            .header("Monew-Request-User-ID", userId)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id", is(notificationId.toString())))
-        .andExpect(jsonPath("$.confirmed", is(true)))
-        .andExpect(jsonPath("$.alreadyConfirmed", is(false)))
-        .andExpect(jsonPath("$.userId", is(userId.toString())));
+        .andExpect(jsonPath("$.content").isEmpty())
+        .andExpect(jsonPath("$.hasNext", is(false)))
+        .andExpect(jsonPath("$.size").value(0))
+        .andExpect(jsonPath("$.totalElements").value(0));
+  }
 
-    verify(notificationService).confirmOne(eq(userId), eq(notificationId));
+  @Test
+  @DisplayName("GET /api/notifications - 잘못된 커서 → 400")
+  void list_bad_cursor_400() throws Exception {
+    UUID userId = UUID.randomUUID();
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.list(eq(userId), eq("BAD_CURSOR"), any(), anyInt()))
+        .willThrow(new org.springframework.web.server.ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "잘못된 커서 형식입니다."));
+
+    mvc.perform(get("/api/notifications")
+            .param("cursor", "BAD_CURSOR")
+            .param("limit", "20")
+            .header("Monew-Request-User-ID", userId)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("GET /api/notifications - 인증 헤더/추출 실패 → 401")
+  void list_unauthorized() throws Exception {
+    given(userExtractor.extractUserId(any())).willReturn(null);
+
+    mvc.perform(get("/api/notifications").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized());
+  }
+
+  // ===== 단건 확인 =====
+  @Test
+  @DisplayName("PATCH /api/notifications/{id} - 이미 확인된 알림")
+  void confirm_one_already() throws Exception {
+    UUID userId = UUID.randomUUID();
+    UUID notiId = UUID.randomUUID();
+    var res = new NotificationConfirmResponseDto(notiId, true, true, userId, Instant.now());
+
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.confirmOne(eq(userId), eq(notiId))).willReturn(res);
+
+    mvc.perform(patch("/api/notifications/{notificationId}", notiId)
+            .header("Monew-Request-User-ID", userId)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(notiId.toString()))
+        .andExpect(jsonPath("$.userId").value(userId.toString()))
+        .andExpect(jsonPath("$.confirmed").value(true))
+        .andExpect(jsonPath("$.alreadyConfirmed").value(true))
+        .andExpect(jsonPath("$.updatedAt").exists());
+  }
+
+  @Test
+  @DisplayName("PATCH /api/notifications/{id} - 존재하지 않는 알림 → 404")
+  void confirm_one_notfound_404() throws Exception {
+    UUID userId = UUID.randomUUID();
+    UUID notiId = UUID.randomUUID();
+
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.confirmOne(eq(userId), eq(notiId)))
+        .willThrow(new org.springframework.web.server.ResponseStatusException(
+            HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."));
+
+    mvc.perform(patch("/api/notifications/{notificationId}", notiId)
+            .header("Monew-Request-User-ID", userId)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
+  }
+
+  // ===== 전체 확인 =====
+  @Test
+  @DisplayName("PATCH /api/notifications - 전체 확인 OK")
+  void confirm_all_ok() throws Exception {
+    UUID userId = UUID.randomUUID();
+    var resp = new BulkConfirmResultDto(2L, true, userId, Instant.now());
+
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.confirmAll(eq(userId))).willReturn(resp);
+
+    mvc.perform(patch("/api/notifications")
+            .header("Monew-Request-User-ID", userId)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.updatedCount").value(2))
+        .andExpect(jsonPath("$.allConfirmed").value(true))
+        .andExpect(jsonPath("$.userId").value(userId.toString()))
+        .andExpect(jsonPath("$.processedAt").exists());
+  }
+
+  @Test
+  @DisplayName("PATCH /api/notifications - 서비스 내부 오류 → 500")
+  void confirm_all_500() throws Exception {
+    UUID userId = UUID.randomUUID();
+
+    given(userExtractor.extractUserId(any())).willReturn(userId);
+    given(notificationService.confirmAll(eq(userId)))
+        .willThrow(new org.springframework.web.server.ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR, "boom"));
+
+    mvc.perform(patch("/api/notifications")
+            .header("Monew-Request-User-ID", userId)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError());
   }
 }

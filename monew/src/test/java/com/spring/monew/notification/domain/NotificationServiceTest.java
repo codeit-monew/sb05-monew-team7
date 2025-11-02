@@ -1,22 +1,17 @@
 package com.spring.monew.notification.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import com.spring.monew.notification.controller.dto.response.BulkConfirmResultDto;
 import com.spring.monew.notification.controller.dto.response.CursorPageResponseNotificationDto;
 import com.spring.monew.notification.controller.dto.response.NotificationConfirmResponseDto;
-import com.spring.monew.notification.controller.dto.response.NotificationDto;
-import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.notification.repository.NotificationRepository;
 import com.spring.monew.notification.service.NotificationService;
+import java.lang.reflect.Field;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,152 +19,229 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.server.ResponseStatusException;
 
-/**
- * 실제 구현 클래스(com.spring.monew.notification.service.NotificationService)에
- * @InjectMocks로 주입하고, Repository만 목킹합니다.
- * - list(UUID, String, Instant, int)
- * - confirmOne(UUID, UUID)
- * - confirmAll(UUID)
- */
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-  @Mock private NotificationRepository repository;
-
-  @InjectMocks private NotificationService service; // 구현 클래스 이름이 Service임(Impl 아님)
+  @Mock NotificationRepository repository;
+  @InjectMocks NotificationService service;
 
   UUID userId;
-  UUID notificationId;
+  Instant fixedNow;
 
   @BeforeEach
-  void setup() {
+  void before() {
     userId = UUID.randomUUID();
-    notificationId = UUID.randomUUID();
+    fixedNow = Instant.parse("2025-10-23T04:22:14.468Z");
+    // 일부 테스트에서 now가 사용되지 않으므로 불필요 스텁 경고 방지용 lenient
+    lenient().when(repository.getDatabaseNow()).thenReturn(fixedNow);
+  }
+
+  // ===== 목록(list) =====
+
+  @Test
+  @DisplayName("list: 최초 페이지(커서 없음) 정상 조회 - hasNext=false, nextCursor=null")
+  void list_firstPage_ok() {
+    int limit = 2; // safeLimit = 2 → fetchSize = 3
+    var n1 = notif(userId, "A", NotificationResourceType.ARTICLE, fixedNow.minusSeconds(10));
+    var n2 = notif(userId, "B", NotificationResourceType.COMMENT, fixedNow.minusSeconds(20));
+
+    when(repository.findUnreadByUserIdWithCursor(eq(userId), any(), isNull(), isNull(), eq(limit + 1)))
+        .thenReturn(List.of(n1, n2));
+    when(repository.countUnreadByUserId(userId)).thenReturn(2L);
+
+    CursorPageResponseNotificationDto dto = service.list(userId, null, null, limit);
+
+    assertThat(dto.content()).hasSize(2);
+    assertThat(dto.hasNext()).isFalse();
+    assertThat(dto.nextCursor()).isNull();
+    assertThat(dto.size()).isEqualTo(2);
+    assertThat(dto.totalElements()).isEqualTo(2);
+    assertThat(dto.nextAfter()).isEqualTo(fixedNow);
   }
 
   @Test
-  @DisplayName("알림 목록 조회 성공 - 빈 결과(커서/카운트/hasNext 계산)")
-  void list_empty_success() {
-    String cursor = null; // 커서 없이 최초 페이지
-    Instant now = Instant.parse("2025-11-01T09:00:00Z");
-    Instant after = now;  // after가 null이 아니고 now보다 미래가 아니도록
-    int limit = 50;
+  @DisplayName("list: hasNext=true 이면 nextCursor 생성되고 content는 limit개로 잘린다")
+  void list_hasNext_true_generates_nextCursor() {
+    int limit = 1; // fetchSize = 2
+    var newer = notif(userId, "NEW", NotificationResourceType.ARTICLE, fixedNow.minusSeconds(1));
+    var older = notif(userId, "OLD", NotificationResourceType.COMMENT, fixedNow.minusSeconds(2));
 
-    when(repository.getDatabaseNow()).thenReturn(now);
-    when(repository.findUnreadByUserIdWithCursor(
-        eq(userId), eq(after), eq(null), eq(null), anyInt()))
-        .thenReturn(Collections.emptyList());
-    when(repository.countUnreadByUserId(eq(userId))).thenReturn(0L);
+    when(repository.findUnreadByUserIdWithCursor(eq(userId), any(), isNull(), isNull(), eq(limit + 1)))
+        .thenReturn(List.of(newer, older));
+    when(repository.countUnreadByUserId(userId)).thenReturn(2L);
 
-    CursorPageResponseNotificationDto res = service.list(userId, cursor, after, limit);
+    CursorPageResponseNotificationDto dto = service.list(userId, null, null, limit);
 
-    assertThat(res).isNotNull();
-    assertThat(res.content()).isEmpty();
-    assertThat(res.size()).isEqualTo(0);
-    assertThat(res.totalElements()).isEqualTo(0L);
-    assertThat(res.hasNext()).isFalse();
-    assertThat(res.nextAfter()).isEqualTo(after);
-
-    verify(repository).getDatabaseNow();
-    verify(repository).findUnreadByUserIdWithCursor(
-        eq(userId), eq(after), eq(null), eq(null), anyInt());
-    verify(repository).countUnreadByUserId(eq(userId));
+    assertThat(dto.content()).hasSize(1);
+    assertThat(dto.hasNext()).isTrue();
+    assertThat(dto.nextCursor()).isNotBlank();
+    assertThat(dto.size()).isEqualTo(1);
   }
 
   @Test
-  @DisplayName("알림 단건 확인 성공 - real entity 사용(최소 목킹)")
-  void confirmOne_success() {
-    // given
-    Instant created = Instant.parse("2025-11-01T10:00:00Z");
+  @DisplayName("list: 잘못된 커서면 400(BAD_REQUEST)")
+  void list_invalid_cursor_400() {
+    String badCursor = "THIS_IS_NOT_BASE64";
+    assertThatThrownBy(() -> service.list(userId, badCursor, null, 20))
+        .isInstanceOf(ResponseStatusException.class)
+        .hasMessageContaining("400");
+  }
 
-    // 실제 엔티티 생성
-    UUID rid = UUID.randomUUID();
-    Notification entity = Notification.of(userId, "to-confirm", NotificationResourceType.ARTICLE, rid);
+  @Test
+  @DisplayName("list: after가 DB now보다 미래면 now로 보정")
+  void list_after_future_is_corrected_to_now() {
+    Instant future = fixedNow.plusSeconds(300);
+    ArgumentCaptor<Instant> upper = ArgumentCaptor.forClass(Instant.class);
 
-    // 생성/수정 시각과 confirmed 초기값을 통제
-    ReflectionTestUtils.setField(entity, "createdAt", created);
-    ReflectionTestUtils.setField(entity, "updatedAt", created);
-    ReflectionTestUtils.setField(entity, "confirmed", false);
+    when(repository.findUnreadByUserIdWithCursor(eq(userId), any(), any(), any(), anyInt()))
+        .thenReturn(List.of());
+    when(repository.countUnreadByUserId(userId)).thenReturn(0L);
 
-    when(repository.findByIdAndUserId(eq(notificationId), eq(userId)))
-        .thenReturn(Optional.of(entity));
+    service.list(userId, null, future, 20);
 
-    // when
-    NotificationConfirmResponseDto res = service.confirmOne(userId, notificationId);
+    verify(repository).findUnreadByUserIdWithCursor(eq(userId), upper.capture(), any(), any(), anyInt());
+    assertThat(upper.getValue()).isEqualTo(fixedNow);
+  }
 
-    // then
-    assertThat(res).isNotNull();
-    assertThat(res.id()).isEqualTo(entity.getId());     // 서비스가 entity id를 그대로 반환
-    assertThat(res.userId()).isEqualTo(userId);
-    assertThat(res.confirmed()).isTrue();
-    // confirm()으로 인해 updatedAt 이 갱신되었을 수도 있으니 null 아님만 체크
-    assertThat(res.updatedAt()).isNotNull();
+  @Test
+  @DisplayName("list: limit 하한/상한 보정(1~100) 후 fetchSize = safeLimit+1")
+  void list_limit_bounds() {
+    // 너무 작은 값(0) → safeLimit=1 → fetchSize=2
+    when(repository.findUnreadByUserIdWithCursor(eq(userId), any(), any(), any(), eq(2)))
+        .thenReturn(List.of());
+    when(repository.countUnreadByUserId(userId)).thenReturn(0L);
+    service.list(userId, null, null, 0);
+    verify(repository).findUnreadByUserIdWithCursor(eq(userId), any(), any(), any(), eq(2));
 
-    verify(repository).findByIdAndUserId(eq(notificationId), eq(userId));
+    // 너무 큰 값(1000) → safeLimit=100 → fetchSize=101
+    reset(repository);
+    // reset 이후 now 재스텁 (lenient)
+    lenient().when(repository.getDatabaseNow()).thenReturn(fixedNow);
+    when(repository.findUnreadByUserIdWithCursor(eq(userId), any(), any(), any(), eq(101)))
+        .thenReturn(List.of());
+    when(repository.countUnreadByUserId(userId)).thenReturn(0L);
+
+    service.list(userId, null, null, 1000);
+
+    verify(repository).findUnreadByUserIdWithCursor(eq(userId), any(), any(), any(), eq(101));
+  }
+
+  // ===== confirmOne =====
+
+  @Test
+  @DisplayName("confirmOne: 대상 없음 → 404")
+  void confirmOne_notFound_404() {
+    UUID nId = UUID.randomUUID();
+    when(repository.findByIdAndUserId(nId, userId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> service.confirmOne(userId, nId))
+        .isInstanceOf(ResponseStatusException.class)
+        .hasMessageContaining("404");
+  }
+
+  @Test
+  @DisplayName("confirmOne: 이미 확인된 알림 → alreadyConfirmed=true, flush 호출 없음")
+  void confirmOne_alreadyConfirmed_true() {
+    UUID nId = UUID.randomUUID();
+    var n = notif(userId, "X", NotificationResourceType.ARTICLE, fixedNow.minusSeconds(10));
+    setId(n, nId);
+    setConfirmed(n, true);
+
+    when(repository.findByIdAndUserId(nId, userId)).thenReturn(Optional.of(n));
+
+    NotificationConfirmResponseDto resp = service.confirmOne(userId, nId);
+
+    assertThat(resp.id()).isEqualTo(nId);
+    assertThat(resp.confirmed()).isTrue();
+    assertThat(resp.alreadyConfirmed()).isTrue();
+    assertThat(resp.userId()).isEqualTo(userId);
+    assertThat(resp.updatedAt()).isNotNull();
+    verify(repository, never()).flush();
+  }
+
+  @Test
+  @DisplayName("confirmOne: 미확인 → 확인 처리, flush 호출, alreadyConfirmed=false")
+  void confirmOne_to_confirmed_calls_flush() {
+    UUID nId = UUID.randomUUID();
+    var n = notif(userId, "Y", NotificationResourceType.COMMENT, fixedNow.minusSeconds(20));
+    setId(n, nId);
+    setConfirmed(n, false);
+
+    when(repository.findByIdAndUserId(nId, userId)).thenReturn(Optional.of(n));
+
+    NotificationConfirmResponseDto resp = service.confirmOne(userId, nId);
+
+    assertThat(resp.id()).isEqualTo(nId);
+    assertThat(resp.confirmed()).isTrue();
+    assertThat(resp.alreadyConfirmed()).isFalse();
+    assertThat(resp.userId()).isEqualTo(userId);
+    assertThat(resp.updatedAt()).isNotNull();
     verify(repository).flush();
   }
 
+  // ===== confirmAll =====
+
   @Test
-  @DisplayName("알림 전체 확인 성공 - confirmAllByUserId/existsByUserIdAndConfirmedFalse/getDatabaseNow")
-  void confirmAll_success() {
-    Instant dbNow = Instant.parse("2025-11-01T10:30:00Z");
+  @DisplayName("confirmAll: 업데이트 건수/상태/시각 검증")
+  void confirmAll_ok() {
+    when(repository.confirmAllByUserId(userId)).thenReturn(2L);
+    when(repository.existsByUserIdAndConfirmedFalse(userId)).thenReturn(false);
 
-    when(repository.confirmAllByUserId(eq(userId))).thenReturn(12L);
-    when(repository.existsByUserIdAndConfirmedFalse(eq(userId))).thenReturn(false);
-    when(repository.getDatabaseNow()).thenReturn(dbNow);
+    BulkConfirmResultDto dto = service.confirmAll(userId);
 
-    BulkConfirmResultDto res = service.confirmAll(userId);
-
-    assertThat(res).isNotNull();
-    assertThat(res.updatedCount()).isEqualTo(12L);
-    assertThat(res.allConfirmed()).isTrue();
-    assertThat(res.userId()).isEqualTo(userId);
-    assertThat(res.processedAt()).isEqualTo(dbNow);
-
-    verify(repository).confirmAllByUserId(eq(userId));
-    verify(repository).existsByUserIdAndConfirmedFalse(eq(userId));
-    verify(repository).getDatabaseNow();
+    assertThat(dto.updatedCount()).isEqualTo(2L);
+    assertThat(dto.allConfirmed()).isTrue();
+    assertThat(dto.userId()).isEqualTo(userId);
+    assertThat(dto.processedAt()).isEqualTo(fixedNow);
   }
 
   @Test
-  @DisplayName("알림 목록 조회 매핑 확인 - 엔티티 1건 → DTO 필드")
-  void list_mapping_single() {
-    Instant now = Instant.parse("2025-11-01T12:00:00Z");
-    Instant after = now;
-    int limit = 20;
+  @DisplayName("confirmAll: 여전히 미확인 남으면 allConfirmed=false")
+  void confirmAll_still_unread_false() {
+    when(repository.confirmAllByUserId(userId)).thenReturn(5L);
+    when(repository.existsByUserIdAndConfirmedFalse(userId)).thenReturn(true);
 
-    // 엔티티 1건 모킹
-    UUID rid = UUID.randomUUID();
-    Notification entity = mock(Notification.class);
-    when(entity.getId()).thenReturn(UUID.randomUUID());
-    when(entity.getCreatedAt()).thenReturn(now.minusSeconds(5));
-    when(entity.getUpdatedAt()).thenReturn(now.minusSeconds(3));
-    when(entity.isConfirmed()).thenReturn(false);
-    when(entity.getUserId()).thenReturn(userId);
-    when(entity.getResourceType()).thenReturn(NotificationResourceType.ARTICLE);
-    when(entity.getResourceId()).thenReturn(rid);
-    when(entity.getContent()).thenReturn("테스트 알림");
+    BulkConfirmResultDto dto = service.confirmAll(userId);
 
-    when(repository.getDatabaseNow()).thenReturn(now);
-    when(repository.findUnreadByUserIdWithCursor(eq(userId), eq(after), eq(null), eq(null), anyInt()))
-        .thenReturn(List.of(entity));
-    when(repository.countUnreadByUserId(eq(userId))).thenReturn(1L);
+    assertThat(dto.updatedCount()).isEqualTo(5L);
+    assertThat(dto.allConfirmed()).isFalse();
+    assertThat(dto.processedAt()).isEqualTo(fixedNow);
+  }
 
-    CursorPageResponseNotificationDto res = service.list(userId, null, after, limit);
+  // ===== 헬퍼 =====
 
-    assertThat(res).isNotNull();
-    assertThat(res.content()).hasSize(1);
-    NotificationDto dto = res.content().get(0);
-    assertThat(dto.userId()).isEqualTo(userId);
-    assertThat(dto.content()).isEqualTo("테스트 알림");
-    assertThat(dto.resourceType()).isEqualTo(NotificationResourceType.ARTICLE);
-    assertThat(dto.resourceId()).isEqualTo(rid);
+  private static Notification notif(UUID userId, String content, NotificationResourceType type, Instant createdAt) {
+    Notification n = Notification.of(userId, content, type, UUID.randomUUID());
+    setField(n, "createdAt", createdAt);
+    setField(n, "updatedAt", createdAt);
+    return n;
+  }
 
-    verify(repository).findUnreadByUserIdWithCursor(eq(userId), eq(after), eq(null), eq(null), anyInt());
+  private static void setId(Notification n, UUID id) {
+    setField(n, "id", id);
+  }
+
+  private static void setConfirmed(Notification n, boolean val) {
+    setField(n, "confirmed", val);
+    if (n.getCreatedAt() == null) {
+      setField(n, "createdAt", Instant.now());
+      setField(n, "updatedAt", n.getCreatedAt());
+    }
+  }
+
+  private static void setField(Object target, String name, Object value) {
+    try {
+      Field f = target.getClass().getDeclaredField(name);
+      f.setAccessible(true);
+      f.set(target, value);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

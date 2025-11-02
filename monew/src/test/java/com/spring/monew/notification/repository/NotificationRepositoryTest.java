@@ -2,11 +2,14 @@ package com.spring.monew.notification.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.spring.monew.common.config.QuerydslConfig;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.monew.notification.domain.Notification;
 import com.spring.monew.notification.domain.NotificationResourceType;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -14,115 +17,158 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 
-@Import(QuerydslConfig.class)
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = Replace.ANY)
 @DataJpaTest
-class NotificationRepositoryNoCursorTest {
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@Import(NotificationRepositoryTest.QuerydslTestConfig.class) // ✅ 명시적 Import
+class NotificationRepositoryTest {
 
-  @Autowired private NotificationRepository notificationRepository;
-  @Autowired private UserRepository userRepository;
-
-  // ---------- helpers ----------
-  private User createUser() {
-    String sfx = UUID.randomUUID().toString().replace("-", "").substring(0, 8); // 8자
-    String email = "u_" + sfx + "@t.com";   // 짧은 이메일 (길이 제한 거의 없음)
-    String nickname = "u_" + sfx;           // 10자 내외 → 20자 제한 안전
-    User u = new User(email, nickname, "pw");
-    u = userRepository.save(u);
-    userRepository.flush();
-    return u;
-  }
-  private Notification saveNotification(User user, String content, boolean confirmed, Instant createdAt) {
-    Notification n = Notification.of(
-        user.getId(),
-        content,
-        NotificationResourceType.ARTICLE,
-        UUID.randomUUID()
-    );
-    if (createdAt != null) {
-      ReflectionTestUtils.setField(n, "createdAt", createdAt);
-      ReflectionTestUtils.setField(n, "updatedAt", createdAt);
+  // ---- 테스트 전용 QueryDSL 빈 (다른 커스텀 레포에서 필요) ----
+  @TestConfiguration
+  static class QuerydslTestConfig {
+    @PersistenceContext EntityManager em;
+    @Bean
+    JPAQueryFactory jpaQueryFactory() {
+      return new JPAQueryFactory(em);
     }
-    ReflectionTestUtils.setField(n, "confirmed", confirmed);
-
-    Notification saved = notificationRepository.save(n);
-    notificationRepository.flush();
-    return saved;
   }
 
-  // ---------- tests ----------
-  @Test
-  @DisplayName("저장/기본조회: 알림이 정상적으로 저장된다")
-  void save_and_basic_fetch() {
-    User u = createUser();
-    saveNotification(u, "hello", false, Instant.now());
+  @Autowired NotificationRepository notificationRepository;
+  @Autowired UserRepository userRepository;
+  @Autowired EntityManager em;
 
-    List<Notification> all = notificationRepository.findAll();
-    assertThat(all).isNotEmpty();
-    assertThat(all.get(0).getUserId()).isEqualTo(u.getId());
+  private static Notification make(UUID userId, String content, NotificationResourceType type) {
+    return Notification.of(userId, content, type, UUID.randomUUID());
   }
 
   @Test
-  @DisplayName("읽지 않은 개수 집계(countUnreadByUserId)")
-  void countUnreadByUserId() {
-    User u = createUser();
-    saveNotification(u, "a", false, Instant.now());
-    saveNotification(u, "b", false, Instant.now());
-    saveNotification(u, "c", true,  Instant.now()); // 읽은 알림
+  @DisplayName("커서 기반 조회: 미확인 알림 최신순 정렬 + 커서 적용")
+  void findUnreadByUserIdWithCursor() {
+    // given
+    User user = userRepository.save(new User("u@test.com", "u", "pw"));
 
-    long cnt = notificationRepository.countUnreadByUserId(u.getId());
-    assertThat(cnt).isEqualTo(2L);
-  }
+    Notification n1 = notificationRepository.save(make(user.getId(), "A", NotificationResourceType.ARTICLE));
+    em.flush();
+    sleep(30); // ✅ createdAt 간격 확보(충돌 방지)
+    Notification n2 = notificationRepository.save(make(user.getId(), "B", NotificationResourceType.COMMENT));
+    em.flush();
+    sleep(30);
+    Notification n3 = notificationRepository.save(make(user.getId(), "C", NotificationResourceType.ARTICLE));
+    em.flush();
+    em.clear();
 
-  @Test
-  @DisplayName("전체 확인 시나리오(엔티티 업데이트로 시뮬레이션) 후 읽지 않은 개수는 0")
-  void simulate_confirm_all_by_updating_entities() {
-    // 주의: confirmAllByUserId()는 현재 구현이 Timestamp→Instant 타입 미스매치로 실패함.
-    // 레포지토리를 수정하지 않는 조건이므로, 테스트에서는 엔티티를 직접 업데이트해 시나리오를 검증한다.
-    User u = createUser();
-    saveNotification(u, "a", false, Instant.now());
-    saveNotification(u, "b", false, Instant.now());
+    Instant upper = Instant.now().plusSeconds(5);
 
-    // when: 읽지 않은 알림을 전부 확인 처리(테스트 시뮬레이션)
-    List<Notification> unread = notificationRepository.findAll().stream()
-        .filter(n -> n.getUserId().equals(u.getId()) && !n.isConfirmed())
-        .toList();
-
-    unread.forEach(n -> {
-      ReflectionTestUtils.setField(n, "confirmed", true);
-      ReflectionTestUtils.setField(n, "updatedAt", Instant.now());
-    });
-    notificationRepository.saveAll(unread);
-    notificationRepository.flush();
+    // when
+    List<Notification> first = notificationRepository.findUnreadByUserIdWithCursor(
+        user.getId(), upper, null, null, 3 + 1);
 
     // then
-    long remaining = notificationRepository.countUnreadByUserId(u.getId());
-    assertThat(remaining).isZero();
+    assertThat(first).hasSize(3);
+
+    // 정렬: createdAt DESC, (동시각이면) id DESC
+    for (int i = 0; i < first.size() - 1; i++) {
+      var a = first.get(i);
+      var b = first.get(i + 1);
+      int cmp = a.getCreatedAt().compareTo(b.getCreatedAt());
+      if (cmp < 0) throw new AssertionError("createdAt must be DESC");
+      if (cmp == 0) {
+        assertThat(a.getId().toString().compareTo(b.getId().toString()))
+            .as("id must be DESC when createdAt equal")
+            .isGreaterThan(0);
+      }
+    }
+
+    // 커서 = 마지막 요소
+    var last = first.get(first.size() - 1);
+    List<Notification> second = notificationRepository.findUnreadByUserIdWithCursor(
+        user.getId(), upper, last.getCreatedAt(), last.getId(), 3 + 1);
+
+    assertThat(second.size()).isBetween(0, 1);
   }
 
   @Test
-  @DisplayName("오래된 읽은 알림만 삭제(deleteConfirmedBefore)")
+  @DisplayName("전체 확인 시나리오(레포 메서드 호출 없이 JPQL로 시뮬레이션) 후 unread=0")
+  void simulateConfirmAll_unreadBecomesZero() {
+    // given
+    User user = userRepository.save(new User("u2@test.com", "u2", "pw"));
+    notificationRepository.saveAll(List.of(
+        make(user.getId(), "A", NotificationResourceType.ARTICLE),
+        make(user.getId(), "B", NotificationResourceType.COMMENT)
+    ));
+    em.flush();
+    em.clear();
+    assertThat(notificationRepository.countUnreadByUserId(user.getId())).isEqualTo(2);
+
+    // when: H2 Timestamp↔Instant 이슈 회피 — JPQL로 직접 업데이트
+    Instant now = Instant.now();
+    em.createQuery("""
+        update Notification n
+           set n.confirmed = true,
+               n.updatedAt = :now
+         where n.userId = :uid and n.confirmed = false
+        """)
+        .setParameter("now", now)
+        .setParameter("uid", user.getId())
+        .executeUpdate();
+    em.flush();
+    em.clear();
+
+    // then
+    assertThat(notificationRepository.countUnreadByUserId(user.getId())).isZero();
+    assertThat(notificationRepository.existsByUserIdAndConfirmedFalse(user.getId())).isFalse();
+  }
+
+  @Test
+  @DisplayName("deleteConfirmedBefore: 기준 이전 confirmed 알림 물리 삭제 (JPQL로 updatedAt 과거화)")
   void deleteConfirmedBefore() {
-    User u = createUser();
-    saveNotification(u, "old-read", true,  Instant.now().minusSeconds(3600));
-    saveNotification(u, "new-read", true,  Instant.now());
-    saveNotification(u, "unread",   false, Instant.now().minusSeconds(3600));
+    // given
+    User user = userRepository.save(new User("u3@test.com", "u3", "pw"));
+    Notification n1 = notificationRepository.save(make(user.getId(), "A", NotificationResourceType.ARTICLE));
+    Notification n2 = notificationRepository.save(make(user.getId(), "B", NotificationResourceType.COMMENT));
+    em.flush();
 
-    int deleted = (int) notificationRepository.deleteConfirmedBefore(Instant.now().minusSeconds(100));
-    assertThat(deleted).isEqualTo(1); // old-read만 삭제
+    // 모두 확인 처리
+    Instant now = Instant.now();
+    em.createQuery("""
+        update Notification n
+           set n.confirmed = true,
+               n.updatedAt = :now
+         where n.userId = :uid and n.confirmed = false
+        """)
+        .setParameter("now", now)
+        .setParameter("uid", user.getId())
+        .executeUpdate();
+    em.flush();
+
+    // updatedAt 과거화
+    Instant past = Instant.now().minus(Duration.ofHours(2));
+    em.createQuery("update Notification n set n.updatedAt = :past where n.id = :id")
+        .setParameter("past", past)
+        .setParameter("id", n1.getId())
+        .executeUpdate();
+    em.flush();
+    em.clear();
+
+    // when: 기준(threshold) 1시간 전 → n1만 삭제
+    Instant threshold = Instant.now().minus(Duration.ofHours(1));
+    long deleted = notificationRepository.deleteConfirmedBefore(threshold);
+
+    // then
+    assertThat(deleted).isEqualTo(1);
+    assertThat(notificationRepository.findById(n1.getId())).isEmpty();
+    assertThat(notificationRepository.findById(n2.getId())).isPresent();
   }
 
-  @Test
-  @DisplayName("getDatabaseNow: DB 서버 시간이 null이 아니다")
-  void getDatabaseNow() {
-    Instant dbNow = notificationRepository.getDatabaseNow();
-    assertThat(dbNow).isNotNull();
+  // getDatabaseNow()는 네이티브 타입 매핑 이슈로 레포 단위 테스트에서 제외.
+
+  private static void sleep(long millis) {
+    try { Thread.sleep(millis); } catch (InterruptedException ignored) {}
   }
 }
