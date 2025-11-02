@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -20,16 +21,28 @@ import org.springframework.data.mongodb.core.mapping.Document;
         @CompoundIndex(name = "ix_view_user_lastViewed", def = "{'userId': 1, 'lastViewedAt': -1}")
 })
 public class ActivityArticleViewDoc {
-    @Id private String id;        // viewEventId (최초 삽입 시)
+    @Id
+    private String id; // viewEventId
+    @Field("user_id")
     private UUID userId;
+    @Field("article_id")
     private UUID articleId;
+    @Field("source")
     private ArticleSource source;
+    @Field("source_url")
     private String sourceUrl;
+    @Field("title")
     private String title;
+    @Field("summary")
     private String summary;
+    @Field("comment_count")
     private Long commentCount;
+    @Field("view_count")
     private Long viewCount;
+    @Field("publish_date")
     private Instant publishDate;
-    private Instant createdAt;    // 최초 본 시각
-    private Instant lastViewedAt; // 최근 본 시각
+    @Field("created_at")
+    private Instant createdAt;
+    @Field("last_viewed_at")
+    private Instant lastViewedAt;
 }
