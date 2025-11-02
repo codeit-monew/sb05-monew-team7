@@ -54,12 +54,17 @@ class NotificationRepositoryTest {
     User user = userRepository.save(new User("u@test.com", "u", "pw"));
 
     Notification n1 = notificationRepository.save(make(user.getId(), "A", NotificationResourceType.ARTICLE));
-    em.flush();
-    sleep(30); // ✅ createdAt 간격 확보(충돌 방지)
     Notification n2 = notificationRepository.save(make(user.getId(), "B", NotificationResourceType.COMMENT));
-    em.flush();
-    sleep(30);
     Notification n3 = notificationRepository.save(make(user.getId(), "C", NotificationResourceType.ARTICLE));
+    em.flush();
+
+    Instant base = Instant.now();
+    em.createQuery("update Notification n set n.createdAt = :t where n.id = :id")
+        .setParameter("t", base.minusSeconds(2)).setParameter("id", n1.getId()).executeUpdate();
+    em.createQuery("update Notification n set n.createdAt = :t where n.id = :id")
+        .setParameter("t", base.minusSeconds(1)).setParameter("id", n2.getId()).executeUpdate();
+    em.createQuery("update Notification n set n.createdAt = :t where n.id = :id")
+        .setParameter("t", base).setParameter("id", n3.getId()).executeUpdate();
     em.flush();
     em.clear();
 
