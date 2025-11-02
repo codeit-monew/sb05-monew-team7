@@ -28,18 +28,7 @@ public class UserActivityController {
   private final UserActivityService userActivityService;
   private final RequestUserExtractor userExtractor;
 
-  // 1) 내 활동내역 (헤더 없으면 401)
-  @Hidden
-  @GetMapping("/api/user-activities/me")
-  public ResponseEntity<UserActivityDto> myActivity(Principal principal) {
-    UUID userId = userExtractor.extractUserId(principal);
-    if (userId == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증이 필요합니다.");
-    }
-    return ResponseEntity.ok(userActivityService.getUserActivity(userId));
-  }
-
-  // 2) 특정 사용자 활동내역
+  // 1) 특정 사용자 활동내역
   @Operation(summary = "사용자 활동 내역 조회", description = "사용자 ID로 활동 내역을 조회합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "사용자 활동 내역 조회 성공"),

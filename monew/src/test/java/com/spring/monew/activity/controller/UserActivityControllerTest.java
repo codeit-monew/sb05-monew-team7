@@ -48,30 +48,24 @@ class UserActivityControllerTest {
   }
 
   @Test
-  @DisplayName("GET /api/user-activities/me → 200")
-  void myActivity_ok() throws Exception {
+  @DisplayName("GET /api/user-activities/{userId} 공개 조회(헤더 없음) → 200 + 최상위 필드")
+  void byUserId_public_ok_without_header() throws Exception {
     UUID uid = UUID.randomUUID();
-    when(userExtractor.extractUserId(any())).thenReturn(uid);
+    when(userExtractor.extractUserId(any())).thenReturn(null); // 헤더 없음
     when(userActivityService.getUserActivity(eq(uid))).thenReturn(dummy(uid));
 
-    mvc.perform(get("/api/user-activities/me")
-            .header("Monew-Request-User-ID", uid.toString())
+    mvc.perform(get("/api/user-activities/{userId}", uid)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(uid.toString()))
         .andExpect(jsonPath("$.email").value("u@test.com"))
-        .andExpect(jsonPath("$.nickname").value("nick"));
+        .andExpect(jsonPath("$.nickname").value("nick"))
+        .andExpect(jsonPath("$.subscriptions").isArray())
+        .andExpect(jsonPath("$.comments").isArray())
+        .andExpect(jsonPath("$.commentLikes").isArray())
+        .andExpect(jsonPath("$.articleViews").isArray());
 
     verify(userActivityService).getUserActivity(eq(uid));
-  }
-
-  @Test
-  @DisplayName("GET /api/user-activities/me (헤더 없음) → 401")
-  void myActivity_unauthorized() throws Exception {
-    when(userExtractor.extractUserId(any())).thenReturn(null);
-
-    mvc.perform(get("/api/user-activities/me"))
-        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -82,8 +76,12 @@ class UserActivityControllerTest {
     when(userActivityService.getUserActivity(eq(uid))).thenReturn(dummy(uid));
 
     mvc.perform(get("/api/user-activities/{userId}", uid)
-            .header("Monew-Request-User-ID", uid.toString()))
-        .andExpect(status().isOk());
+            .header("Monew-Request-User-ID", uid.toString())
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(uid.toString()))
+        .andExpect(jsonPath("$.email").value("u@test.com"))
+        .andExpect(jsonPath("$.nickname").value("nick"));
 
     verify(userActivityService).getUserActivity(eq(uid));
   }
@@ -96,7 +94,10 @@ class UserActivityControllerTest {
     when(userExtractor.extractUserId(any())).thenReturn(other);
 
     mvc.perform(get("/api/user-activities/{userId}", owner)
-            .header("Monew-Request-User-ID", other.toString()))
+            .header("Monew-Request-User-ID", other.toString())
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isForbidden());
+
+    verify(userActivityService, never()).getUserActivity(any());
   }
 }

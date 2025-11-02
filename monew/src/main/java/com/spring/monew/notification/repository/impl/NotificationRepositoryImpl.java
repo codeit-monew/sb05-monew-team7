@@ -57,15 +57,16 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
 
   @Override
   public long confirmAllByUserId(UUID userId) {
-    final Query query = em.createQuery("""
-        UPDATE Notification n
-           SET n.confirmed = TRUE,
-               n.updatedAt = CURRENT_TIMESTAMP
-         WHERE n.userId = :userId
-           AND n.confirmed = FALSE
-        """);
-    query.setParameter("userId", userId);
-    return query.executeUpdate();
+    final Query q = em.createQuery("""
+      UPDATE Notification n
+         SET n.confirmed = TRUE,
+             n.updatedAt = :now
+       WHERE n.userId = :userId
+         AND n.confirmed = FALSE
+      """);
+    q.setParameter("userId", userId);
+    q.setParameter("now", java.time.Instant.now()); // 또는 getDatabaseNow()로 일관성 유지
+    return q.executeUpdate();
   }
 
   @Override
