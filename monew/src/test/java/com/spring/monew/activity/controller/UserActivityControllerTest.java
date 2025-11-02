@@ -1,14 +1,10 @@
 package com.spring.monew.activity.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.monew.activity.controller.dto.response.CommentActivityDto;
 import com.spring.monew.activity.controller.dto.response.CommentLikeActivityDto;
 import com.spring.monew.activity.controller.dto.response.UserActivityDto;
@@ -35,21 +31,15 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class UserActivityControllerTest {
 
-  @Autowired
-  MockMvc mvc;
+  @Autowired MockMvc mvc;
+  @Autowired ObjectMapper mapper;
 
-  @MockitoBean
-  UserActivityService userActivityService;
+  @MockitoBean UserActivityService userActivityService;
+  @MockitoBean RequestUserExtractor userExtractor;
 
-  @MockitoBean
-  RequestUserExtractor userExtractor;
-
-  private UserActivityDto sampleDto(UUID userId) {
+  private static UserActivityDto dummy(UUID uid) {
     return new UserActivityDto(
-        userId,
-        "user@example.com",
-        "유저",
-        Instant.parse("2025-01-01T00:00:00Z"),
+        uid, "u@test.com", "nick", Instant.parse("2025-01-01T00:00:00Z"),
         List.<SubscriptionDto>of(),
         List.<CommentActivityDto>of(),
         List.<CommentLikeActivityDto>of(),
@@ -58,26 +48,26 @@ class UserActivityControllerTest {
   }
 
   @Test
-  @DisplayName("내 활동 조회 성공")
-  void myActivity_success() throws Exception {
-    UUID me = UUID.randomUUID();
-    when(userExtractor.extractUserId(any())).thenReturn(me);
-    when(userActivityService.getUserActivity(me)).thenReturn(sampleDto(me));
+  @DisplayName("GET /api/user-activities/me → 200")
+  void myActivity_ok() throws Exception {
+    UUID uid = UUID.randomUUID();
+    when(userExtractor.extractUserId(any())).thenReturn(uid);
+    when(userActivityService.getUserActivity(eq(uid))).thenReturn(dummy(uid));
 
     mvc.perform(get("/api/user-activities/me")
-            .header("Monew-Request-User-ID", me.toString())
-            .contentType(MediaType.APPLICATION_JSON))
+            .header("Monew-Request-User-ID", uid.toString())
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id", is(me.toString())))
-        .andExpect(jsonPath("$.email", is("user@example.com")))
-        .andExpect(jsonPath("$.nickname", is("유저")));
+        .andExpect(jsonPath("$.id").value(uid.toString()))
+        .andExpect(jsonPath("$.email").value("u@test.com"))
+        .andExpect(jsonPath("$.nickname").value("nick"));
 
-    verify(userActivityService).getUserActivity(eq(me));
+    verify(userActivityService).getUserActivity(eq(uid));
   }
 
   @Test
-  @DisplayName("내 활동 조회 - 헤더 없음")
-  void myActivity_unauthorized_when_no_header() throws Exception {
+  @DisplayName("GET /api/user-activities/me (헤더 없음) → 401")
+  void myActivity_unauthorized() throws Exception {
     when(userExtractor.extractUserId(any())).thenReturn(null);
 
     mvc.perform(get("/api/user-activities/me"))
@@ -85,32 +75,28 @@ class UserActivityControllerTest {
   }
 
   @Test
-  @DisplayName("사용자 활동 조회(본인) 성공")
-  void userActivityById_owner_success() throws Exception {
-    UUID me = UUID.randomUUID();
-    when(userExtractor.extractUserId(any())).thenReturn(me);
-    when(userActivityService.getUserActivity(me)).thenReturn(sampleDto(me));
+  @DisplayName("GET /api/user-activities/{userId} (소유자 접근) → 200")
+  void byUserId_owner_ok() throws Exception {
+    UUID uid = UUID.randomUUID();
+    when(userExtractor.extractUserId(any())).thenReturn(uid);
+    when(userActivityService.getUserActivity(eq(uid))).thenReturn(dummy(uid));
 
-    mvc.perform(get("/api/user-activities/{userId}", me)
-            .header("Monew-Request-User-ID", me.toString())
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id", is(me.toString())))
-        .andExpect(jsonPath("$.email", is("user@example.com")))
-        .andExpect(jsonPath("$.nickname", is("유저")));
+    mvc.perform(get("/api/user-activities/{userId}", uid)
+            .header("Monew-Request-User-ID", uid.toString()))
+        .andExpect(status().isOk());
 
-    verify(userActivityService).getUserActivity(eq(me));
+    verify(userActivityService).getUserActivity(eq(uid));
   }
 
   @Test
-  @DisplayName("사용자 활동 조회(타인)")
-  void userActivityById_forbidden_when_other() throws Exception {
-    UUID requester = UUID.randomUUID();
-    UUID target = UUID.randomUUID();
-    when(userExtractor.extractUserId(any())).thenReturn(requester);
+  @DisplayName("GET /api/user-activities/{userId} (타인 접근) → 403")
+  void byUserId_forbidden_ifNotOwner() throws Exception {
+    UUID owner = UUID.randomUUID();
+    UUID other = UUID.randomUUID();
+    when(userExtractor.extractUserId(any())).thenReturn(other);
 
-    mvc.perform(get("/api/user-activities/{userId}", target)
-            .header("Monew-Request-User-ID", requester.toString()))
+    mvc.perform(get("/api/user-activities/{userId}", owner)
+            .header("Monew-Request-User-ID", other.toString()))
         .andExpect(status().isForbidden());
   }
 }

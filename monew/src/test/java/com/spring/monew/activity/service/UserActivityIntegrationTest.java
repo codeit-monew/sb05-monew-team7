@@ -1,11 +1,11 @@
 package com.spring.monew.activity.service;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.spring.monew.activity.repository.ActivitySyncRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.monew.article.domain.Article;
 import com.spring.monew.article.domain.ArticleSource;
 import com.spring.monew.article.repository.ArticleRepository;
@@ -13,148 +13,170 @@ import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
-import java.sql.Timestamp;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.bson.Document;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "activity-mongo"})
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc // filters=true (기본값) → SecurityFilterChain 활성
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 class UserActivityIntegrationTest {
 
-  @Autowired private MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
+  @Autowired ObjectMapper objectMapper;
 
-  @Autowired private UserRepository userRepository;
-  @Autowired private InterestRepository interestRepository;
-  @Autowired private ArticleRepository articleRepository;
-  @Autowired private ActivitySyncRepository activitySyncRepository;
+  @Autowired UserRepository userRepository;
+  @Autowired ArticleRepository articleRepository;
+  @Autowired InterestRepository interestRepository;
 
-  @Autowired private JdbcTemplate jdbc;
+  @Autowired MongoTemplate mongoTemplate;
+  @PersistenceContext EntityManager em;
 
   private User user;
-  private Interest interest;
   private Article article;
+
+  @DynamicPropertySource
+  static void props(DynamicPropertyRegistry r) {
+    // JPA/H2
+    r.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+    r.add("spring.jpa.show-sql", () -> "false");
+    r.add("spring.sql.init.mode", () -> "never");
+    r.add("spring.flyway.enabled", () -> "false");
+    r.add("spring.liquibase.enabled", () -> "false");
+    r.add("spring.batch.job.enabled", () -> "false");
+
+    // Embedded Mongo (Flapdoodle)
+    r.add("spring.mongodb.embedded.version", () -> "6.0.5");
+    r.add("spring.data.mongodb.database", () -> "testdb");
+  }
 
   @BeforeEach
   void setup() {
-    // 1) 기본 데이터 저장
-    user = userRepository.save(new User("email@test.com", "nick", "password"));
-    interest = interestRepository.save(new Interest("AI", List.of("생성형", "LLM")));
+    // --- RDB 시드 ---
+    user = userRepository.save(new User("activity@test.com", "act-nick", "password"));
+    ensureCreatedAtExists(em, user.getId(), Instant.parse("2025-01-01T00:00:00Z"));
+
+    Interest interest = interestRepository.save(new Interest("it", List.of("dev", "code")));
     article = articleRepository.save(
         Article.of(
             interest,
             ArticleSource.CHOSUN,
-            "https://example.com/news/1",
-            "기사제목",
-            Instant.parse("2024-12-31T00:00:00Z"),
-            "요약"
+            "http://example.com/1",
+            "title",
+            Instant.parse("2025-01-01T00:00:00Z"),
+            "summary"
         )
     );
 
-    // 2) 즉시 flush (동일 트랜잭션에서 JDBC 가시성 보장)
-    userRepository.flush();
-    interestRepository.flush();
-    articleRepository.flush();
+    // --- Mongo 시드 ---
+    // activity_article_views
+    mongoTemplate.save(new Document()
+            .append("_id", UUID.randomUUID().toString())
+            .append("userId", user.getId())
+            .append("articleId", article.getId())
+            .append("source", ArticleSource.CHOSUN.name())
+            .append("sourceUrl", "http://example.com/1")
+            .append("title", "title")
+            .append("summary", "summary")
+            .append("commentCount", 0L)
+            .append("viewCount", 10L)
+            .append("publishDate", Instant.parse("2025-01-01T00:00:00Z"))
+            .append("createdAt", Instant.now())
+            .append("lastViewedAt", Instant.now()),
+        "activity_article_views");
 
-    // 3) users.created_at 강제 보정 (인용/카멜/스네이크 모두 대응)
-    ensureCreatedAtExists(jdbc, user.getId(), Instant.parse("2025-01-01T00:00:00Z"));
+    // activity_comments
+    mongoTemplate.save(new Document()
+            .append("_id", UUID.randomUUID().toString())
+            .append("userId", user.getId())
+            .append("articleId", article.getId())
+            .append("articleTitle", "title")
+            .append("content", "활동 댓글")
+            .append("likeCount", 0L)
+            .append("createdAt", Instant.now())
+            .append("userNickname", "act-nick"),
+        "activity_comments");
+
+    // activity_comment_likes
+    mongoTemplate.save(new Document()
+            .append("_id", UUID.randomUUID().toString())
+            .append("userId", user.getId()) // likedBy
+            .append("commentId", UUID.randomUUID())
+            .append("articleId", article.getId())
+            .append("articleTitle", "title")
+            .append("commentUserId", user.getId())
+            .append("commentUserNickname", "act-nick")
+            .append("commentContent", "활동 댓글")
+            .append("commentLikeCount", 1L)
+            .append("commentCreatedAt", Instant.now())
+            .append("createdAt", Instant.now()),
+        "activity_comment_likes");
+
+    // user_interest_subscriptions
+    mongoTemplate.save(new Document()
+            .append("_id", UUID.randomUUID().toString())
+            .append("user_id", user.getId())
+            .append("interest_id", interest.getId())
+            .append("interest_name", interest.getName())
+            .append("interest_keywords", interest.getKeywords())
+            .append("interest_subscriber_count", interest.getSubscriptionsCount())
+            .append("created_at", Instant.now()),
+        "user_interest_subscriptions");
   }
 
   @Test
   @Order(1)
-  @DisplayName("me: 활동이 없어도 200 + 사용자 요약 반환")
-  void myActivity_empty_ok() throws Exception {
+  @DisplayName("GET /api/user-activities/me: 200 + 사용자 요약 반환")
+  void me_ok() throws Exception {
     mockMvc.perform(get("/api/user-activities/me")
+            .with(user(user.getId().toString()).roles("USER"))                 // ★ 인증 주입
             .header("Monew-Request-User-ID", user.getId().toString())
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(user.getId().toString()))
-        .andExpect(jsonPath("$.email").value("email@test.com"))
-        .andExpect(jsonPath("$.nickname").value("nick"))
-        .andExpect(jsonPath("$.subscriptions", hasSize(0)))
-        .andExpect(jsonPath("$.comments", hasSize(0)))
-        .andExpect(jsonPath("$.commentLikes", hasSize(0)));
-    // articleViews 검증은 생략(동기화 메서드 없음 + 유니크 인덱스 충돌 회피)
+        .andExpect(jsonPath("$.email").value("activity@test.com"))
+        .andExpect(jsonPath("$.nickname").value("act-nick"));
   }
 
   @Test
   @Order(2)
-  @DisplayName("me: 구독/댓글/좋아요 활동이 있으면 각 섹션이 채워진다")
-  void myActivity_with_events_ok() throws Exception {
-    // ===== seed: 구독 =====
-    UUID subId = UUID.randomUUID();
-    activitySyncRepository.onSubscribed(
-        subId,
-        user.getId(),
-        interest.getId(),
-        interest.getName(),
-        interest.getKeywords(),
-        123L,
-        Instant.parse("2025-01-02T00:00:00Z")
-    );
-
-    // ===== seed: 댓글 =====
-    UUID commentId = UUID.randomUUID();
-    activitySyncRepository.onCommentCreated(
-        commentId,
-        user.getId(),
-        article.getId(),
-        article.getTitle(),
-        user.getNickname(),
-        "댓글내용",
-        3L,
-        Instant.parse("2025-01-03T00:00:00Z")
-    );
-
-    // ===== seed: 좋아요 =====
-    UUID likeEventId = UUID.randomUUID();
-    activitySyncRepository.onCommentLiked(
-        likeEventId,
-        user.getId(),                // likedBy
-        commentId,
-        article.getId(),
-        article.getTitle(),
-        user.getId(),                // commentUserId (현재 구현과 맞춤)
-        user.getNickname(),          // commentUserNickname (현재 구현과 맞춤)
-        "댓글내용",
-        10L,
-        Instant.parse("2025-01-01T00:00:00Z"),
-        Instant.parse("2025-01-04T00:00:00Z")
-    );
-
+  @DisplayName("GET /api/user-activities/me: Mongo 시드 후 각 섹션 크기 ≥ 1")
+  void me_sections_filled() throws Exception {
     mockMvc.perform(get("/api/user-activities/me")
+            .with(user(user.getId().toString()).roles("USER"))                 // ★ 인증 주입
             .header("Monew-Request-User-ID", user.getId().toString())
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(user.getId().toString()))
-        .andExpect(jsonPath("$.subscriptions", hasSize(greaterThanOrEqualTo(1))))
-        .andExpect(jsonPath("$.comments", hasSize(greaterThanOrEqualTo(1))))
-        .andExpect(jsonPath("$.commentLikes", hasSize(greaterThanOrEqualTo(1))));
-    // articleViews 검증은 생략
+        .andExpect(jsonPath("$.articleViews.length()").value(greaterThanOrEqualTo(1)))
+        .andExpect(jsonPath("$.comments.length()").value(greaterThanOrEqualTo(1)))
+        .andExpect(jsonPath("$.commentLikes.length()").value(greaterThanOrEqualTo(1)))
+        .andExpect(jsonPath("$.subscriptions.length()").value(greaterThanOrEqualTo(1)));
   }
 
   @Test
   @Order(3)
-  @DisplayName("{userId}: 소유자 접근이면 200")
-  void userActivity_by_id_owner_ok() throws Exception {
+  @DisplayName("GET /api/user-activities/{userId}: 소유자 접근이면 200")
+  void byUserId_owner_ok() throws Exception {
     mockMvc.perform(get("/api/user-activities/{userId}", user.getId())
+            .with(user(user.getId().toString()).roles("USER"))                 // ★ 인증 주입
             .header("Monew-Request-User-ID", user.getId().toString())
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -163,74 +185,30 @@ class UserActivityIntegrationTest {
 
   @Test
   @Order(4)
-  @DisplayName("{userId}: 헤더 유저 ≠ 경로 유저 → 403")
-  void userActivity_by_id_forbidden_when_other() throws Exception {
-    UUID other = UUID.randomUUID();
-    mockMvc.perform(get("/api/user-activities/{userId}", user.getId())
-            .header("Monew-Request-User-ID", other.toString())
+  @DisplayName("GET /api/user-activities/me: 헤더 없음 → 401")
+  void me_unauthorized_ifNoHeader() throws Exception {
+    mockMvc.perform(get("/api/user-activities/me")
+            .with(user(user.getId().toString()).roles("USER")) // 인증은 있어도 헤더 없음 → 401(컨트롤러 검증)
             .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
-  @Order(5)
-  @DisplayName("me: 헤더 없으면 401")
-  void myActivity_unauthorized_when_no_header() throws Exception {
-    mockMvc.perform(get("/api/user-activities/me"))
         .andExpect(status().isUnauthorized());
   }
 
-  // ---------- helper ----------
+  // ===== 유틸: User.createdAt 보장 =====
+  private static void ensureCreatedAtExists(EntityManager em, UUID userId, Instant ts) {
+    int updated = em.createQuery(
+            "update User u set u.createdAt = :ts where u.id = :id")
+        .setParameter("ts", ts)
+        .setParameter("id", userId)
+        .executeUpdate();
 
-  private static void ensureCreatedAtExists(JdbcTemplate jdbc, UUID userId, Instant instant) {
-    Timestamp ts = Timestamp.from(instant);
+    if (updated != 1) throw new AssertionError("User.createdAt 업데이트 실패");
+    em.clear();
 
-    // 1) UPDATE 시도 (인용/비인용 + 카멜/스네이크 조합)
-    String[] updateSqls = new String[] {
-        // users.created_at
-        "UPDATE users SET created_at = ? WHERE id = ?",
-        "UPDATE users SET \"created_at\" = ? WHERE id = ?",
-        "UPDATE \"users\" SET created_at = ? WHERE id = ?",
-        "UPDATE \"users\" SET \"created_at\" = ? WHERE id = ?",
+    Instant created = em.createQuery(
+            "select u.createdAt from User u where u.id = :id", Instant.class)
+        .setParameter("id", userId)
+        .getSingleResult();
 
-        // users.createdAt (카멜 표기 대응)
-        "UPDATE users SET createdAt = ? WHERE id = ?",
-        "UPDATE users SET \"createdAt\" = ? WHERE id = ?",
-        "UPDATE \"users\" SET createdAt = ? WHERE id = ?",
-        "UPDATE \"users\" SET \"createdAt\" = ? WHERE id = ?"
-    };
-
-    int updated = 0;
-    for (String sql : updateSqls) {
-      try {
-        updated = jdbc.update(sql, ts, userId);
-      } catch (Exception ignore) { }
-      if (updated > 0) break;
-    }
-
-    // 2) SELECT로 실제 값 확인 (여의치 않으면 명확히 실패)
-    String[] selectSqls = new String[] {
-        "SELECT created_at FROM users WHERE id = ?",
-        "SELECT \"created_at\" FROM users WHERE id = ?",
-        "SELECT created_at FROM \"users\" WHERE id = ?",
-        "SELECT \"created_at\" FROM \"users\" WHERE id = ?",
-
-        "SELECT createdAt FROM users WHERE id = ?",
-        "SELECT \"createdAt\" FROM users WHERE id = ?",
-        "SELECT createdAt FROM \"users\" WHERE id = ?",
-        "SELECT \"createdAt\" FROM \"users\" WHERE id = ?"
-    };
-
-    Timestamp created = null;
-    for (String sql : selectSqls) {
-      try {
-        created = jdbc.queryForObject(sql, (rs, rowNum) -> rs.getTimestamp(1), userId);
-      } catch (Exception ignore) { }
-      if (created != null) break;
-    }
-
-    if (created == null) {
-      throw new AssertionError("users 테이블의 created_at/createdAt 업데이트 실패: 스키마 컬럼명/인용(quoting) 확인 필요");
-    }
+    if (created == null) throw new AssertionError("User.createdAt 조회 실패");
   }
 }

@@ -30,12 +30,6 @@ public class UserActivityController {
 
   // 1) 내 활동내역 (헤더 없으면 401)
   @Hidden
-  @Operation( summary = "자신의 활동 내역 조회", description = "자신의 ID로 활동 내역을 조회합니다.")
-  @ApiResponses ({
-      @ApiResponse(responseCode = "200", description = "사용자 활동 내역 조회 성공"),
-      @ApiResponse(responseCode = "404", description = "사용자 정보 없음"),
-      @ApiResponse(responseCode = "500", description = "서버 내부 오류")
-  })
   @GetMapping("/api/user-activities/me")
   public ResponseEntity<UserActivityDto> myActivity(Principal principal) {
     UUID userId = userExtractor.extractUserId(principal);
