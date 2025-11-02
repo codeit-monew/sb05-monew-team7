@@ -65,7 +65,7 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
          AND n.confirmed = FALSE
       """);
     q.setParameter("userId", userId);
-    q.setParameter("now", java.time.Instant.now()); // 또는 getDatabaseNow()로 일관성 유지
+    q.setParameter("now", java.time.Instant.now()); // 또는 getDatabaseNow()로 일관성
     return q.executeUpdate();
   }
 
