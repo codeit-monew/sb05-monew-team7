@@ -9,15 +9,20 @@ import com.spring.monew.activity.domain.ActivityCommentDoc;
 import com.spring.monew.activity.domain.ActivityCommentLikeDoc;
 import com.spring.monew.activity.domain.UserInterestSubscriptionDoc;
 import com.spring.monew.activity.repository.UserActivityQueryRepository;
+import com.spring.monew.article.domain.Article;
+import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.articleview.controller.dto.response.ArticleViewDto;
 import com.spring.monew.subscription.controller.dto.response.SubscriptionDto;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Sort;
@@ -33,6 +38,7 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
 
   private final MongoTemplate mongo;
   private final JdbcTemplate jdbc;
+  private final ArticleRepository articleRepository;
 
   @Override
   public Optional<UserSummary> findUserSummary(UUID userId) {
@@ -147,16 +153,32 @@ public class UserActivityQueryRepositoryImpl implements UserActivityQueryReposit
     q.limit(topN);
 
     List<ActivityArticleViewDoc> docs = mongo.find(q, ActivityArticleViewDoc.class);
-    List<ArticleViewDto> out = new ArrayList<>(docs.size());
+    if (docs.isEmpty()) return List.of();
 
+    List<UUID> articleIds = docs.stream()
+        .map(ActivityArticleViewDoc::getArticleId)
+        .distinct()
+        .toList();
+
+    Map<UUID, Long> latestCc = articleRepository.findAllById(articleIds).stream()
+        .collect(Collectors.toMap(
+            Article::getId,
+            a -> a.getCommentCount() == 0 ? 0L : a.getCommentCount()
+        ));
+
+    List<ArticleViewDto> out = new ArrayList<>(docs.size());
     for (ActivityArticleViewDoc d : docs) {
-      long cc = d.getCommentCount() == null ? 0L : d.getCommentCount();
+      // ★ 변경: 댓글수는 RDB 최신값 우선, 없으면 Mongo 값 사용
+      long cc = latestCc.getOrDefault(
+          d.getArticleId(),
+          d.getCommentCount() == null ? 0L : d.getCommentCount()
+      );
       long vc = d.getViewCount() == null ? 0L : d.getViewCount();
 
       out.add(new ArticleViewDto(
           UUID.fromString(d.getId()),
           d.getUserId(),
-          d.getLastViewedAt(),   // 최근 조회 시각
+          d.getLastViewedAt(),
           d.getArticleId(),
           d.getSource(),
           d.getSourceUrl(),
