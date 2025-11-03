@@ -1,6 +1,8 @@
 package com.spring.monew.common.exception;
 
 import com.spring.monew.article.exception.ArticleNotFoundException;
+import com.spring.monew.backup.exception.BackupNotFoundException;
+import com.spring.monew.backup.exception.S3ServiceException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +76,31 @@ public class GlobalExceptionHandler {
         log.warn("리소스를 찾을 수 없음: {}", ex.getMessage());
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setTitle("리소스 없음");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(BackupNotFoundException.class)
+    public ProblemDetail handleBackupNotFoundException(BackupNotFoundException ex) {
+        log.warn("백업을 찾을 수 없음: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("백업 정보 없음");
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("backupDate", ex.getBackupDate());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(S3ServiceException.class)
+    public ProblemDetail handleS3ServiceException(S3ServiceException ex) {
+        log.error("S3 서비스 오류: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("백업 서비스 일시 불가");
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
     }
