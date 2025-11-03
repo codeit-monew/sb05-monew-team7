@@ -23,12 +23,12 @@ public class SecurityConfig {
   private final RequestIdFilter requestIdFilter;
 
   @Value("${monitoring.prometheus.allow-ip}")
-  private String prometheusAllowIp;// yml 속성 주입 (기본값은 localhost)
+  private String prometheusAllowIp; // yml 속성 주입 (기본값은 localhost)
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-        .csrf(AbstractHttpConfigurer::disable)// CSRF 보안 비활성화 (개발용)
+        .csrf(AbstractHttpConfigurer::disable) // CSRF 보안 비활성화 (개발용)
 
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/actuator/prometheus")
@@ -38,7 +38,7 @@ public class SecurityConfig {
               return new AuthorizationDecision(equals);
             })
             .requestMatchers("/actuator/health", "/actuator/info",
-                "/actuator/loggers").permitAll()//Actuator 허용 (원래는 이렇게 하면 안됨)
+                "/actuator/loggers").permitAll() //Actuator 허용 (원래는 이렇게 하면 안됨)
                 //  모든 경로 허용 (개발용)
             .requestMatchers("/api/batch/**").permitAll()
             .anyRequest().permitAll()
