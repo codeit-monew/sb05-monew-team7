@@ -31,7 +31,7 @@ public class CommentLikeController {
   private final UserActivityService userActivityService;
   private final NotificationService notificationService;
 
-  @Operation(summary = "댓글 물리 삭제", description = "댓글 좋아요를 등록합니다.")
+  @Operation(summary = "관심사 댓글 좋아요", description = "댓글 좋아요를 등록합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "댓글 좋아요 성공"),
       @ApiResponse(responseCode = "404", description = "댓글 정보 없음"),
@@ -64,7 +64,7 @@ public class CommentLikeController {
   @Operation(summary = "댓글 좋아요 취소", description = "댓글 좋아요를 취소합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "댓글 좋아요 취소 성공"),
-      @ApiResponse(responseCode = "404", description = "관심사 정보 없음"),
+      @ApiResponse(responseCode = "404", description = "댓글 정보 없음"),
       @ApiResponse(responseCode = "500", description = "서버 내부 오류")
   })
   @DeleteMapping("/{commentId}/comment-likes")

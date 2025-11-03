@@ -37,7 +37,7 @@ public class CommentController {
   private final RequestUserExtractor userExtractor;
   private final UserActivityService userActivityService;
 
-  @Operation(summary = "댓글 등록", description = "새로운 댓글를 등록합니다.")
+  @Operation(summary = "댓글 등록", description = "새로운 댓글을 등록합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "등록 성공"),
       @ApiResponse(responseCode = "400", description = "잘못된 요청 (입력값 검증 실패)"),
@@ -109,7 +109,7 @@ public class CommentController {
     );
   }
 
-  @Operation(summary = "댓글 논리 삭제", description = "댓글를 논리적으로 삭제합니다.")
+  @Operation(summary = "댓글 논리 삭제", description = "댓글을 논리적으로 삭제합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "삭제 성공"),
       @ApiResponse(responseCode = "404", description = "댓글 정보 없음"),
@@ -121,7 +121,7 @@ public class CommentController {
     userActivityService.removeCommentActivity(commentId);
   }
 
-  @Operation(summary = "댓글 물리 삭제", description = "댓글를 물리적으로 삭제합니다.")
+  @Operation(summary = "댓글 물리 삭제", description = "댓글을 물리적으로 삭제합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "삭제 성공"),
       @ApiResponse(responseCode = "404", description = "댓글 정보 없음"),

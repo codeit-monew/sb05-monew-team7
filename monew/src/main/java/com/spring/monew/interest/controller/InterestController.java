@@ -45,7 +45,7 @@ public class InterestController {
     return interestService.addInterest(registerRequest);
   }
 
-  @Operation(summary = "관심사 등록", description = "조건에 맞는 관심사 목록을 조회합니다.")
+  @Operation(summary = "관심사 목록 조회", description = "조건에 맞는 관심사 목록을 조회합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "조회 성공"),
       @ApiResponse(responseCode = "400", description = "잘못된 요청 (정렬 기준 오류, 페이지네이션 파라미터 오류 등)"),

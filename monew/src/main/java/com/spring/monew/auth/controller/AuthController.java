@@ -24,7 +24,7 @@ public class AuthController {
 
   @Operation(
       summary = "로그인",
-      description = "사용자 로그인을 처리합니다.."
+      description = "사용자 로그인을 처리합니다."
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "로그인 성공"),
