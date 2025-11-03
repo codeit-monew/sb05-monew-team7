@@ -24,6 +24,8 @@ public class BatchJobService {
 
     private final JobLauncher jobLauncher;
     private final Job newsCollectionJob;
+    private final Job articleBackupJob;
+    private final Job logBackupJob;
     private final JobRepository jobRepository;
     private final JobExplorer jobExplorer;
 
@@ -42,6 +44,44 @@ public class BatchJobService {
             return BatchJobTriggerResponse.from(jobExecution);
         } catch (Exception e) {
             log.error("newsCollectionJob 실행 실패", e);
+            throw new RuntimeException("배치 작업 실행 실패", e);
+        }
+    }
+
+    public BatchJobTriggerResponse triggerArticleBackupJob() {
+        log.info("articleBackupJob 수동 실행 요청");
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("triggerType", "MANUAL")
+                .addLong("triggerTime", System.currentTimeMillis())
+                .toJobParameters();
+
+        try {
+            JobExecution jobExecution = jobLauncher.run(articleBackupJob, jobParameters);
+            log.info("articleBackupJob 실행 성공 - executionId: {}, status: {}",
+                    jobExecution.getId(), jobExecution.getStatus());
+            return BatchJobTriggerResponse.from(jobExecution);
+        } catch (Exception e) {
+            log.error("articleBackupJob 실행 실패", e);
+            throw new RuntimeException("배치 작업 실행 실패", e);
+        }
+    }
+
+    public BatchJobTriggerResponse triggerLogBackupJob() {
+        log.info("logBackupJob 수동 실행 요청");
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("triggerType", "MANUAL")
+                .addLong("triggerTime", System.currentTimeMillis())
+                .toJobParameters();
+
+        try {
+            JobExecution jobExecution = jobLauncher.run(logBackupJob, jobParameters);
+            log.info("logBackupJob 실행 성공 - executionId: {}, status: {}",
+                    jobExecution.getId(), jobExecution.getStatus());
+            return BatchJobTriggerResponse.from(jobExecution);
+        } catch (Exception e) {
+            log.error("logBackupJob 실행 실패", e);
             throw new RuntimeException("배치 작업 실행 실패", e);
         }
     }
