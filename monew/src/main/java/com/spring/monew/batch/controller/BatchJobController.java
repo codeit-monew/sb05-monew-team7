@@ -35,6 +35,26 @@ public class BatchJobController {
     }
 
     @Operation(
+            summary = "기사 백업 배치 작업 수동 트리거",
+            description = "articleBackupJob을 수동으로 실행하여 모든 기사를 S3에 백업합니다."
+    )
+    @PostMapping("/trigger/article-backup")
+    public ResponseEntity<BatchJobTriggerResponse> triggerArticleBackupJob() {
+        BatchJobTriggerResponse response = batchJobService.triggerArticleBackupJob();
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "로그 백업 배치 작업 수동 트리거",
+            description = "logBackupJob을 수동으로 실행하여 로그 파일을 S3에 백업합니다."
+    )
+    @PostMapping("/trigger/log-backup")
+    public ResponseEntity<BatchJobTriggerResponse> triggerLogBackupJob() {
+        BatchJobTriggerResponse response = batchJobService.triggerLogBackupJob();
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
             summary = "배치 작업 실행 상세 조회",
             description = "특정 executionId의 배치 작업 실행 상세 정보를 조회합니다 (Step 통계 포함)."
     )
