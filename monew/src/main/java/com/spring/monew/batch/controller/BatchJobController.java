@@ -5,6 +5,8 @@ import com.spring.monew.batch.dto.response.BatchJobTriggerResponse;
 import com.spring.monew.batch.service.BatchJobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Batch Job API", description = "뉴스 수집 배치 작업 트리거 및 모니터링 API")
+@Tag(name = "뉴스 배치 작업 관리", description = "뉴스 수집 배치 작업 트리거 및 모니터링 API")
 @RestController
 @RequestMapping("/api/batch")
 @RequiredArgsConstructor
@@ -28,6 +30,10 @@ public class BatchJobController {
             summary = "뉴스 수집 배치 작업 수동 트리거",
             description = "newsCollectionJob을 수동으로 실행합니다. 스케줄러와 별도로 즉시 실행됩니다."
     )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "배치 작업 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @PostMapping("/trigger")
     public ResponseEntity<BatchJobTriggerResponse> triggerNewsCollectionJob() {
         BatchJobTriggerResponse response = batchJobService.triggerNewsCollectionJob();
@@ -38,6 +44,10 @@ public class BatchJobController {
             summary = "배치 작업 실행 상세 조회",
             description = "특정 executionId의 배치 작업 실행 상세 정보를 조회합니다 (Step 통계 포함)."
     )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @GetMapping("/executions/{executionId}")
     public ResponseEntity<BatchJobExecutionResponse> getExecutionDetails(
             @Parameter(description = "배치 작업 실행 ID", example = "1")
