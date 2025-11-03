@@ -17,8 +17,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @Document("activity_article_views")
 @CompoundIndexes({
-    @CompoundIndex(name = "uk_view_user_article", def = "{'userId': 1, 'articleId': 1}", unique = true),
-    @CompoundIndex(name = "ix_view_user_lastViewed", def = "{'userId': 1, 'lastViewedAt': -1}")
+    @CompoundIndex(name = "uk_view_user_article", def = "{'user_id': 1, 'article_id': 1}", unique = true),
+    @CompoundIndex(name = "ix_view_user_lastViewed", def = "{'user_id': 1, 'last_viewed_at': -1}")
 })
 public class ActivityArticleViewDoc {
     @Id
