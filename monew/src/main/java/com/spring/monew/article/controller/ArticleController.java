@@ -7,6 +7,8 @@ import com.spring.monew.auth.config.HeaderUserAuthentication;
 import com.spring.monew.common.util.RequestUserExtractor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -26,14 +28,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "기사", description = "기사 목록 조회 및 검색 API")
+@Tag(name = "뉴스 기사 관리", description = "기사 목록 조회 및 검색 API")
 public class ArticleController {
 
   private final ArticleService articleService;
   private final RequestUserExtractor userExtractor;
 
+
   @GetMapping
-  @Operation(summary = "기사 목록 조회", description = "필터, 검색, 정렬 기능을 지원하는 페이지네이션 기사 목록 조회")
+  @Operation(summary = "뉴스 기사 목록 조회", description = "조건에 맞는 뉴스 기사 목록을 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공"),
+      @ApiResponse(responseCode = "400", description = "잘못된 요청 (정렬 기준 오류, 페이지네이션 파라미터 오류 등)"),
+      @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+  })
   public CursorPageResponseArticleDto articleList(
       @Parameter(description = "검색어(제목, 요약)")
       @RequestParam(required = false) String keyword,
@@ -62,9 +70,9 @@ public class ArticleController {
       @RequestParam(required = false) String cursor,
 
       @Parameter(description = "커서 페이지 크기", required = true)
-      @RequestParam(required = true) 
-      @Min(1) 
-      @Max(100) 
+      @RequestParam(required = true)
+      @Min(1)
+      @Max(100)
       int limit,
 
       Principal principal
@@ -88,8 +96,13 @@ public class ArticleController {
   @GetMapping("/{articleId}")
   @Operation(
       summary = "뉴스 기사 단건 조회",
-      description = "뉴스 기사 ID를 사용하여 특정 기사의 상세 정보를 조회합니다. 조회 시 자동으로 조회수가 증가하며, 같은 사용자의 중복 조회는 24시간 동안 1회만 카운트됩니다."
+      description = "뉴스 기사 ID로 뉴스 기사 단건을 조회합니다."
   )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공"),
+      @ApiResponse(responseCode = "404", description = "뉴스 기사 정보 없음"),
+      @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+  })
   public ArticleDto articleDetails(
       @Parameter(description = "뉴스 기사 ID", required = true)
       @PathVariable UUID articleId,
@@ -101,7 +114,11 @@ public class ArticleController {
   }
 
   @GetMapping("/sources")
-  @Operation(summary = "기사 출처 목록 조회", description = "뉴스 기사 출처 enum 값 목록 반환")
+  @Operation(summary = "출처 목록 조회", description = "출처 목록을 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공"),
+      @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+  })
   public List<String> articleSourceList() {
     return articleService.getSources();
   }
