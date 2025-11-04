@@ -276,7 +276,7 @@ ALTER TABLE batch_job_execution_context
 
 ALTER TABLE batch_step_execution_context
     ADD CONSTRAINT step_exec_ctx_fk FOREIGN KEY (step_execution_id) REFERENCES batch_step_execution(step_execution_id);
-    
+
 CREATE INDEX IF NOT EXISTS idx_notif_user_confirm_created_desc
     ON notifications (user_id, confirmed, created_at DESC, id DESC);
 
