@@ -121,7 +121,7 @@ public class S3LogBackupServiceImpl implements LogBackupService {
   }
 
   private String generateLogFilePath(LocalDate logDate) {
-    return logFilePath + "/" + logFileName + "." + logDate.format(DATE_FORMATTER) + ".log";
+    return Paths.get(logFilePath, logFileName + "-" + logDate.format(DATE_FORMATTER) + ".log").toString();
   }
 
   private String generateS3Key(LocalDate logDate) {
@@ -138,7 +138,12 @@ public class S3LogBackupServiceImpl implements LogBackupService {
 
   private LocalDate extractDateFromFileName(String fileName) {
     try {
-      String dateStr = fileName.replaceAll("^.*\\.", "").replaceAll("\\.log$", "");
+      int dateStart = fileName.lastIndexOf('-');
+      int extensionIndex = fileName.lastIndexOf(".log");
+      if (dateStart < 0 || extensionIndex < 0 || dateStart >= extensionIndex) {
+        return null;
+      }
+      String dateStr = fileName.substring(dateStart + 1, extensionIndex);
       return LocalDate.parse(dateStr, DATE_FORMATTER);
     } catch (Exception e) {
       return null;
