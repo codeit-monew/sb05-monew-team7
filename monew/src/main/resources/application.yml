@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none # 'none' for initial creation, 'validate' afterwards
+      ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
     properties:
       hibernate:
         format_sql: true
@@ -24,7 +24,7 @@ spring:
 
   sql:
     init:
-      mode: always # 'always' for initial creation, 'never' afterwards
+      mode: never # 'always' for initial creation, 'never' afterwards
 
   data:
     mongodb:

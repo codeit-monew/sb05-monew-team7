@@ -33,6 +33,7 @@ public class ArticleBackupWriter implements ItemWriter<ArticleBackupDto>, StepEx
             .toList();
 
         if (articles.isEmpty()) {
+            log.warn("청크가 비어있음 - 건너뜀");
             return;
         }
 
@@ -50,12 +51,18 @@ public class ArticleBackupWriter implements ItemWriter<ArticleBackupDto>, StepEx
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
+        log.info("afterStep 호출됨 - aggregatedArticles 크기: {}", aggregatedArticles.size());
+        
         if (!aggregatedArticles.isEmpty()) {
             LocalDate backupDate = LocalDate.now().minusDays(1);
+            log.info("S3 업로드 시작: backupDate={}, 기사 수={}", backupDate, aggregatedArticles.size());
             s3BackupService.uploadBackup(backupDate, new ArrayList<>(aggregatedArticles));
             log.info("S3 백업 완료: {} 개의 기사", aggregatedArticles.size());
             aggregatedArticles.clear();
+        } else {
+            log.warn("백업할 기사가 없음 - S3 업로드 건너뜀");
         }
+        
         return ExitStatus.COMPLETED;
     }
 }

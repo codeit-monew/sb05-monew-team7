@@ -6,6 +6,7 @@ import com.spring.monew.batch.processor.ArticleBackupProcessor;
 import com.spring.monew.batch.writer.ArticleBackupWriter;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -25,6 +26,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class ArticleBackupBatchConfig {
@@ -69,9 +71,13 @@ public class ArticleBackupBatchConfig {
         if ("MANUAL".equals(triggerType)) {
             startDate = yesterday.atStartOfDay(zoneId).toInstant();
             endDate = tomorrow.atStartOfDay(zoneId).toInstant();
+            log.info("수동 트리거: 백업 기간 설정 - startDate: {} ({}), endDate: {} ({})", 
+                    startDate, yesterday, endDate, tomorrow);
         } else {
             startDate = yesterday.atStartOfDay(zoneId).toInstant();
             endDate = today.atStartOfDay(zoneId).toInstant();
+            log.info("스케줄 트리거: 백업 기간 설정 - startDate: {} ({}), endDate: {} ({})", 
+                    startDate, yesterday, endDate, today);
         }
 
         Map<String, Object> parameters = new HashMap<>();
