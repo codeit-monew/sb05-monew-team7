@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
-@Tag(name = "기사 조회 추적", description = "기사 조회수 추적 API")
+@Tag(name = "뉴스 기사 조회 추적", description = "기사 조회수 추적 API")
 public class ArticleViewController {
 
     private final ArticleViewService articleViewService;
@@ -43,7 +43,7 @@ public class ArticleViewController {
         Principal principal
     ) {
         UUID userId = userExtractor.extractUserId(principal);
-        
+
         if (userId == null) {
             return ResponseEntity.badRequest().build();
         }
