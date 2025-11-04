@@ -1,5 +1,7 @@
 package com.spring.monew.interest.service.impl;
 
+import com.spring.monew.article.domain.Article;
+import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.interest.controller.dto.request.InterestRegisterRequest;
 import com.spring.monew.interest.controller.dto.request.InterestUpdateRequest;
 import com.spring.monew.interest.controller.dto.response.CursorPageResponseInterestDto;
@@ -12,22 +14,24 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class InterestServiceImpl implements InterestService {
 
   private final InterestRepository interestRepository;
+  private final ArticleRepository articleRepository;
 
   @Override
   @Transactional
   public InterestDto addInterest(InterestRegisterRequest registerRequest) {
     List<String> similarNames = interestRepository.findSimilarNames(registerRequest.name(), 0.45);
 
-    //예외 처리 필요 interests name exixsts
     if (interestRepository.existsByName(registerRequest.name())) {
       throw new IllegalArgumentException("같은 이름이 존재합니다.");
     }
@@ -84,6 +88,14 @@ public class InterestServiceImpl implements InterestService {
   public void removeInterest(UUID interestId) {
     Interest interest = interestRepository.findById(interestId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관심사입니다."));
+
+    List<Article> relatedArticles = articleRepository.findAllByInterestId(interestId);
+    
+    if (!relatedArticles.isEmpty()) {
+      log.info("관심사 삭제로 인한 연관 게시글 소프트 삭제: interestId={}, articleCount={}", 
+          interestId, relatedArticles.size());
+      articleRepository.deleteAll(relatedArticles);
+    }
 
     interestRepository.delete(interest);
   }

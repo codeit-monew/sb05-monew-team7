@@ -2,7 +2,9 @@ package com.spring.monew.batch.service;
 
 import com.spring.monew.batch.dto.response.BatchJobExecutionResponse;
 import com.spring.monew.batch.dto.response.BatchJobTriggerResponse;
+import com.spring.monew.batch.dto.response.CleanupTriggerResponse;
 import com.spring.monew.batch.exception.BatchJobExecutionNotFoundException;
+import com.spring.monew.batch.scheduler.ArticleCleanupScheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -24,8 +26,11 @@ public class BatchJobService {
 
     private final JobLauncher jobLauncher;
     private final Job newsCollectionJob;
+    private final Job articleBackupJob;
+    private final Job logBackupJob;
     private final JobRepository jobRepository;
     private final JobExplorer jobExplorer;
+    private final ArticleCleanupScheduler articleCleanupScheduler;
 
     public BatchJobTriggerResponse triggerNewsCollectionJob() {
         log.info("newsCollectionJob 수동 실행 요청");
@@ -43,6 +48,57 @@ public class BatchJobService {
         } catch (Exception e) {
             log.error("newsCollectionJob 실행 실패", e);
             throw new RuntimeException("배치 작업 실행 실패", e);
+        }
+    }
+
+    public BatchJobTriggerResponse triggerArticleBackupJob() {
+        log.info("articleBackupJob 수동 실행 요청");
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("triggerType", "MANUAL")
+                .addLong("triggerTime", System.currentTimeMillis())
+                .toJobParameters();
+
+        try {
+            JobExecution jobExecution = jobLauncher.run(articleBackupJob, jobParameters);
+            log.info("articleBackupJob 실행 성공 - executionId: {}, status: {}",
+                    jobExecution.getId(), jobExecution.getStatus());
+            return BatchJobTriggerResponse.from(jobExecution);
+        } catch (Exception e) {
+            log.error("articleBackupJob 실행 실패", e);
+            throw new RuntimeException("배치 작업 실행 실패", e);
+        }
+    }
+
+    public BatchJobTriggerResponse triggerLogBackupJob() {
+        log.info("logBackupJob 수동 실행 요청");
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("triggerType", "MANUAL")
+                .addLong("triggerTime", System.currentTimeMillis())
+                .toJobParameters();
+
+        try {
+            JobExecution jobExecution = jobLauncher.run(logBackupJob, jobParameters);
+            log.info("logBackupJob 실행 성공 - executionId: {}, status: {}",
+                    jobExecution.getId(), jobExecution.getStatus());
+            return BatchJobTriggerResponse.from(jobExecution);
+        } catch (Exception e) {
+            log.error("logBackupJob 실행 실패", e);
+            throw new RuntimeException("배치 작업 실행 실패", e);
+        }
+    }
+
+    public CleanupTriggerResponse triggerArticleCleanupJob() {
+        log.info("articleCleanupJob 수동 실행 요청");
+
+        try {
+            int[] counts = articleCleanupScheduler.deleteSoftDeletedArticlesManual();
+            log.info("articleCleanupJob 실행 완료");
+            return CleanupTriggerResponse.success("articleCleanupJob", counts[0], counts[1]);
+        } catch (Exception e) {
+            log.error("articleCleanupJob 실행 실패", e);
+            return CleanupTriggerResponse.failure("articleCleanupJob", e.getMessage());
         }
     }
 

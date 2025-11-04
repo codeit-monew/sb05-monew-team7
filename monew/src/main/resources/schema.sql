@@ -64,7 +64,10 @@ CREATE TABLE interests
     name                VARCHAR(255) NOT NULL UNIQUE,
     created_at          TIMESTAMP WITH TIME ZONE  NOT NULL,
     keywords            TEXT         NOT NULL,
-    subscriptions_count BIGINT       NOT NULL DEFAULT 0
+    subscriptions_count BIGINT                NOT NULL DEFAULT 0,
+    updated_at          TIMESTAMP WITH TIME ZONE  NOT NULL,
+    is_deleted          BOOLEAN                   NOT NULL DEFAULT FALSE,
+    deleted_at          TIMESTAMP WITH TIME ZONE
 );
 
 -- name 컬럼 GIN 트라이그램 인덱스
@@ -107,7 +110,7 @@ CREATE TABLE articles
     deleted_at    TIMESTAMP WITH TIME ZONE      NULL,
     CONSTRAINT fk_article_interest FOREIGN KEY (interest_id)
         REFERENCES interests (id)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON UPDATE CASCADE
 );
 
 -- ==============================
@@ -276,7 +279,7 @@ ALTER TABLE batch_job_execution_context
 
 ALTER TABLE batch_step_execution_context
     ADD CONSTRAINT step_exec_ctx_fk FOREIGN KEY (step_execution_id) REFERENCES batch_step_execution(step_execution_id);
-    
+
 CREATE INDEX IF NOT EXISTS idx_notif_user_confirm_created_desc
     ON notifications (user_id, confirmed, created_at DESC, id DESC);
 

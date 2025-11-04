@@ -36,11 +36,11 @@ spring:
 
   batch:
     job:
+      enabled: false
+    trigger:
       enabled: true
     jdbc:
       initialize-schema: never
-    trigger:
-      enabled: true
 
   servlet:
     multipart:
@@ -60,6 +60,10 @@ logging:
     org.hibernate.type.descriptor.sql: WARN
     org.springframework.batch: INFO
     com.spring.monew: INFO
+  file:
+    path: ${LOG_FILE_PATH:./logs}
+    name: ${LOG_FILE_NAME:monew-application}
+    max-history: ${LOG_FILE_MAX_HISTORY:7}
 
 management:
   endpoints:
@@ -100,3 +104,11 @@ naver:
   api:
     client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
     client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
+
+aws:
+  s3:
+    region: ${AWS_REGION:ap-northeast-2}
+    bucket: ${AWS_S3_BUCKET:monew-article-backups}
+    log-bucket: ${AWS_S3_LOG_BUCKET:monew-bucket-s3-logback}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}

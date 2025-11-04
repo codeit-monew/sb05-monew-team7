@@ -83,6 +83,19 @@ public class Article {
         return new Article(interest, source, sourceUrl, title, publishDate, summary);
     }
 
+    public static Article restore(UUID id, Interest interest, ArticleSource source,
+                                  String sourceUrl, String title, Instant publishDate,
+                                  String summary, long viewCount, long commentCount,
+                                  Instant createdAt) {
+      Article article = new Article(interest, source, sourceUrl, title, publishDate, summary);
+      article.id = id;
+      article.viewCount = viewCount;
+      article.commentCount = commentCount;
+      article.createdAt = createdAt;
+      article.updatedAt = createdAt;
+      return article;
+    }
+
     public void incrementViewCount() {
         this.viewCount++;
     }
@@ -98,7 +111,6 @@ public class Article {
     }
     
     
-    // 테스트용
     @TestOnly
     public Article(
         UUID id,
