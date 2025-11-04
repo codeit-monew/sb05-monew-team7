@@ -125,7 +125,7 @@ public class S3LogBackupServiceImpl implements LogBackupService {
   }
 
   private String generateLogFilePath(LocalDate logDate) {
-    return Paths.get(logFilePath, logFileName + "-" + logDate.format(DATE_FORMATTER) + ".log").toString();
+    return Paths.get(logFilePath, logFileName + "." + logDate.format(DATE_FORMATTER) + ".log").toString();
   }
 
   private String generateS3Key(LocalDate logDate) {
