@@ -159,7 +159,7 @@ public class ArticleServiceImpl implements ArticleService {
   }
 
   @Override
-  @Transactional(isolation = Isolation.SERIALIZABLE)
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void hardDeleteArticle(UUID articleId, UUID userId) {
     String requestId = MDC.get("requestId");
     try {
@@ -199,6 +199,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     List<UUID> restoredArticleIds = new ArrayList<>();
+    List<String> failedDates = new ArrayList<>();
     LocalDate currentDate = fromDate.atZone(ZoneOffset.UTC).toLocalDate();
     LocalDate endDate = toDate.atZone(ZoneOffset.UTC).toLocalDate();
 
@@ -213,11 +214,16 @@ public class ArticleServiceImpl implements ArticleService {
         }
       } catch (Exception e) {
         log.warn("날짜 {}의 백업 복원 중 오류 발생: {}", currentDate, e.getMessage());
+        failedDates.add(currentDate.toString());
       }
       
       currentDate = currentDate.plusDays(1);
     }
 
+    if (!failedDates.isEmpty()) {
+      log.warn("복원 실패한 날짜: {}", String.join(", ", failedDates));
+    }
+    
     log.info("복원 완료: {} 개의 기사 복원됨", restoredArticleIds.size());
     auditLogger.logRestore(fromDate, toDate, restoredArticleIds.size(), userId, requestId);
     return new ArticleRestoreResultDto(Instant.now(), restoredArticleIds, restoredArticleIds.size());
@@ -246,9 +252,13 @@ public class ArticleServiceImpl implements ArticleService {
       return List.of();
     }
 
-    Set<String> existingUrls = articleRepository.findAllSourceUrls();
-    log.info("[복원] 현재 DB에 존재하는 기사 URL 개수: {}", existingUrls.size());
-    log.info("[복원] 백업 파일의 기사 개수: {}", backupDataList.size());
+    List<String> backupUrls = backupDataList.stream()
+        .map(data -> (String) data.get("sourceUrl"))
+        .filter(url -> url != null)
+        .toList();
+
+    Set<String> existingUrls = articleRepository.findExistingSourceUrls(backupUrls);
+    log.info("[복원] 백업 파일의 기사 개수: {}, DB에 존재하는 URL 개수: {}", backupUrls.size(), existingUrls.size());
     
     List<Map<String, Object>> missingArticles = new ArrayList<>();
 
