@@ -1,7 +1,9 @@
 package com.spring.monew.article.repository;
 
 import com.spring.monew.article.domain.Article;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -27,4 +29,12 @@ public interface ArticleRepository extends JpaRepository<Article, UUID>, Article
 
   @Query("SELECT a.sourceUrl FROM Article a")
   Set<String> findAllSourceUrls();
+
+  @Query(value = """
+    SELECT id FROM articles
+    WHERE is_deleted = true
+      AND deleted_at IS NOT NULL
+      AND deleted_at < :threshold
+    """, nativeQuery = true)
+  List<UUID> findSoftDeletedBefore(@Param("threshold") Instant threshold);
 }
