@@ -14,6 +14,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -21,7 +22,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class ArticleBackupBatchConfig {
     public Step articleBackupStep() {
         return new StepBuilder("articleBackupStep", jobRepository)
                 .<Article, ArticleBackupDto>chunk(100, transactionManager)
-                .reader(articleBackupReader())
+                .reader(articleBackupReader(null))
                 .processor(articleBackupProcessor)
                 .writer(articleBackupWriter)
                 .listener(articleBackupWriter)
@@ -55,13 +55,24 @@ public class ArticleBackupBatchConfig {
 
     @Bean
     @StepScope
-    public JpaPagingItemReader<Article> articleBackupReader() {
+    public JpaPagingItemReader<Article> articleBackupReader(
+            @Value("#{jobParameters['triggerType']}") String triggerType
+    ) {
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         LocalDate yesterday = LocalDate.now(zoneId).minusDays(1);
         LocalDate today = LocalDate.now(zoneId);
+        LocalDate tomorrow = LocalDate.now(zoneId).plusDays(1);
 
-        Instant startDate = yesterday.atStartOfDay(zoneId).toInstant();
-        Instant endDate = today.atStartOfDay(zoneId).toInstant();
+        Instant startDate;
+        Instant endDate;
+
+        if ("MANUAL".equals(triggerType)) {
+            startDate = yesterday.atStartOfDay(zoneId).toInstant();
+            endDate = tomorrow.atStartOfDay(zoneId).toInstant();
+        } else {
+            startDate = yesterday.atStartOfDay(zoneId).toInstant();
+            endDate = today.atStartOfDay(zoneId).toInstant();
+        }
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("startDate", startDate);
