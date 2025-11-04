@@ -28,4 +28,15 @@ public interface CommentRepository extends JpaRepository<Comment, UUID>, Comment
 
   @Query(value = "SELECT * FROM comments c WHERE c.id = :commentId AND c.is_deleted = true", nativeQuery = true)
   Optional<Comment> findIncludingDeleted(@Param("commentId") UUID commentId);
+
+  @Modifying(clearAutomatically = true)
+  @Query(value = "DELETE FROM comment_likes WHERE comment_id IN (SELECT id FROM comments WHERE article_id = :articleId)", nativeQuery = true)
+  void deleteCommentLikesByArticleId(@Param("articleId") UUID articleId);
+
+  @Modifying(clearAutomatically = true)
+  @Query(value = "DELETE FROM comments WHERE article_id = :articleId", nativeQuery = true)
+  void deleteByArticleId(@Param("articleId") UUID articleId);
+
+  @Query(value = "SELECT COUNT(*) FROM comments WHERE article_id = :articleId", nativeQuery = true)
+  int countByArticleId(@Param("articleId") UUID articleId);
 }

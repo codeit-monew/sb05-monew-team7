@@ -9,12 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spring.monew.article.domain.Article;
+import com.spring.monew.article.domain.ArticleSource;
+import com.spring.monew.article.repository.ArticleRepository;
 import com.spring.monew.interest.controller.dto.request.InterestRegisterRequest;
 import com.spring.monew.interest.controller.dto.request.InterestUpdateRequest;
 import com.spring.monew.interest.domain.Interest;
 import com.spring.monew.interest.repository.InterestRepository;
 import com.spring.monew.user.domain.User;
 import com.spring.monew.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +51,8 @@ class InterestIntegrationTest {
 
   @Autowired private InterestRepository interestRepository;
   @Autowired private UserRepository userRepository;
+  @Autowired private ArticleRepository articleRepository;
+  @Autowired private EntityManager entityManager;
 
   private User user;
 
@@ -55,7 +62,7 @@ class InterestIntegrationTest {
           .withDatabaseName("monew_test")
           .withUsername("postgres")
           .withPassword("1234")
-          .withInitScript("schema.sql"); // 자동으로 CREATE EXTENSION 실행
+          .withInitScript("schema.sql");
 
   @DynamicPropertySource
   static void overrideProps(DynamicPropertyRegistry registry) {
@@ -119,14 +126,52 @@ class InterestIntegrationTest {
   }
 
   @Test
-  @DisplayName("관심사 삭제 성공")
+  @DisplayName("관심사 삭제 성공 - 관련 게시글도 소프트 삭제됨")
   void removeInterest() throws Exception {
     Interest saved = interestRepository.save(new Interest("삭제대상", List.of("tag")));
+    UUID interestId = saved.getId();
+    
+    Article article1 = Article.of(saved, ArticleSource.NAVER, 
+        "https://example.com/1", "제목1", Instant.now(), "요약1");
+    Article article2 = Article.of(saved, ArticleSource.NAVER, 
+        "https://example.com/2", "제목2", Instant.now(), "요약2");
+    
+    articleRepository.save(article1);
+    articleRepository.save(article2);
+    
+    UUID article1Id = article1.getId();
+    UUID article2Id = article2.getId();
+    
+    entityManager.flush();
+    entityManager.clear();
 
-    mockMvc.perform(delete("/api/interests/{interestId}", saved.getId()))
+    mockMvc.perform(delete("/api/interests/{interestId}", interestId))
         .andExpect(status().isOk());
 
-    assertThat(interestRepository.findById(saved.getId()).isEmpty()).isTrue();
+    entityManager.flush();
+    entityManager.clear();
+    
+    Boolean interestIsDeleted = (Boolean) entityManager.createNativeQuery(
+        "SELECT is_deleted FROM interests WHERE id = CAST(?1 AS uuid)")
+        .setParameter(1, interestId.toString())
+        .getSingleResult();
+    assertThat(interestIsDeleted).isTrue();
+    
+    Boolean article1IsDeleted = (Boolean) entityManager.createNativeQuery(
+        "SELECT is_deleted FROM articles WHERE id = CAST(?1 AS uuid)")
+        .setParameter(1, article1Id.toString())
+        .getSingleResult();
+    assertThat(article1IsDeleted).isTrue();
+    
+    Boolean article2IsDeleted = (Boolean) entityManager.createNativeQuery(
+        "SELECT is_deleted FROM articles WHERE id = CAST(?1 AS uuid)")
+        .setParameter(1, article2Id.toString())
+        .getSingleResult();
+    assertThat(article2IsDeleted).isTrue();
+    
+    assertThat(interestRepository.findById(interestId).isEmpty()).isTrue();
+    assertThat(articleRepository.findById(article1Id).isEmpty()).isTrue();
+    assertThat(articleRepository.findById(article2Id).isEmpty()).isTrue();
   }
 
   @Test
