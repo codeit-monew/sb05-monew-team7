@@ -85,7 +85,7 @@ dependencies {
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
 	// AWS SDK for S3
-	implementation platform('software.amazon.awssdk:bom:2.29.32')
+	implementation platform('software.amazon.awssdk:bom:2.34.0')
 	implementation 'software.amazon.awssdk:s3'
 }
 
