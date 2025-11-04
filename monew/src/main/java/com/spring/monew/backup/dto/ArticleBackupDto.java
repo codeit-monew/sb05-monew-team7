@@ -20,6 +20,9 @@ public record ArticleBackupDto(
     Instant createdAt
 ) {
   public static ArticleBackupDto from(Article article) {
+    if (article.getInterest() == null) {
+      throw new IllegalArgumentException("Article must have an associated Interest");
+    }
     return new ArticleBackupDto(
         article.getId(),
         article.getInterest().getId(),
