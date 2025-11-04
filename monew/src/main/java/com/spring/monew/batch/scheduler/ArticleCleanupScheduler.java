@@ -38,7 +38,6 @@ public class ArticleCleanupScheduler {
 
       if (articleIds.isEmpty()) {
         log.info("[Batch] 정리할 삭제된 게시글이 없습니다.");
-        return;
       }
 
       log.info("[Batch] 정리 대상 게시글 {}개 발견", articleIds.size());
@@ -64,7 +63,7 @@ public class ArticleCleanupScheduler {
     }
   }
 
-  public void deleteSoftDeletedArticlesManual() {
+  public int[] deleteSoftDeletedArticlesManual() {
     String batchRequestId = "MANUAL-CLEANUP-" + UUID.randomUUID();
     MDC.put(REQUEST_ID_KEY, batchRequestId);
 
@@ -77,7 +76,7 @@ public class ArticleCleanupScheduler {
 
       if (articleIds.isEmpty()) {
         log.info("[Manual] 정리할 삭제된 게시글이 없습니다.");
-        return;
+        return new int[]{0, 0};
       }
 
       log.info("[Manual] 정리 대상 게시글 {}개 발견", articleIds.size());
@@ -98,6 +97,7 @@ public class ArticleCleanupScheduler {
       Duration executionTime = Duration.between(startTime, Instant.now());
       log.info("[Manual] 삭제된 게시글 정리 작업 완료 - 성공: {}개, 실패: {}개, 실행 시간: {}초", 
           successCount, failureCount, executionTime.getSeconds());
+      return new int[]{successCount, failureCount};
     } finally {
       MDC.remove(REQUEST_ID_KEY);
     }

@@ -13,6 +13,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class ArticleBackupWriter implements ItemWriter<ArticleBackupDto>, StepEx
         log.info("afterStep 호출됨 - aggregatedArticles 크기: {}", aggregatedArticles.size());
         
         if (!aggregatedArticles.isEmpty()) {
-            LocalDate backupDate = LocalDate.now().minusDays(1);
+            LocalDate backupDate = LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1);
             log.info("S3 업로드 시작: backupDate={}, 기사 수={}", backupDate, aggregatedArticles.size());
             s3BackupService.uploadBackup(backupDate, new ArrayList<>(aggregatedArticles));
             log.info("S3 백업 완료: {} 개의 기사", aggregatedArticles.size());
