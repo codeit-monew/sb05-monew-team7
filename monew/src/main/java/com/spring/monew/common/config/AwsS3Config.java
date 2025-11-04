@@ -20,7 +20,7 @@ public class AwsS3Config {
   @Value("${aws.s3.secret-key}")
   private String secretKey;
 
-  @Bean
+  @Bean(destroyMethod = "close")
   public S3Client s3Client() {
     if (accessKey == null || accessKey.isEmpty() || secretKey == null || secretKey.isEmpty()) {
       return S3Client.builder()
