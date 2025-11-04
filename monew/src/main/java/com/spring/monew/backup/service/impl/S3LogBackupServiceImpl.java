@@ -70,9 +70,6 @@ public class S3LogBackupServiceImpl implements LogBackupService {
       log.info("S3에 로그 파일 업로드 성공: bucket={}, key={}, size={} bytes", 
           logBucketName, s3Key, compressedBytes.length);
 
-      Files.delete(logFile);
-      log.info("업로드 후 로컬 로그 파일 삭제 완료: {}", logFilePathStr);
-
     } catch (IOException e) {
       log.error("로그 파일 읽기 또는 압축 실패: {}", logFilePathStr, e);
       throw new S3ServiceException("로그 파일 업로드 처리 실패", e);
@@ -80,6 +77,13 @@ public class S3LogBackupServiceImpl implements LogBackupService {
       log.error("로그 업로드 중 S3 오류 발생: bucket={}, key={}, statusCode={}", 
           logBucketName, s3Key, e.statusCode(), e);
       throw new S3ServiceException("로그 업로드 중 S3 서비스 오류", e);
+    }
+
+    try {
+      Files.delete(logFile);
+      log.info("업로드 후 로컬 로그 파일 삭제 완료: {}", logFilePathStr);
+    } catch (IOException e) {
+      log.error("업로드는 성공했으나 로컬 로그 파일 삭제 실패: {}", logFilePathStr, e);
     }
   }
 
