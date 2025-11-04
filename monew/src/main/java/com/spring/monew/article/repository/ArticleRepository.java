@@ -37,4 +37,6 @@ public interface ArticleRepository extends JpaRepository<Article, UUID>, Article
       AND deleted_at < :threshold
     """, nativeQuery = true)
   List<UUID> findSoftDeletedBefore(@Param("threshold") Instant threshold);
+
+  List<Article> findAllByInterestId(UUID interestId);
 }

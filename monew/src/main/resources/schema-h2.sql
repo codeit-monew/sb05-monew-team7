@@ -20,7 +20,10 @@ CREATE TABLE interests (
                            name VARCHAR(255) NOT NULL UNIQUE,
                            created_at TIMESTAMP NOT NULL,
                            keywords TEXT NOT NULL,
-                           subscriptions_count BIGINT NOT NULL DEFAULT 0
+                           subscriptions_count BIGINT NOT NULL DEFAULT 0,
+                           updated_at TIMESTAMP NOT NULL,
+                           is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+                           deleted_at TIMESTAMP
 );
 
 -- ==============================
