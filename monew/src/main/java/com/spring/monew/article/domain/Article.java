@@ -92,6 +92,7 @@ public class Article {
       article.viewCount = viewCount;
       article.commentCount = commentCount;
       article.createdAt = createdAt;
+      article.updatedAt = createdAt;
       return article;
     }
 
