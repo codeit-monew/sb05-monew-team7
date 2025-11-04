@@ -93,7 +93,7 @@ public class BatchJobService {
         log.info("articleCleanupJob 수동 실행 요청");
 
         try {
-            articleCleanupScheduler.deleteSoftDeletedArticles();
+            articleCleanupScheduler.deleteSoftDeletedArticlesManual();
             log.info("articleCleanupJob 실행 완료");
             return CleanupTriggerResponse.success("articleCleanupJob", 0, 0);
         } catch (Exception e) {

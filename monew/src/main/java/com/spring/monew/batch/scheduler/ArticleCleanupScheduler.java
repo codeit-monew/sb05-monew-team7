@@ -63,4 +63,43 @@ public class ArticleCleanupScheduler {
       MDC.remove(REQUEST_ID_KEY);
     }
   }
+
+  public void deleteSoftDeletedArticlesManual() {
+    String batchRequestId = "MANUAL-CLEANUP-" + UUID.randomUUID();
+    MDC.put(REQUEST_ID_KEY, batchRequestId);
+
+    try {
+      Instant startTime = Instant.now();
+      log.info("[Manual] 삭제된 게시글 정리 작업 시작 (최근 30일)");
+
+      Instant thirtyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS);
+      List<UUID> articleIds = articleRepository.findSoftDeletedBetween(thirtyDaysAgo, Instant.now());
+
+      if (articleIds.isEmpty()) {
+        log.info("[Manual] 정리할 삭제된 게시글이 없습니다.");
+        return;
+      }
+
+      log.info("[Manual] 정리 대상 게시글 {}개 발견", articleIds.size());
+
+      int successCount = 0;
+      int failureCount = 0;
+
+      for (UUID articleId : articleIds) {
+        try {
+          articleService.hardDeleteArticle(articleId, SYSTEM_USER_ID);
+          successCount++;
+        } catch (Exception e) {
+          failureCount++;
+          log.error("[Manual] 게시글 {} 정리 실패: {}", articleId, e.getMessage(), e);
+        }
+      }
+
+      Duration executionTime = Duration.between(startTime, Instant.now());
+      log.info("[Manual] 삭제된 게시글 정리 작업 완료 - 성공: {}개, 실패: {}개, 실행 시간: {}초", 
+          successCount, failureCount, executionTime.getSeconds());
+    } finally {
+      MDC.remove(REQUEST_ID_KEY);
+    }
+  }
 }
