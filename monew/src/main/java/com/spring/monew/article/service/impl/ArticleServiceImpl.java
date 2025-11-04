@@ -24,6 +24,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -164,8 +166,6 @@ public class ArticleServiceImpl implements ArticleService {
       Article article = articleRepository.findIncludingDeleted(articleId)
           .orElseThrow(() -> new ArticleNotFoundException(articleId));
 
-      // Backup handled by scheduled batch job (ArticleBackupScheduler)
-
       int commentsDeleted = commentRepository.countByArticleId(articleId);
       int viewsDeleted = articleViewRepository.countByArticleId(articleId);
 
@@ -233,7 +233,7 @@ public class ArticleServiceImpl implements ArticleService {
         backups.add(backupMap);
       }
       
-      log.debug("Found {} backups for date: {}", backups.size(), date);
+      log.info("[복원] {} 날짜의 백업 파일에서 {}개 기사 발견", date, backups.size());
       return backups;
     } catch (Exception e) {
       log.warn("백업 검색 실패 for date {}: {}", date, e.getMessage());
@@ -247,17 +247,27 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     Set<String> existingUrls = articleRepository.findAllSourceUrls();
+    log.info("[복원] 현재 DB에 존재하는 기사 URL 개수: {}", existingUrls.size());
+    log.info("[복원] 백업 파일의 기사 개수: {}", backupDataList.size());
+    
     List<Map<String, Object>> missingArticles = new ArrayList<>();
 
     for (Map<String, Object> backupData : backupDataList) {
       String sourceUrl = (String) backupData.get("sourceUrl");
       if (sourceUrl != null && !existingUrls.contains(sourceUrl)) {
         missingArticles.add(backupData);
+        log.debug("[복원] 복원 대상 기사: sourceUrl={}", sourceUrl);
+      } else {
+        log.debug("[복원] 이미 존재하는 기사 (스킵): sourceUrl={}", sourceUrl);
       }
     }
 
+    log.info("[복원] 복원 대상 기사 개수: {} (백업: {}, 중복: {})", 
+        missingArticles.size(), backupDataList.size(), backupDataList.size() - missingArticles.size());
+
     return missingArticles;
   }
+
 
   private Article restoreArticle(Map<String, Object> backupData) {
     try {
@@ -278,7 +288,17 @@ public class ArticleServiceImpl implements ArticleService {
       long commentCount = commentCountNum != null ? commentCountNum.longValue() : 0L;
 
       Interest interest = interestRepository.findById(interestId)
-          .orElseGet(() -> getDefaultInterest());
+          .or(() -> {
+            log.info("활성 Interest를 찾을 수 없음. 삭제된 Interest를 확인합니다: interestId={}", interestId);
+            return interestRepository.findIncludingDeleted(interestId)
+                .map(deletedInterest -> {
+                  deletedInterest.undelete();
+                  Interest restored = interestRepository.save(deletedInterest);
+                  log.info("Interest 복원 완료: id={}, name={}", restored.getId(), restored.getName());
+                  return restored;
+                });
+          })
+          .orElseGet(() -> getOrCreateDefaultInterest());
 
       Article article = Article.restore(
           articleId,
@@ -316,9 +336,24 @@ public class ArticleServiceImpl implements ArticleService {
     return Instant.now();
   }
 
-  private Interest getDefaultInterest() {
+  private Interest getOrCreateDefaultInterest() {
     return interestRepository.findAll().stream()
         .findFirst()
-        .orElseThrow(() -> new IllegalStateException("최소 하나의 Interest가 존재해야 합니다"));
+        .orElseGet(() -> {
+          log.warn("활성화된 Interest가 없습니다. 삭제된 Interest를 복원합니다.");
+          
+          Optional<Interest> deletedInterest = interestRepository.findFirstDeleted();
+          if (deletedInterest.isPresent()) {
+            Interest interest = deletedInterest.get();
+            interest.undelete();
+            Interest restored = interestRepository.save(interest);
+            log.info("삭제된 Interest 복원 완료: id={}, name={}", restored.getId(), restored.getName());
+            return restored;
+          }
+          
+          log.warn("삭제된 Interest도 없어서 기본 Interest를 생성합니다");
+          Interest defaultInterest = new Interest("복원됨", List.of("복원"));
+          return interestRepository.save(defaultInterest);
+        });
   }
 }

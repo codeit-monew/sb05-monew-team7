@@ -83,6 +83,11 @@ public class Interest {
         }
     }
 
+    public void undelete() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+    }
+
     @TestOnly
     public Interest(UUID id, String name, List<String> keywords, String keywordsString,
         Instant createdAt, long subscriptionsCount) {
