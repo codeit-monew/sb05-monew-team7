@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,12 +56,16 @@ public class ArticleBackupBatchConfig {
     @Bean
     @StepScope
     public JpaPagingItemReader<Article> articleBackupReader() {
-        Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
-        Instant today = Instant.now().truncatedTo(ChronoUnit.DAYS);
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        LocalDate yesterday = LocalDate.now(zoneId).minusDays(1);
+        LocalDate today = LocalDate.now(zoneId);
+
+        Instant startDate = yesterday.atStartOfDay(zoneId).toInstant();
+        Instant endDate = today.atStartOfDay(zoneId).toInstant();
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("startDate", yesterday);
-        parameters.put("endDate", today);
+        parameters.put("startDate", startDate);
+        parameters.put("endDate", endDate);
 
         return new JpaPagingItemReaderBuilder<Article>()
                 .name("articleBackupReader")
