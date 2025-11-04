@@ -18,7 +18,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.Collections;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -44,18 +47,26 @@ public class ArticleBackupBatchConfig {
                 .reader(articleBackupReader())
                 .processor(articleBackupProcessor)
                 .writer(articleBackupWriter)
+                .listener(articleBackupWriter)
                 .build();
     }
 
     @Bean
     @StepScope
     public JpaPagingItemReader<Article> articleBackupReader() {
+        Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+        Instant today = Instant.now().truncatedTo(ChronoUnit.DAYS);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("startDate", yesterday);
+        parameters.put("endDate", today);
+
         return new JpaPagingItemReaderBuilder<Article>()
                 .name("articleBackupReader")
                 .entityManagerFactory(entityManagerFactory)
-                .queryString("SELECT a FROM Article a WHERE a.isDeleted = false ORDER BY a.createdAt ASC")
+                .queryString("SELECT a FROM Article a WHERE a.isDeleted = false AND a.createdAt >= :startDate AND a.createdAt < :endDate ORDER BY a.createdAt ASC")
                 .pageSize(100)
-                .parameterValues(Collections.emptyMap())
+                .parameterValues(parameters)
                 .build();
     }
 }
