@@ -18,6 +18,14 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 2g
+        reservations:
+          cpus: "2.0"
+          memory: 1g
 
   redis:
     image: redis:7
@@ -26,6 +34,11 @@ services:
       - "6379:6379"
     networks:
       - monew-net
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
 
   mongo:
     image: mongo:6
@@ -36,6 +49,11 @@ services:
       - "27017:27017"
     networks:
       - monew-net
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1g
 
   app:
     build:
@@ -58,6 +76,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       BATCH_TRIGGER_ENABLED: true
       SPRING_BATCH_JDBC_INITIALIZE_SCHEMA: always
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
+      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 10s
