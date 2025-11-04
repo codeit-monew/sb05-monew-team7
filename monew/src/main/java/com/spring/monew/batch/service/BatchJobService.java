@@ -2,7 +2,9 @@ package com.spring.monew.batch.service;
 
 import com.spring.monew.batch.dto.response.BatchJobExecutionResponse;
 import com.spring.monew.batch.dto.response.BatchJobTriggerResponse;
+import com.spring.monew.batch.dto.response.CleanupTriggerResponse;
 import com.spring.monew.batch.exception.BatchJobExecutionNotFoundException;
+import com.spring.monew.batch.scheduler.ArticleCleanupScheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -28,6 +30,7 @@ public class BatchJobService {
     private final Job logBackupJob;
     private final JobRepository jobRepository;
     private final JobExplorer jobExplorer;
+    private final ArticleCleanupScheduler articleCleanupScheduler;
 
     public BatchJobTriggerResponse triggerNewsCollectionJob() {
         log.info("newsCollectionJob 수동 실행 요청");
@@ -83,6 +86,19 @@ public class BatchJobService {
         } catch (Exception e) {
             log.error("logBackupJob 실행 실패", e);
             throw new RuntimeException("배치 작업 실행 실패", e);
+        }
+    }
+
+    public CleanupTriggerResponse triggerArticleCleanupJob() {
+        log.info("articleCleanupJob 수동 실행 요청");
+
+        try {
+            articleCleanupScheduler.deleteSoftDeletedArticles();
+            log.info("articleCleanupJob 실행 완료");
+            return CleanupTriggerResponse.success("articleCleanupJob", 0, 0);
+        } catch (Exception e) {
+            log.error("articleCleanupJob 실행 실패", e);
+            return CleanupTriggerResponse.failure("articleCleanupJob", e.getMessage());
         }
     }
 

@@ -2,6 +2,7 @@ package com.spring.monew.batch.controller;
 
 import com.spring.monew.batch.dto.response.BatchJobExecutionResponse;
 import com.spring.monew.batch.dto.response.BatchJobTriggerResponse;
+import com.spring.monew.batch.dto.response.CleanupTriggerResponse;
 import com.spring.monew.batch.service.BatchJobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,7 +43,7 @@ public class BatchJobController {
 
     @Operation(
             summary = "기사 백업 배치 작업 수동 트리거",
-            description = "articleBackupJob을 수동으로 실행하여 모든 기사를 S3에 백업합니다."
+            description = "articleBackupJob을 수동으로 실행하여 어제+오늘 기사를 S3에 백업합니다."
     )
     @PostMapping("/trigger/article-backup")
     public ResponseEntity<BatchJobTriggerResponse> triggerArticleBackupJob() {
@@ -57,6 +58,20 @@ public class BatchJobController {
     @PostMapping("/trigger/log-backup")
     public ResponseEntity<BatchJobTriggerResponse> triggerLogBackupJob() {
         BatchJobTriggerResponse response = batchJobService.triggerLogBackupJob();
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "기사 정리 배치 작업 수동 트리거",
+            description = "논리 삭제된 지 30일이 지난 기사를 물리 삭제합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "배치 작업 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/trigger/article-cleanup")
+    public ResponseEntity<CleanupTriggerResponse> triggerArticleCleanupJob() {
+        CleanupTriggerResponse response = batchJobService.triggerArticleCleanupJob();
         return ResponseEntity.ok(response);
     }
 
