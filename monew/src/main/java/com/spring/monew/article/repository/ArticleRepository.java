@@ -24,7 +24,7 @@ public interface ArticleRepository extends JpaRepository<Article, UUID>, Article
   @Query(value = "SELECT EXISTS(SELECT 1 FROM articles WHERE id = :articleId)", nativeQuery = true)
   boolean existsIncludingDeleted(@Param("articleId") UUID articleId);
 
-  @Query(value = "SELECT * FROM articles WHERE id = :articleId", nativeQuery = true)
+  @Query(value = "SELECT * FROM articles WHERE id = :articleId AND is_deleted = true", nativeQuery = true)
   Optional<Article> findIncludingDeleted(@Param("articleId") UUID articleId);
 
   @Query("SELECT a.sourceUrl FROM Article a")
