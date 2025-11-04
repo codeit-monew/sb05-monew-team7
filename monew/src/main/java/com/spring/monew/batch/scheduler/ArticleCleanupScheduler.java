@@ -1,9 +1,7 @@
 package com.spring.monew.batch.scheduler;
 
 import com.spring.monew.article.repository.ArticleRepository;
-import com.spring.monew.articleview.repository.ArticleViewRepository;
-import com.spring.monew.comment.repository.CommentRepository;
-import jakarta.transaction.Transactional;
+import com.spring.monew.article.service.ArticleService;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -20,11 +18,9 @@ import org.springframework.stereotype.Component;
 public class ArticleCleanupScheduler {
 
   private final ArticleRepository articleRepository;
-  private final CommentRepository commentRepository;
-  private final ArticleViewRepository articleViewRepository;
+  private final ArticleService articleService;
 
   @Scheduled(cron = "0 0 15 * * *")
-  @Transactional
   public void deleteSoftDeletedArticles() {
     Instant startTime = Instant.now();
     log.info("[Batch] 삭제된 게시글 정리 작업 시작");
@@ -44,18 +40,7 @@ public class ArticleCleanupScheduler {
 
     for (UUID articleId : articleIds) {
       try {
-        commentRepository.deleteCommentLikesByArticleId(articleId);
-        log.debug("[Batch] 게시글 {} - 댓글 좋아요 삭제 완료", articleId);
-
-        commentRepository.deleteByArticleId(articleId);
-        log.debug("[Batch] 게시글 {} - 댓글 삭제 완료", articleId);
-
-        articleViewRepository.deleteByArticleId(articleId);
-        log.debug("[Batch] 게시글 {} - 조회 기록 삭제 완료", articleId);
-
-        articleRepository.hardDelete(articleId);
-        log.debug("[Batch] 게시글 {} - 게시글 삭제 완료", articleId);
-
+        articleService.hardDeleteArticle(articleId, null);
         successCount++;
       } catch (Exception e) {
         failureCount++;
