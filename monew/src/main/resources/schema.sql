@@ -98,7 +98,7 @@ CREATE TABLE articles
     id            UUID PRIMARY KEY,
     interest_id   UUID             NOT NULL,
     source        VARCHAR(20)      NOT NULL CHECK (source IN ('NAVER', 'HANKYUNG', 'CHOSUN', 'YEONHAP')),
-    source_url    VARCHAR(255)     NOT NULL UNIQUE,
+    source_url    VARCHAR(500)     NOT NULL UNIQUE,
     title         VARCHAR(255)     NOT NULL,
     publish_date  TIMESTAMP WITH TIME ZONE      NOT NULL,
     summary       TEXT             NOT NULL,
@@ -286,3 +286,12 @@ CREATE INDEX IF NOT EXISTS idx_notif_user_confirm_created_desc
 -- 정리 배치(삭제): WHERE confirmed=true AND updated_at < :threshold
 CREATE INDEX IF NOT EXISTS idx_notif_confirmed_updated
     ON notifications (confirmed, updated_at);
+
+-- comments Indexing
+-- (1) createdAt 기반 정렬
+CREATE INDEX IF NOT EXISTS idx_comment_article_created
+    ON comments (article_id, is_deleted, created_at DESC, id);
+
+-- (2) likeCount 정렬 대비
+CREATE INDEX IF NOT EXISTS idx_comment_article_like
+    ON comments (article_id, is_deleted, like_count DESC, created_at DESC, id);
