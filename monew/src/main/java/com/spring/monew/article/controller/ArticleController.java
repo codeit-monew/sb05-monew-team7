@@ -7,6 +7,8 @@ import com.spring.monew.article.service.ArticleService;
 import com.spring.monew.common.util.RequestUserExtractor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -36,6 +38,7 @@ public class ArticleController {
 
   private final ArticleService articleService;
   private final RequestUserExtractor userExtractor;
+
 
   @GetMapping
   @Operation(summary = "뉴스 기사 목록 조회", description = "조건에 맞는 뉴스 기사 목록을 조회합니다.")
