@@ -93,9 +93,9 @@ public class BatchJobService {
         log.info("articleCleanupJob 수동 실행 요청");
 
         try {
-            articleCleanupScheduler.deleteSoftDeletedArticlesManual();
+            int[] counts = articleCleanupScheduler.deleteSoftDeletedArticlesManual();
             log.info("articleCleanupJob 실행 완료");
-            return CleanupTriggerResponse.success("articleCleanupJob", 0, 0);
+            return CleanupTriggerResponse.success("articleCleanupJob", counts[0], counts[1]);
         } catch (Exception e) {
             log.error("articleCleanupJob 실행 실패", e);
             return CleanupTriggerResponse.failure("articleCleanupJob", e.getMessage());
