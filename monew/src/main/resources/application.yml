@@ -33,6 +33,7 @@ spring:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD
 
   batch:
     job:
@@ -40,7 +41,7 @@ spring:
     trigger:
       enabled: true
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
 
   servlet:
     multipart:
