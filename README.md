@@ -52,7 +52,7 @@
     • 서버 인프라 구성 및 운영
   </td>
 </tr>    <tr>
-      <td><a href="https://github.com/yuhandemian">yuhandemianj</a></td>
+      <td><a href="https://github.com/yuhandemian">yuhandemian</a></td>
       <td><a href="https://github.com/kimyumin03">kimyumin03</a></td>
       <td><a href="https://github.com/Namsoo315">Namsoo315</a></td>
       <td><a href="https://github.com/haram-jo">haram-jo</a></td>
@@ -125,7 +125,7 @@
 ## 팀원별 구현 기능 상세
 
 ### 박유한
-뉴스 기사 API 스프링 배치 처리, AWS S3 연동, 뉴스 기사 관리 모듈 개발 및 CI/CD 파이프라인 구축
+뉴스 기사 API 스프링 배치 처리, AWS S3 연동, 뉴스 기사 로그 백업 및 복구 기능 개발, 뉴스 기사 기능 개발 및 CI/CD 파이프라인 구축
 
 ### 김유민
 활동 내역 관리 기능, 알림 관리 기능 개발, MongoDB 설계
