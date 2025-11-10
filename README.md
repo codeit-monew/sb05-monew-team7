@@ -137,290 +137,281 @@
 사용자 관리 기능 개발, 서버 인프라 구성 및 운영
 
 ## 파일 구조
-<details> <summary><b>
+<details> <summary><b>src/main/java/com/spring/monew 트리</b></summary>
+<pre>
 com.spring.monew
- ┣ activity
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data
- ┃ ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┃ ┣ request
- ┃ ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┣ CommentActivityDto.java
- ┃ ┃ ┃    ┣ CommentLikeActivityDto.java
- ┃ ┃ ┃    ┗ UserActivityDto.java
- ┃ ┃ ┗ UserActivityController.java
- ┃ ┣ domain
- ┃ ┃ ┣ ActivityArticleViewDoc.java
- ┃ ┃ ┣ ActivityCommentDoc.java
- ┃ ┃ ┣ ActivityCommentLikeDoc.java
- ┃ ┃ ┗ UserInterestSubscriptionDoc.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┣ ActivitySyncRepositoryImpl.java
- ┃ ┃ ┃ ┗ UserActivityQueryRepositoryImpl.java
- ┃ ┃ ┣ ActivityArticleViewRepository.java
- ┃ ┃ ┣ ActivitySyncRepository.java
- ┃ ┃ ┗ UserActivityQueryRepository.java
- ┃ ┣ service
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ UserActivityServiceImpl.java
- ┃ ┃ ┗ UserActivityService.java
- ┃ ┗ util
- ┃   ┗ ActivityMapper.java
- ┣ article
- ┃ ┣ client
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┗ ArticleCandidate.java
- ┃ ┃ ┣ NaverNewsApiClient.java
- ┃ ┃ ┗ RssFeedClient.java
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data
- ┃ ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┃ ┣ request
- ┃ ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┣ ArticleDto.java
- ┃ ┃ ┃    ┣ ArticleRestoreResultDto.java
- ┃ ┃ ┃    ┗ CursorPageResponseArticleDto.java
- ┃ ┃ ┗ ArticleController.java
- ┃ ┣ domain
- ┃ ┃ ┣ Article.java
- ┃ ┃ ┗ ArticleSource.java
- ┃ ┣ exception
- ┃ ┃ ┗ ArticleNotFoundException.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ ArticleRepositoryCustomImpl.java
- ┃ ┃ ┣ ArticleRepository.java
- ┃ ┃ ┗ ArticleRepositoryCustom.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┗ ArticleServiceImpl.java
- ┃   ┗ ArticleService.java
- ┣ articleview
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data/
- ┃ ┃ ┃ ┣ request/
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┗ ArticleViewDto.java
- ┃ ┃ ┗ ArticleViewController.java
- ┃ ┣ domain
- ┃ ┃ ┗ ArticleView.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┗ ArticleViewRepository.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┗ ArticleViewServiceImpl.java
- ┃   ┗ ArticleViewService.java
- ┣ auth
- ┃ ┣ config
- ┃ ┃ ┣ HeaderAuthFilter.java
- ┃ ┃ ┣ HeaderUserAuthentication.java
- ┃ ┃ ┗ SecurityConfig.java
- ┃ ┣ controller
- ┃ ┃ ┗ AuthController.java
- ┃ ┗ service
- ┃   ┗ AuthService.java
- ┣ backup
- ┃ ┣ dto
- ┃ ┃ ┗ ArticleBackupDto.java
- ┃ ┣ exception
- ┃ ┃ ┣ BackupNotFoundException.java
- ┃ ┃ ┗ S3ServiceException.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┣ S3BackupServiceImpl.java
- ┃   ┃ ┗ S3LogBackupServiceImpl.java
- ┃   ┣ LogBackupService.java
- ┃   ┗ S3BackupService.java
- ┣ batch
- ┃ ┣ config
- ┃ ┃ ┣ ArticleBackupBatchConfig.java
- ┃ ┃ ┣ BatchSkipListener.java
- ┃ ┃ ┣ LogBackupBatchConfig.java
- ┃ ┃ ┣ NewsCollectionJobConfig.java
- ┃ ┃ ┗ RestTemplateConfig.java
- ┃ ┣ controller
- ┃ ┃ ┗ BatchJobController.java
- ┃ ┣ dto
- ┃ ┃ ┗ response
- ┃ ┃    ┣ BatchJobExecutionResponse.java
- ┃ ┃    ┣ BatchJobTriggerResponse.java
- ┃ ┃    ┣ CleanupTriggerResponse.java
- ┃ ┃    ┗ StepStatistics.java
- ┃ ┣ exception
- ┃ ┃ ┣ BatchJobExceptionHandler.java
- ┃ ┃ ┗ BatchJobExecutionNotFoundException.java
- ┃ ┣ listener
- ┃ ┃ ┗ ArticleNotificationListener.java
- ┃ ┣ processor
- ┃ ┃ ┣ ArticleBackupProcessor.java
- ┃ ┃ ┗ ArticleCandidateProcessor.java
- ┃ ┣ reader
- ┃ ┃ ┗ ArticleCandidateReader.java
- ┃ ┣ scheduler
- ┃ ┃ ┣ ArticleBackupScheduler.java
- ┃ ┃ ┣ ArticleCleanupScheduler.java
- ┃ ┃ ┣ CommentCleanupScheduler.java
- ┃ ┃ ┣ LogBackupScheduler.java
- ┃ ┃ ┣ NewsCollectionScheduler.java
- ┃ ┃ ┗ UserCleanupScheduler.java
- ┃ ┣ service
- ┃ ┃ ┗ BatchJobService.java
- ┃ ┗ writer
- ┃   ┣ ArticleBackupWriter.java
- ┃   ┗ ArticleWriter.java
- ┣ comment
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data/
- ┃ ┃ ┃ ┣ request
- ┃ ┃ ┃ ┃ ┣ CommentRegisterRequest.java
- ┃ ┃ ┃ ┃ ┗ CommentUpdateRequest.java
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┣ CommentDto.java
- ┃ ┃ ┃    ┗ CursorPageResponseCommentDto.java
- ┃ ┃ ┗ CommentController.java
- ┃ ┣ domain
- ┃ ┃ ┗ Comment.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ CommentRepositoryCustomImpl.java
- ┃ ┃ ┣ CommentRepository.java
- ┃ ┃ ┗ CommentRepositoryCustom.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┗ CommentServiceImpl.java
- ┃   ┗ CommentService.java
- ┣ commentlike
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data/
- ┃ ┃ ┃ ┣ request/
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┗ CommentLikeDto.java
- ┃ ┃ ┗ CommentLikeController.java
- ┃ ┣ domain
- ┃ ┃ ┗ CommentLike.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┗ CommentLikeRepository.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┗ CommentLikeServiceImpl.java
- ┃   ┗ CommentLikeService.java
- ┣ common
- ┃ ┣ config
- ┃ ┃ ┣ converter
- ┃ ┃ ┃ ┗ StringToInstantConverter.java
- ┃ ┃ ┣ AwsS3Config.java
- ┃ ┃ ┣ HibernateFilterAspect.java
- ┃ ┃ ┣ MongoConfig.java
- ┃ ┃ ┣ QuerydslConfig.java
- ┃ ┃ ┗ RedisConfig.java
- ┃ ┣ converter
- ┃ ┃ ┗ KeywordsConverter.java
- ┃ ┣ exception
- ┃ ┃ ┗ GlobalExceptionHandler.java
- ┃ ┣ filter
- ┃ ┃ ┗ RequestIdFilter.java
- ┃ ┣ logging
- ┃ ┃ ┗ AuditLogger.java
- ┃ ┗ util
- ┃   ┗ RequestUserExtractor.java
- ┣ data
- ┃ ┣ config
- ┃ ┃ ┗ Test.java
- ┃ ┗ storage
- ┃   ┗ Test.java
- ┣ interest
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data/
- ┃ ┃ ┃ ┣ request
- ┃ ┃ ┃ ┃ ┣ InterestRegisterRequest.java
- ┃ ┃ ┃ ┃ ┗ InterestUpdateRequest.java
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┣ CursorPageResponseInterestDto.java
- ┃ ┃ ┃    ┗ InterestDto.java
- ┃ ┃ ┗ InterestController.java
- ┃ ┣ domain
- ┃ ┃ ┗ Interest.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ InterestRepositoryCustom.java
- ┃ ┃ ┗ InterestRepository.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┗ InterestServiceImpl.java
- ┃   ┗ InterestService.java
- ┣ notification
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data/
- ┃ ┃ ┃ ┣ request/
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┣ BulkConfirmResultDto.java
- ┃ ┃ ┃    ┣ CursorPageResponseNotificationDto.java
- ┃ ┃ ┃    ┣ NotificationConfirmResponseDto.java
- ┃ ┃ ┃    ┗ NotificationDto.java
- ┃ ┃ ┗ NotificationController.java
- ┃ ┣ domain
- ┃ ┃ ┣ Notification.java
- ┃ ┃ ┗ NotificationResourceType.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ NotificationRepositoryImpl.java
- ┃ ┃ ┣ NotificationRepository.java
- ┃ ┃ ┗ NotificationRepositoryCustom.java
- ┃ ┣ scheduler
- ┃ ┃ ┗ NotificationCleanupScheduler.java
- ┃ ┗ service
- ┃   ┗ NotificationService.java
- ┣ subscription
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data/
- ┃ ┃ ┃ ┣ request/
- ┃ ┃ ┃ ┗ response
- ┃ ┃ ┃    ┗ SubscriptionDto.java
- ┃ ┃ ┗ SubscriptionController.java
- ┃ ┣ domain
- ┃ ┃ ┗ Subscription.java
- ┃ ┣ repository
- ┃ ┃ ┣ impl
- ┃ ┃ ┃ ┗ Test.java
- ┃ ┃ ┗ SubscriptionRepository.java
- ┃ ┗ service
- ┃   ┣ impl
- ┃   ┃ ┗ SubscriptionServiceImpl.java
- ┃   ┗ SubscriptionService.java
- ┣ user
- ┃ ┣ controller
- ┃ ┃ ┣ dto
- ┃ ┃ ┃ ┣ data
- ┃ ┃ ┃ ┃ ┗ UserDto.java
- ┃ ┃ ┃ ┗ request
- ┃ ┃ ┃    ┣ UserLoginRequest.java
- ┃ ┃ ┃    ┣ UserRegisterRequest.java
- ┃ ┃ ┃    ┗ UserUpdateRequest.java
- ┃ ┃ ┗ UserController.java
- ┃ ┣ domain
- ┃ ┃ ┣ User.java
- ┃ ┃ ┗ UserRole.java
- ┃ ┣ repository
- ┃ ┃ ┗ UserRepository.java
- ┃ ┗ service
- ┃   ┣ UserService.java
- ┃   ┗ UserServiceImpl.java
- ┗ MonewApplication.java
-</b></summary>
+|-- activity
+|   |-- controller
+|   |   |-- dto
+|   |   |   |-- data
+|   |   |   |   `-- Test.java
+|   |   |   |-- request
+|   |   |   |   `-- Test.java
+|   |   |   `-- response
+|   |   |       |-- CommentActivityDto.java
+|   |   |       |-- CommentLikeActivityDto.java
+|   |   |       `-- UserActivityDto.java
+|   |   `-- UserActivityController.java
+|   |-- domain
+|   |   |-- ActivityArticleViewDoc.java
+|   |   |-- ActivityCommentDoc.java
+|   |   |-- ActivityCommentLikeDoc.java
+|   |   `-- UserInterestSubscriptionDoc.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   |-- ActivitySyncRepositoryImpl.java
+|   |   |   `-- UserActivityQueryRepositoryImpl.java
+|   |   |-- ActivityArticleViewRepository.java
+|   |   |-- ActivitySyncRepository.java
+|   |   `-- UserActivityQueryRepository.java
+|   |-- service
+|   |   |-- impl
+|   |   |   `-- UserActivityServiceImpl.java
+|   |   `-- UserActivityService.java
+|   `-- util
+|       `-- ActivityMapper.java
+|-- article
+|   |-- client
+|   |   |-- dto
+|   |   |   `-- ArticleCandidate.java
+|   |   |-- NaverNewsApiClient.java
+|   |   `-- RssFeedClient.java
+|   |-- controller
+|   |   |-- dto
+|   |   |   |-- data
+|   |   |   |   `-- Test.java
+|   |   |   |-- request
+|   |   |   |   `-- Test.java
+|   |   |   `-- response
+|   |   |       |-- ArticleDto.java
+|   |   |       |-- ArticleRestoreResultDto.java
+|   |   |       `-- CursorPageResponseArticleDto.java
+|   |   `-- ArticleController.java
+|   |-- domain
+|   |   |-- Article.java
+|   |   `-- ArticleSource.java
+|   |-- exception
+|   |   `-- ArticleNotFoundException.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- ArticleRepositoryCustomImpl.java
+|   |   |-- ArticleRepository.java
+|   |   `-- ArticleRepositoryCustom.java
+|   `-- service
+|       |-- impl
+|       |   `-- ArticleServiceImpl.java
+|       `-- ArticleService.java
+|-- articleview
+|   |-- controller
+|   |   |-- dto
+|   |   |   `-- response
+|   |   |       `-- ArticleViewDto.java
+|   |   `-- ArticleViewController.java
+|   |-- domain
+|   |   `-- ArticleView.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- Test.java
+|   |   `-- ArticleViewRepository.java
+|   `-- service
+|       |-- impl
+|       |   `-- ArticleViewServiceImpl.java
+|       `-- ArticleViewService.java
+|-- auth
+|   |-- config
+|   |   |-- HeaderAuthFilter.java
+|   |   |-- HeaderUserAuthentication.java
+|   |   `-- SecurityConfig.java
+|   |-- controller
+|   |   `-- AuthController.java
+|   `-- service
+|       `-- AuthService.java
+|-- backup
+|   |-- dto
+|   |   `-- ArticleBackupDto.java
+|   |-- exception
+|   |   |-- BackupNotFoundException.java
+|   |   `-- S3ServiceException.java
+|   `-- service
+|       |-- impl
+|       |   |-- S3BackupServiceImpl.java
+|       |   `-- S3LogBackupServiceImpl.java
+|       |-- LogBackupService.java
+|       `-- S3BackupService.java
+|-- batch
+|   |-- config
+|   |   |-- ArticleBackupBatchConfig.java
+|   |   |-- BatchSkipListener.java
+|   |   |-- LogBackupBatchConfig.java
+|   |   |-- NewsCollectionJobConfig.java
+|   |   `-- RestTemplateConfig.java
+|   |-- controller
+|   |   `-- BatchJobController.java
+|   |-- dto
+|   |   `-- response
+|   |       |-- BatchJobExecutionResponse.java
+|   |       |-- BatchJobTriggerResponse.java
+|   |       |-- CleanupTriggerResponse.java
+|   |       `-- StepStatistics.java
+|   |-- exception
+|   |   |-- BatchJobExceptionHandler.java
+|   |   `-- BatchJobExecutionNotFoundException.java
+|   |-- listener
+|   |   `-- ArticleNotificationListener.java
+|   |-- processor
+|   |   |-- ArticleBackupProcessor.java
+|   |   `-- ArticleCandidateProcessor.java
+|   |-- reader
+|   |   `-- ArticleCandidateReader.java
+|   |-- scheduler
+|   |   |-- ArticleBackupScheduler.java
+|   |   |-- ArticleCleanupScheduler.java
+|   |   |-- CommentCleanupScheduler.java
+|   |   |-- LogBackupScheduler.java
+|   |   |-- NewsCollectionScheduler.java
+|   |   `-- UserCleanupScheduler.java
+|   |-- service
+|   |   `-- BatchJobService.java
+|   `-- writer
+|       |-- ArticleBackupWriter.java
+|       `-- ArticleWriter.java
+|-- comment
+|   |-- controller
+|   |   |-- dto
+|   |   |   |-- request
+|   |   |   |   |-- CommentRegisterRequest.java
+|   |   |   |   `-- CommentUpdateRequest.java
+|   |   |   `-- response
+|   |   |       |-- CommentDto.java
+|   |   |       `-- CursorPageResponseCommentDto.java
+|   |   `-- CommentController.java
+|   |-- domain
+|   |   `-- Comment.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- CommentRepositoryCustomImpl.java
+|   |   |-- CommentRepository.java
+|   |   `-- CommentRepositoryCustom.java
+|   `-- service
+|       |-- impl
+|       |   `-- CommentServiceImpl.java
+|       `-- CommentService.java
+|-- commentlike
+|   |-- controller
+|   |   |-- dto
+|   |   |   `-- response
+|   |   |       `-- CommentLikeDto.java
+|   |   `-- CommentLikeController.java
+|   |-- domain
+|   |   `-- CommentLike.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- Test.java
+|   |   `-- CommentLikeRepository.java
+|   `-- service
+|       |-- impl
+|       |   `-- CommentLikeServiceImpl.java
+|       `-- CommentLikeService.java
+|-- common
+|   |-- config
+|   |   |-- converter
+|   |   |   `-- StringToInstantConverter.java
+|   |   |-- AwsS3Config.java
+|   |   |-- HibernateFilterAspect.java
+|   |   |-- MongoConfig.java
+|   |   |-- QuerydslConfig.java
+|   |   `-- RedisConfig.java
+|   |-- converter
+|   |   `-- KeywordsConverter.java
+|   |-- exception
+|   |   `-- GlobalExceptionHandler.java
+|   |-- filter
+|   |   `-- RequestIdFilter.java
+|   |-- logging
+|   |   `-- AuditLogger.java
+|   `-- util
+|       `-- RequestUserExtractor.java
+|-- data
+|   |-- config
+|   |   `-- Test.java
+|   `-- storage
+|       `-- Test.java
+|-- interest
+|   |-- controller
+|   |   |-- dto
+|   |   |   |-- request
+|   |   |   |   |-- InterestRegisterRequest.java
+|   |   |   |   `-- InterestUpdateRequest.java
+|   |   |   `-- response
+|   |   |       |-- CursorPageResponseInterestDto.java
+|   |   |       `-- InterestDto.java
+|   |   `-- InterestController.java
+|   |-- domain
+|   |   `-- Interest.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- InterestRepositoryCustom.java
+|   |   `-- InterestRepository.java
+|   `-- service
+|       |-- impl
+|       |   `-- InterestServiceImpl.java
+|       `-- InterestService.java
+|-- notification
+|   |-- controller
+|   |   |-- dto
+|   |   |   `-- response
+|   |   |       |-- BulkConfirmResultDto.java
+|   |   |       |-- CursorPageResponseNotificationDto.java
+|   |   |       |-- NotificationConfirmResponseDto.java
+|   |   |       `-- NotificationDto.java
+|   |   `-- NotificationController.java
+|   |-- domain
+|   |   |-- Notification.java
+|   |   `-- NotificationResourceType.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- NotificationRepositoryImpl.java
+|   |   |-- NotificationRepository.java
+|   |   `-- NotificationRepositoryCustom.java
+|   |-- scheduler
+|   |   `-- NotificationCleanupScheduler.java
+|   `-- service
+|       `-- NotificationService.java
+|-- subscription
+|   |-- controller
+|   |   |-- dto
+|   |   |   `-- response
+|   |   |       `-- SubscriptionDto.java
+|   |   `-- SubscriptionController.java
+|   |-- domain
+|   |   `-- Subscription.java
+|   |-- repository
+|   |   |-- impl
+|   |   |   `-- Test.java
+|   |   `-- SubscriptionRepository.java
+|   `-- service
+|       |-- impl
+|       |   `-- SubscriptionServiceImpl.java
+|       `-- SubscriptionService.java
+`-- user
+    |-- controller
+    |   |-- dto
+    |   |   |-- data
+    |   |   |   `-- UserDto.java
+    |   |   `-- request
+    |   |       |-- UserLoginRequest.java
+    |   |       |-- UserRegisterRequest.java
+    |   |       `-- UserUpdateRequest.java
+    |   `-- UserController.java
+    |-- domain
+    |   |-- User.java
+    |   `-- UserRole.java
+    |-- repository
+    |   `-- UserRepository.java
+    `-- service
+        |-- UserService.java
+        `-- UserServiceImpl.java
+ </pre>
+ </details>
 
 
