@@ -2,7 +2,7 @@
 [![dev Server CI/CD](https://github.com/codeit-monew/sb05-monew-team7/actions/workflows/backend-dev-server.yml/badge.svg)](https://github.com/codeit-monew/sb05-monew-team7/actions/workflows/backend-dev-server.yml)
 
 ## 프로젝트 개요
-다수의 뉴스 API(네이버, 연합뉴스, 조선일보, 한국경제)를 통합하여 사용자의 관심사에 맞춘 뉴스를 제공하고, 댓글 및 소셜 기능을 통해 사용자 간 상호작용이 가능한 통합형 뉴스 플랫폼입니다.
+네이버 OpenAPI와 주요 언론사 RSS(연합뉴스, 조선일보, 한국경제)를 통합하여 사용자의 관심사에 맞춘 뉴스를 제공하고, 댓글 및 소셜 기능을 통해 사용자 간 상호작용이 가능한 통합형 뉴스 플랫폼입니다.
 
 ## 주요 특징
   -	뉴스 통합 제공: 네이버 OpenAPI와 주요 언론사 RSS를 연동하여 최신 뉴스 콘텐츠를 수집 및 제공
