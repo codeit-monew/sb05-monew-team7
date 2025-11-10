@@ -141,9 +141,9 @@
 ### 박유한 (팀장 / Back-End)
 - 뉴스 기사 도메인 총괄: 논리/물리 삭제 API 등 기사 관련 핵심 비즈니스 로직 개발.
 
-- 데이터 수집 자동화: Spring Batch Job을 설계하여, 다수의 외부 뉴스 API 및 RSS 피드를 주기적으로 수집(Fetch) 및 파싱하여 DB에 저장하는 기능 구현.
+- 데이터 수집 자동화: Spring Batch Job을 설계하여, 외부 뉴스 API 및 RSS 피드를 주기적으로 수집 및 파싱하여 DB에 저장하는 기능 구현.
 
-- 성능 최적화: Redis의 setIfAbsent를 활용한 조회수 중복 방지 로직 및 try-catch 기반의 Redis 장애 대비 Fallback(대체) 로직 구현.
+- 성능 최적화: Redis의 setIfAbsent를 활용한 조회수 중복 방지 로직 및 try-catch 기반의 Redis 장애 대비 Fallback로직 구현.
 
 - 데이터 백업/복구: AWS S3 연동 및 Spring Batch를 활용, 일일 뉴스 데이터를 S3에 백업하고, 관리자가 날짜별로 데이터를 복원할 수 있는 API 개발.
 
