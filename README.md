@@ -137,6 +137,7 @@
 사용자 관리 기능 개발, 서버 인프라 구성 및 운영
 
 ## 파일 구조
+<details> <summary><b>
 com.spring.monew
  ┣ activity
  ┃ ┣ controller
@@ -420,6 +421,6 @@ com.spring.monew
  ┃   ┣ UserService.java
  ┃   ┗ UserServiceImpl.java
  ┗ MonewApplication.java
-
+</b></summary>
 
 
