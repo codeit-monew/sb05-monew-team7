@@ -13,6 +13,7 @@
 
 | 항목 | 내용 |
 |------|------|
+| **📣 발표 자료** | [발표 자료 PDF](https://drive.google.com/file/d/1MufjAdIKfLtgAoV8cw_RIeqcD7vkOC9h/view) |
 | **📄 협업 문서** | [Notion 페이지](https://sugared-macaroon-51d.notion.site/MONEW-7-29e9482652098081a86feca5c16624c6?source=copy_link) |
 | **🔗 배포 링크** | [배포 링크](http://3.35.36.222:8080/) |
 | **🎬 시연 영상** | [YouTube 시연 영상](https://youtu.be/IzG9F0YrPRg) |
@@ -61,6 +62,15 @@
 </table>
 
 ## 시스템 구성도
+
+<img width="770" height="352" alt="image" src="https://github.com/user-attachments/assets/d5390699-1008-4a78-bf38-a2778b095146" />
+
+## ERD
+<img width="576" height="382" alt="image" src="https://github.com/user-attachments/assets/ccdc4df8-8c8c-46c3-9348-73ac34e5d423" />
+
+## MongoDB 컬렉션
+<img width="343" height="311" alt="image" src="https://github.com/user-attachments/assets/dc6b597a-064c-4791-bdb7-0a70688a3bf9" />
+
 
 ## 기술 스택
 
@@ -124,17 +134,45 @@
 
 ## 팀원별 구현 기능 상세
 
-### 박유한
-뉴스 기사 API 스프링 배치 처리, AWS S3 연동, 뉴스 기사 로그 백업 및 복구 기능 개발, 뉴스 기사 기능 개발 및 CI/CD 파이프라인 구축
+### 박유한 (팀장 / Back-End)
+- 뉴스 기사 도메인 총괄: 기사 CRUD API, 논리/물리 삭제 API 등 기사 관련 핵심 비즈니스 로직 개발.
 
-### 김유민
-활동 내역 관리 기능, 알림 관리 기능 개발, MongoDB 설계
+- 데이터 수집 자동화: Spring Batch Job을 설계하여, 다수의 외부 뉴스 API 및 RSS 피드를 주기적으로 수집(Fetch) 및 파싱하여 DB에 저장하는 기능 구현.
 
-### 남현수
-관심사 관리 기능, 댓글 관리 기능 개발, 시스템 모니터링 및 부하 테스트 수행
+- 성능 최적화: Redis의 setIfAbsent를 활용한 조회수 중복 방지 로직 및 try-catch 기반의 Redis 장애 대비 Fallback(대체) 로직 구현.
 
-### 조하람
-사용자 관리 기능 개발, 서버 인프라 구성 및 운영
+- 데이터 백업/복구: AWS S3 연동 및 Spring Batch를 활용, 일일 뉴스 데이터를 S3에 백업하고, 관리자가 날짜별로 데이터를 복원할 수 있는 API 개발.
+
+- CI/CD 파이프라인 구축: GitHub Actions 워크플로우(*.yml)를 작성
+
+### 김유민 (Back-End)
+- NoSQL 데이터 모델링: MongoDB를 기반으로 '사용자 활동 내역'컬렉션 스키마를 설계.
+
+- 활동 내역 관리: 기사 조회, 댓글 작성, 좋아요 등 사용자의 주요 활동 이력을 추적하여 MongoDB에 비동기적으로 저장 및 조회하는 기능 구현.
+
+- 실시간 알림 기능: 내 관심사의 새 기사, 내 글의 새 댓글 등 주요 이벤트 발생 시 MongoDB에 알림 문서를 생성하고 관리하는 API 개발.
+
+### 남현수 (Back-End / Infra)
+- 댓글/대댓글 기능 개발: 기사별 댓글/대댓글 CRUD API, 댓글 좋아요 기능 구현.
+
+- 데이터 생명주기 관리: Spring Scheduler를 활용, 논리 삭제(Soft Delete)된 댓글(CommentCleanupScheduler)을 N시간/일 기준으로 자동 물리 삭제(Hard Delete)하는 배치 작업 구현.
+
+- 관심사 기능 개발: 사용자별 관심 키워드 등록/삭제(CRUD) API 및 사용자의 관심사와 신규 수집된 뉴스를 매칭하는 로직 개발.
+
+- CI/CD 파이프라인 구축: Gradle 빌드, Docker 이미지 생성, AWS ECR 푸시 및 ECS 서비스 롤링 업데이트까지의 배포 자동화 파이프라인 구축.
+
+- 컨테이너화 및 배포: Docker Compose를 활용하여 개발 환경의 Postgres, Redis 등을 컨테이너로 관리하며, 운영 환경 배포 전략 수립.
+
+- 시스템 모니터링 구축: Prometheus, Grafana를 Spring Actuator와 연동하여 JVM, API 응답 속도, HTTP Status 등 핵심 메트릭 시각화 대시보드 구축.
+
+- 성능 부하 테스트: 주요 API(로그인, 기사 조회, 댓글 작성)의 부하 테스트 시나리오를 작성하고, 병목 지점을 분석하여 성능 개선.
+
+### 조하람 (Back-End / Infra)
+- 인증/인가 시스템 구축: Spring Security를 활용하여 사용자 회원가입, 로그인(인증), 권한(ADMIN/USER) 관리(인가) 시스템 전반을 구현.
+
+- 사용자 도메인 관리: 사용자 정보 CRUD API 및 Spring Scheduler를 활용한 탈퇴 계정(UserCleanupScheduler) 자동 물리 삭제 로직 구현.
+
+- 클라우드 인프라 구축: AWS (EC2, RDS-PostgreSQL, ElastiCache-Redis) 등 핵심 인프라를 프로비저닝하고 보안 그룹(SG) 및 네트워크(VPC) 설정.
 
 ## 파일 구조
 <details> <summary><b>src/main/java/com/spring/monew 트리</b></summary>
