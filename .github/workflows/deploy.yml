@@ -47,7 +47,7 @@ jobs:
       - name: 📄 Download current ECS Task Definition
         run: |
           aws ecs describe-task-definition \
-            --task-definition $ECS_TASK_DEFINITION \
+            --task-definition "$ECS_TASK_DEFINITION" \
             --query taskDefinition \
             --output json > task-definition.json
 
@@ -76,12 +76,36 @@ jobs:
             --cluster $ECS_CLUSTER \
             --service $ECS_SERVICE \
             --task-definition $NEW_TASK_DEF_ARN
+          aws ecs wait services-stable \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE
           echo "✅ ECS Service update triggered successfully!"
 
-      - name: ✅ Confirm Deployment
+      - name: ✅ Confirm Deployment (with validation)
         run: |
-          echo "Checking ECS deployment status..."
-          aws ecs describe-services \
+          echo "🔍 Checking ECS deployment status..."
+
+          STATUS_JSON=$(aws ecs describe-services \
             --cluster $ECS_CLUSTER \
-            --services $ECS_SERVICE \
-            --query "services[0].deployments"
+            --services $ECS_SERVICE)
+
+          PRIMARY_DEPLOYMENT=$(echo "$STATUS_JSON" | jq -r '.services[0].deployments[] | select(.status=="PRIMARY")')
+
+          DESIRED_COUNT=$(echo "$PRIMARY_DEPLOYMENT" | jq -r '.desiredCount')
+          RUNNING_COUNT=$(echo "$PRIMARY_DEPLOYMENT" | jq -r '.runningCount')
+          FAILED_COUNT=$(echo "$PRIMARY_DEPLOYMENT" | jq -r '.failedTasks')
+
+          echo "Desired: $DESIRED_COUNT, Running: $RUNNING_COUNT, Failed: $FAILED_COUNT"
+
+          if [ "$RUNNING_COUNT" -lt "$DESIRED_COUNT" ]; then
+            echo "❌ Deployment not yet stable — runningCount < desiredCount"
+            exit 1
+          fi
+
+          if [ "$FAILED_COUNT" != "0" ]; then
+            echo "🚨 Deployment has failed tasks!"
+            exit 1
+          fi
+
+          echo "✅ Deployment verified successfully!"
+
