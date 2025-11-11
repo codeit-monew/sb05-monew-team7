@@ -1,0 +1,111 @@
+name: 🚀 Deploy to AWS ECS (Monew)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: monew-repo
+  ECS_CLUSTER: monew-cluster
+  ECS_SERVICE: monew-service
+  ECS_TASK_DEFINITION: monew-task
+  CONTAINER_NAME: monew-app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔑 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions
+
+      - name: 🔐 Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 🛠️ Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          echo "🔨 Building Docker image..."
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: 📄 Download current ECS Task Definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "$ECS_TASK_DEFINITION" \
+            --query taskDefinition \
+            --output json > task-definition.json
+
+      - name: 🧩 Update Task Definition with new image
+        run: |
+          NEW_IMAGE="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest"
+          echo "✅ Updating container image to $NEW_IMAGE"
+          jq --arg IMAGE "$NEW_IMAGE" \
+            '.containerDefinitions[0].image = $IMAGE' \
+            task-definition.json > new-task-definition.json
+
+      - name: 📝 Register new ECS Task Definition
+        id: register-task
+        run: |
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-definition.json \
+            --query "taskDefinition.taskDefinitionArn" \
+            --output text)
+          echo "✅ New Task Definition ARN: $NEW_TASK_DEF_ARN"
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
+
+      - name: 🚀 Deploy new Task Definition to ECS Service
+        run: |
+          echo "Deploying new Task Definition to ECS..."
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition $NEW_TASK_DEF_ARN
+          aws ecs wait services-stable \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE
+          echo "✅ ECS Service update triggered successfully!"
+
+      - name: ✅ Confirm Deployment (with validation)
+        run: |
+          echo "🔍 Checking ECS deployment status..."
+
+          STATUS_JSON=$(aws ecs describe-services \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE)
+
+          PRIMARY_DEPLOYMENT=$(echo "$STATUS_JSON" | jq -r '.services[0].deployments[] | select(.status=="PRIMARY")')
+
+          DESIRED_COUNT=$(echo "$PRIMARY_DEPLOYMENT" | jq -r '.desiredCount')
+          RUNNING_COUNT=$(echo "$PRIMARY_DEPLOYMENT" | jq -r '.runningCount')
+          FAILED_COUNT=$(echo "$PRIMARY_DEPLOYMENT" | jq -r '.failedTasks')
+
+          echo "Desired: $DESIRED_COUNT, Running: $RUNNING_COUNT, Failed: $FAILED_COUNT"
+
+          if [ "$RUNNING_COUNT" -lt "$DESIRED_COUNT" ]; then
+            echo "❌ Deployment not yet stable — runningCount < desiredCount"
+            exit 1
+          fi
+
+          if [ "$FAILED_COUNT" != "0" ]; then
+            echo "🚨 Deployment has failed tasks!"
+            exit 1
+          fi
+
+          echo "✅ Deployment verified successfully!"
+

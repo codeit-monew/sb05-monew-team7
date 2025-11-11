@@ -169,7 +169,7 @@ public class InterestRepositoryCustomImpl implements InterestRepositoryCustom {
   private OrderSpecifier<?> getOrderSpecifier(String orderBy, String direction) {
     Order order = "DESC".equalsIgnoreCase(direction) ? Order.DESC : Order.ASC;
     if ("subscriberCount".equals(orderBy)) {
-      new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.subscriptionsCount);
+      return new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.subscriptionsCount);
     }
     return new OrderSpecifier<>(order, InterestRepositoryCustomImpl.interest.name);
   }

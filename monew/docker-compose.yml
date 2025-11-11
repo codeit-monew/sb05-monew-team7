@@ -82,6 +82,11 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 10s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4g
     ports:
       - "8080:8080"
       - "1327:1327"

@@ -22,7 +22,7 @@ WORKDIR /app
 RUN yum update -y && yum install -y curl && yum clean all
 
 ENV SERVER_PORT=8080 \
-    SPRING_PROFILES_ACTIVE=docker \
+    SPRING_PROFILES_ACTIVE=local \
     PROJECT_NAME=sb05-monew-team7 \
     PROJECT_VERSION=1.0.0
 
