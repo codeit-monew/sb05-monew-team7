@@ -1,0 +1,115 @@
+spring:
+  application:
+    name: monew
+
+  profiles:
+    active: local
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monew?sessionTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # 'none' for initial creation, 'validate' afterwards
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+    show-sql: false
+
+  sql:
+    init:
+      mode: never # 'always' for initial creation, 'never' afterwards
+
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/monew}
+      uuid-representation: standard
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD}
+
+  batch:
+    job:
+      enabled: false
+    trigger:
+      enabled: true
+    jdbc:
+      initialize-schema: never
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
+    org.springframework.batch: INFO
+    com.spring.monew: INFO
+  file:
+    path: ${LOG_FILE_PATH:./logs}
+    name: ${LOG_FILE_NAME:monew-application}
+    max-history: ${LOG_FILE_MAX_HISTORY:7}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, loggers
+  endpoint:
+    health:
+      show-details: always
+
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  info:
+    os:
+      enabled:
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    cassandra:
+      enabled: true
+  server:
+    port: 1327
+
+monitoring:
+  prometheus:
+    allow-ip: ${PROMETHEUS_IP:localhost}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+naver:
+  api:
+    client-id: ${NAVER_CLIENT_ID:dummy-naver-id}
+    client-secret: ${NAVER_CLIENT_SECRET:dummy-naver-secret}
+
+aws:
+  s3:
+    region: ${AWS_REGION:ap-northeast-2}
+    bucket: ${AWS_S3_BUCKET:monew-article-backups}
+    log-bucket: ${AWS_S3_LOG_BUCKET:monew-bucket-s3-logback}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
