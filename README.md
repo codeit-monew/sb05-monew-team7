@@ -1,5 +1,4 @@
 # 📰 모뉴: 흩어진 뉴스를 한 곳에서
-[![dev Server CI/CD](https://github.com/codeit-monew/sb05-monew-team7/actions/workflows/backend-dev-server.yml/badge.svg)](https://github.com/codeit-monew/sb05-monew-team7/actions/workflows/backend-dev-server.yml)
 
 ## 프로젝트 개요
 네이버 OpenAPI와 주요 언론사 RSS(연합뉴스, 조선일보, 한국경제)를 통합하여 사용자의 관심사에 맞춘 뉴스를 제공하고, 댓글 및 소셜 기능을 통해 사용자 간 상호작용이 가능한 통합형 뉴스 플랫폼입니다.
